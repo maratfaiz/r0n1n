@@ -1,106 +1,107 @@
 # Roadmap
 
-## Статус на данный момент
+## Current status
 
-**Ничего из перечисленного ниже не начато.** Этот репозиторий на данный
-момент содержит только концептуальную документацию (`docs/`). Этап 0
-(форк базы) — следующий шаг, но он требует отдельного решения о старте,
-не подразумевается автоматически фактом существования этой документации.
+**None of the below has started.** Right now this repository contains only
+concept documentation (`docs/`). Stage 0 (forking the base) is the next
+step, but it requires a separate decision to start — it isn't implied
+automatically just because this documentation exists.
 
-Оценки длительности этапов — ориентировочные, перенесены из исходного
-ресёрча без независимой проверки; при реальном планировании их нужно
-пересчитать после Этапа 0, когда будет ясен фактический темп работы над
-конкретной кодовой базой.
+Stage-duration estimates are rough, carried over from the original
+research without independent verification; real planning should
+recompute them after Stage 0, once the actual pace of work on a concrete
+codebase is known.
 
-## Этап 0 — Fork & Foundation
+## Stage 0 — Fork & Foundation
 
-Цель: собрать R0N1N как форк Unleashed, наладить `ufbt`/CI, релизные
-каналы, брендинг, воспроизводимую сборку.
-Зависимости: актуальный `HEAD` `DarkFlippers/unleashed-firmware`
-(см. `FIRMWARE_LANDSCAPE.md`), toolchain.
-Риск: дрейф от апстрима — митигируется регулярным rebase.
-Результат: билд R0N1N == Unleashed + бренд, ставится через web/qFlipper.
+Goal: assemble R0N1N as a fork of Unleashed, set up `ufbt`/CI, release
+channels, branding, a reproducible build.
+Dependencies: the current `HEAD` of `DarkFlippers/unleashed-firmware` (see
+`FIRMWARE_LANDSCAPE.md`), the toolchain.
+Risk: drifting from upstream — mitigated by regular rebasing.
+Outcome: an R0N1N build == Unleashed + branding, installable via
+web/qFlipper.
 
-## Этап 1 — MVP: Home + навигация + Control Center
+## Stage 1 — MVP: Home + navigation + Control Center
 
-Цель: новый Desktop-дашборд (время/дата/заряд/индикаторы), «псевдо-свайпы»,
-Control Center (портирован из Momentum), базовые favorites/recent.
-Зависимости: GUI/`ViewDispatcher`, notification (см. `ARCHITECTURE.md`).
-Риск: RAM/производительность Desktop — митигируется профилированием и
-ленивыми `View`.
-Результат: устройство ощущается как цельная оболочка, а не список
-приложений — демонстрируемый MVP-прототип.
+Goal: the new Desktop dashboard (time/date/battery/indicators),
+pseudo-swipes, Control Center (ported from Momentum), basic
+favorites/recent.
+Dependencies: GUI/`ViewDispatcher`, notification (see `ARCHITECTURE.md`).
+Risk: Desktop RAM/performance — mitigated by profiling and lazy `View`s.
+Outcome: the device feels like a cohesive shell rather than an app list —
+a demonstrable MVP prototype.
 
-## Этап 2 — Профили + Global Search + Capture Timeline
+## Stage 2 — Profiles + Global Search + Capture Timeline
 
-Цель: Profile Manager (Everyday/Pentest/Dev/CTF), глобальный поиск (индекс
-на SD), единая лента захватов.
-Зависимости: storage, хуки сохранения захватов в core-приложениях.
-Риск: индекс поиска и память — митигируется хранением на SD, а не в RAM.
-Результат: ключевая UX-уникальность R0N1N (см. `UNIQUE_FEATURES.md`, п.1)
-работает.
+Goal: Profile Manager (Everyday/Pentest/Dev/CTF), global search (index on
+SD), a unified capture feed.
+Dependencies: storage, hooks into core apps' capture-save paths.
+Risk: the search index and memory — mitigated by keeping it on SD, not RAM.
+Outcome: R0N1N's key UX differentiator (see `UNIQUE_FEATURES.md`, item 1)
+is working.
 
-## Этап 3 — R0N1N Hub + совместимость приложений
+## Stage 3 — R0N1N Hub + app compatibility
 
-Цель: on-device каталог с фильтром API-совместимости, официальный
-R0N1N-таргет в `ufbt` + GitHub Actions, microSD-раскладка и миграции
-(см. `ECOSYSTEM.md`).
-Зависимости: стабилизированный `api_symbols.csv`, CI.
-Риск: «API mismatch» — митигируется версионированием и матрицей сборок.
-Результат: приложения ставятся и обновляются без боли.
+Goal: the on-device catalog with an API-compatibility filter, an official
+R0N1N target in `ufbt` + GitHub Actions, microSD layout and migrations
+(see `ECOSYSTEM.md`).
+Dependencies: a stabilized `api_symbols.csv`, CI.
+Risk: "API mismatch" — mitigated by versioning and a build matrix.
+Outcome: apps install and update without friction.
 
-## Этап 4 — Companion v1
+## Stage 4 — Companion v1
 
-Цель: PC/mobile-компаньон — синхронизация captures, каталог/установка,
-бэкап, remote screen — поверх RPC (см. `COMPANION.md`).
-Зависимости: RPC, стабильный формат Capture Timeline.
-Риск: кросс-платформенность/стабильность BLE.
-Результат: экосистема, а не только прошивка.
+Goal: the PC/mobile companion — capture sync, catalog/install, backup,
+remote screen — built on RPC (see `COMPANION.md`).
+Dependencies: RPC, a stable Capture Timeline format.
+Risk: cross-platform reach/BLE stability.
+Outcome: an ecosystem, not just firmware.
 
-## Этап 5 — Workflow/JS-движок + внешние модули first-class
+## Stage 5 — Workflow/JS engine + first-class external modules
 
-Цель: JS-«рецепты», авто-детект и онбординг ESP32/nRF24/CC1101/VGM,
-Sweep-режим (см. `UNIQUE_FEATURES.md`, п. 4–5).
-Зависимости: JS-модули (портированы из Momentum), драйверы модулей.
-Риск: память JS-раннера, разнобой пинов у разных модулей.
-Результат: автоматизация и модульность как «граждане первого класса».
+Goal: JS "recipes," auto-detection and onboarding for ESP32/nRF24/
+CC1101/VGM, Sweep mode (see `UNIQUE_FEATURES.md`, items 4–5).
+Dependencies: JS modules (ported from Momentum), module drivers.
+Risk: JS-runner memory footprint, inconsistent pinouts across modules.
+Outcome: automation and modularity become first-class citizens.
 
-## Этап 6 — AI-мост + учебный/CTF-слой + полировка
+## Stage 6 — AI bridge + educational/CTF layer + polish
 
-Цель: опциональный AI-мост в companion (approve-per-action, офлайн-режим),
-встроенные labs/CTF-режим, аудит стабильности, интеграционные тесты,
-документация.
-Зависимости: companion, RPC.
-Риск: безопасность/этика AI-действий — митигируется риск-тирами, логами,
-off-by-default.
-Результат: R0N1N 1.0.
+Goal: the optional AI bridge in the companion (approve-per-action, offline
+mode), built-in labs/CTF mode, a stability audit, integration tests,
+documentation.
+Dependencies: the companion, RPC.
+Risk: AI-action safety/ethics — mitigated by risk tiers, logging,
+off-by-default behavior.
+Outcome: R0N1N 1.0.
 
-## MVP vs. полная версия
+## MVP vs. the full release
 
-**MVP (Этапы 0–2):** форк Unleashed + Home-дашборд, «псевдо-свайпы»,
-Control Center, профили, Global Search, Capture Timeline. Функционально
-MVP = Unleashed (совместимость и мощь уже есть); добавленная ценность —
-UX-слой поверх.
+**MVP (Stages 0–2):** a fork of Unleashed + the Home dashboard,
+pseudo-swipes, Control Center, profiles, Global Search, Capture Timeline.
+Functionally the MVP equals Unleashed (compatibility and power are already
+there); the added value is the UX layer on top.
 
-**Полная версия / R0N1N 1.0 (Этапы 3–6):** добавляет R0N1N Hub с решённой
-совместимостью приложений, companion-экосистему, workflow/JS-движок,
-first-class внешние модули, опциональный AI-мост, учебный/CTF-слой.
+**Full release / R0N1N 1.0 (Stages 3–6):** adds the R0N1N Hub with app
+compatibility solved, the companion ecosystem, the workflow/JS engine,
+first-class external modules, the optional AI bridge, and the
+educational/CTF layer.
 
-## Главные риски проекта
+## Main project risks
 
-1. **Память/производительность** — R0N1N-слой не должен ухудшать свободный
-   heap относительно Unleashed (проверяется с Этапа 1, см.
+1. **Memory/performance** — the R0N1N layer must not make free heap worse
+   than stock Unleashed (verified starting at Stage 1, see
    `ARCHITECTURE.md`).
-2. **Дрейф от апстрима** — дисциплинированный regular rebase на Unleashed.
-3. **Фрагментация приложений** — версионирование API и CI-таргет
-   (Этап 3).
-4. **Удержание white-hat-рамок** — TX-lock как опция, подтверждения
-   «острых» операций, AI-действия off-by-default (см.
+2. **Upstream drift** — disciplined, regular rebasing onto Unleashed.
+3. **App fragmentation** — API versioning and the CI target (Stage 3).
+4. **Staying within white-hat boundaries** — TX-lock as an option,
+   confirmation for "sharp" operations, AI actions off-by-default (see
    `SECURITY_TOOLKIT.md`, `VISION.md`).
 
-## Как читать этот roadmap
+## How to read this roadmap
 
-Каждый этап — это направление и порядок зависимостей, не жёсткий график.
-Перед стартом любого этапа стоит заново свериться с `HARDWARE.md`
-(открытые вопросы про фактический бюджет памяти) и `FIRMWARE_LANDSCAPE.md`
-(актуальность апстрима на момент старта).
+Each stage is a direction and a dependency order, not a rigid schedule.
+Before starting any stage, re-check `HARDWARE.md` (open questions about the
+actual memory budget) and `FIRMWARE_LANDSCAPE.md` (how current upstream is
+at the time work starts).

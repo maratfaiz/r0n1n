@@ -1,83 +1,88 @@
-# UX/UI концепция R0N1N
+# R0N1N UX/UI concept
 
-Ограничения-данность (детали — `HARDWARE.md`): экран 128×64 монохром,
-5-way D-pad + Back, нет тача, единицы–десятки КБ свободной RAM. Любая
-«свайповая» метафора реализуется кнопками — направления D-pad должны стать
-предсказуемыми «жестами», а не метафорой ради метафоры.
+Given constraints (details in `HARDWARE.md`): a 128×64 monochrome screen, a
+5-way D-pad + Back, no touch, single-digit-to-low-tens of KB of free RAM.
+Any "swipe" metaphor is implemented through buttons — D-pad directions need
+to become predictable "gestures," not a metaphor for its own sake.
 
-## Home — «дашборд», а не лаунчер
+## Home — a "dashboard," not a launcher
 
-Стоковый подход всех форков — «главное меню = список приложений». R0N1N
-меняет саму роль домашнего экрана: он показывает **состояние устройства**,
-а не список того, что можно запустить.
+The stock approach across every fork is "home menu = app list." R0N1N
+changes the role of the home screen itself: it shows the **device's
+state**, not a list of things you could launch.
 
-Крупное **время**, ниже **дата**, в углу **заряд**, тонкая строка системных
-индикаторов (BLE, USB, SD, активное радио, текущий профиль). Дельфин/анимация
-— опционально, через asset packs (портируется из Momentum). Минимализм:
-главное видно сразу, без захода в меню.
+Large **time**, **date** below it, **battery** in the corner, a thin strip
+of system indicators (BLE, USB, SD, active radio, current profile). A
+dolphin/animation is optional, via asset packs (ported from Momentum).
+Minimal by design: the essentials are visible immediately, no menu diving
+required.
 
-## Навигационная модель — «псевдо-свайпы»
+## Navigation model — "pseudo-swipes"
 
-Единый закон движения от Home, одинаковый во всех разделах:
+A single, consistent law of motion from Home, identical across every
+section:
 
-| Действие | Результат |
+| Action | Result |
 |---|---|
-| **OK** | Открыть App Launcher (сетка/список с категориями) |
-| **Влево / Вправо** | Переключение «рабочих столов» (Radio ⇄ Cards ⇄ IR ⇄ USB/HID ⇄ Dev/GPIO); набор и порядок зависят от активного профиля |
-| **Вниз** | Control Center: быстрые тумблеры (BLE, подсветка, звук/вибро, тихий режим, USB-режим, TX-lock, активный внешний модуль), слайдеры, переключение профиля |
-| **Вверх** | Quick Actions / Favorites: настраиваемая сетка избранных действий, hold-OK — перемещение слотов, hold-Back — выбор действия; здесь же «последний захват» |
-| **Hold Back** | Глобальный поиск (приложения, файлы-захваты, действия, настройки), ввод через системную клавиатуру, инкрементальный |
-| **Long-press OK на Home** | Recent — последние приложения/файлы |
+| **OK** | Open the App Launcher (grid/list with categories) |
+| **Left / Right** | Switch "desktops" (Radio ⇄ Cards ⇄ IR ⇄ USB/HID ⇄ Dev/GPIO); the set and order depend on the active profile |
+| **Down** | Control Center: quick toggles (BLE, backlight, sound/vibration, silent mode, USB mode, TX-lock, active external module), sliders, profile switcher |
+| **Up** | Quick Actions / Favorites: a customizable grid of favorite actions, hold-OK to move slots, hold-Back to pick an action; also shows the "last capture" |
+| **Hold Back** | Global search (apps, capture files, actions, settings), typed via the system keyboard, incremental |
+| **Long-press OK on Home** | Recent — last-used apps/files |
 
-Это ощущается как листание экранов телефона, но реализовано исключительно
-кнопками — никакой имитации жестов, требующей тача.
+It feels like flipping through phone home screens, but it's implemented
+entirely with buttons — no imitation of gestures that would require touch.
 
-## Профили/режимы — ядро UX-концепции
+## Profiles/modes — the core of the UX concept
 
-Один и тот же билд обслуживает разную аудиторию через профиль, а не через
-раздвоение прошивки:
+The same build serves a mixed audience through a profile, not through a
+forked firmware:
 
-- **Everyday** — крупные элементы, мастера-пошаговики, «безопасные»
-  инструменты (IR-пульт, U2F, TOTP, чтение своих карт).
-- **Pentest** — плотные списки, все RF/NFC/USB-инструменты, keybind'ы,
-  Capture Timeline на первом плане.
-- **Dev** — GPIO/UART/SPI/I2C/SWD, логический анализатор, консоль/CLI,
-  JS-раннер.
-- **CTF** — заметки, таймер, «шпаргалки», экспорт находок в companion.
+- **Everyday** — large elements, step-by-step wizards, "safe" tools (IR
+  remote, U2F, TOTP, reading your own cards).
+- **Pentest** — dense lists, the full RF/NFC/USB toolset, keybinds,
+  Capture Timeline front and center.
+- **Dev** — GPIO/UART/SPI/I2C/SWD, a logic analyzer, a console/CLI, the JS
+  runner.
+- **CTF** — notes, a timer, "cheat sheets," exporting findings to the
+  companion.
 
-Профиль меняет: набор и порядок «рабочих столов», плотность интерфейса,
-содержимое Quick Actions/Control Center, уровень подсказок. Переключение —
-из Control Center за 2 нажатия.
+A profile changes: the set and order of "desktops," interface density, the
+content of Quick Actions/Control Center, and the level of hints. Switching
+profiles takes 2 presses from the Control Center.
 
-## Сквозные системные сервисы
+## Cross-cutting system services
 
-- **Capture Timeline** — единая хронологическая лента всех артефактов
-  (.sub/.nfc/.rfid/.ir), с тегами типа/частоты/времени; повтор, экспорт,
-  отправка в companion — из одного места, а не по разным папкам приложений.
-- **Global Search** — поиск по приложениям, файлам, действиям и настройкам,
-  индекс держится на SD (см. ограничения RAM в `HARDWARE.md`), не в памяти.
-- **Favorites/Recent** — быстрый доступ к часто используемым инструментам.
-- **Контекстные действия** — долгое нажатие OK на объекте открывает единое
-  меню (эмулировать/сохранить/переименовать/экспортировать/удалить) — одно
-  и то же поведение везде, а не свой велосипед в каждом приложении.
-- **Прогрессивные подсказки** — строка-хинт видна в Everyday, скрыта в
+- **Capture Timeline** — a single chronological feed of every artifact
+  (.sub/.nfc/.rfid/.ir), tagged by type/frequency/time; replay, export, and
+  send-to-companion from one place instead of scattered across each app's
+  own folder.
+- **Global Search** — search across apps, files, actions, and settings;
+  the index lives on SD (see the RAM constraints in `HARDWARE.md`), not in
+  memory.
+- **Favorites/Recent** — quick access to frequently used tools.
+- **Contextual actions** — a long OK-press on any object opens a single
+  menu (emulate/save/rename/export/delete) — the same behavior everywhere,
+  instead of each app reinventing it.
+- **Progressive hints** — a hint line is visible in Everyday, hidden in
   Pentest/Dev.
-- **Нотификации через RGB/вибро/звук** — настраиваемый слой, включая
-  «тихий режим» (только LED).
-- **Консистентность** — один системный keyboard, один file-picker, один
-  диалог подтверждения «острых» операций во всей прошивке.
+- **Notifications via RGB/vibration/sound** — a configurable layer,
+  including a "silent mode" (LED only).
+- **Consistency** — one system keyboard, one file picker, one confirmation
+  dialog for "sharp" operations, shared across the whole firmware.
 
-## Откуда что берётся технически
+## Where each piece comes from technically
 
-Control Center, продвинутый file manager, keybind-система, JS-модули и
-Asset Packs — портируются и переосмысливаются из Momentum поверх базы
-Unleashed (см. `FIRMWARE_LANDSCAPE.md`). Home-дашборд, навигационная модель
-«псевдо-свайпы», профили, Global Search и Capture Timeline — уникальный вклад
-R0N1N, реализуются как новые системные сервисы поверх Furi (см.
-`ARCHITECTURE.md`, раздел «R0N1N-слой»).
+Control Center, the advanced file manager, the keybind system, JS modules,
+and Asset Packs are ported and reworked from Momentum on top of the
+Unleashed base (see `FIRMWARE_LANDSCAPE.md`). The Home dashboard, the
+pseudo-swipe navigation model, profiles, Global Search, and Capture
+Timeline are R0N1N's own contribution, implemented as new system services
+on top of Furi (see `ARCHITECTURE.md`, "R0N1N layer" section).
 
-## Критерий готовности UX-решения
+## Readiness criterion for a UX decision
 
-Любой новый экран или взаимодействие проверяется по списку из `VISION.md`
-(путь к цели, адаптация под профиль, честность об источнике возможности) —
-до включения в реализацию.
+Every new screen or interaction is checked against the list in
+`VISION.md` (path to the goal, adapts to profile, honest about the
+capability's source) before it's greenlit for implementation.

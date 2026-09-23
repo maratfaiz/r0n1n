@@ -1,79 +1,83 @@
-# Vision R0N1N
+# R0N1N Vision
 
 ## TL;DR
 
-R0N1N — не «ещё один форк с кучей приложений», а UX-first операционная
-оболочка поверх стабильной базы Unleashed (с UX-идеями, портированными из
-Momentum): единый Home-дашборд (время/дата/заряд), навигация «псевдо-свайпами»
-на 5-кнопочном D-pad, единый каталог приложений с поиском/избранным/recent,
-и сквозные «профили режимов» (Everyday / Pentest / Dev / CTF), перестраивающие
-меню под задачу.
+R0N1N is not "yet another fork with a pile of apps" — it's a UX-first
+operating shell on top of the stable Unleashed base (with UX ideas ported
+from Momentum): a single Home dashboard (time/date/battery), "pseudo-swipe"
+navigation on the 5-button D-pad, a unified app catalog with
+search/favorites/recent, and cross-cutting "mode profiles" (Everyday /
+Pentest / Dev / CTF) that reshape the menu around the task at hand.
 
-Рынок форков Flipper Zero (OFW, Unleashed, Momentum, RogueMaster) к 2026 году
-функционально сошёлся — они различаются стабильностью, полировкой и объёмом
-bundled-приложений, а не сырыми возможностями (см. `FIRMWARE_LANDSCAPE.md`).
-Главный незанятый дефицит — не функции, а **связность и удобство**. Туда
-R0N1N и должна бить.
+By 2026 the Flipper Zero fork market (OFW, Unleashed, Momentum,
+RogueMaster) has functionally converged — they differ in stability,
+polish, and the volume of bundled apps, not in raw capability (see
+`FIRMWARE_LANDSCAPE.md`). The main unaddressed gap isn't features — it's
+**coherence and usability**. That's where R0N1N aims to compete.
 
-## Три принципа
+## Three principles
 
-1. **UX-first, а не feature-first.** Конкурентное преимущество лежит в
-   удобстве: сколько нажатий до нужного действия, насколько понятен экран
-   новичку, насколько быстро эксперт достигает цели. Мы не соревнуемся в
-   количестве встроенных приложений — это уже решено community-каталогом
-   (см. `ECOSYSTEM.md`).
+1. **UX-first, not feature-first.** The competitive edge lies in
+   convenience: how many presses to the action you need, how legible the
+   screen is to a newcomer, how fast an expert reaches their goal. We're
+   not competing on the number of bundled apps — that's already solved by
+   the community catalog (see `ECOSYSTEM.md`).
 
-2. **Прогрессивное раскрытие сложности.** Одно устройство обслуживает и
-   новичка, и пентестера. Решение — не два билда, а **режимы/профили**
-   (Everyday / Pentest / Dev / CTF), меняющие плотность интерфейса: новичок
-   видит крупные подсказки и мастера, эксперт — плотные списки, keybind'ы и
-   CLI. Подробности — `UX_DESIGN.md`.
+2. **Progressive disclosure of complexity.** One device serves both a
+   beginner and a pentester. The answer isn't two builds, but
+   **modes/profiles** (Everyday / Pentest / Dev / CTF) that change
+   interface density: a beginner sees large hints and wizards, an expert
+   sees dense lists, keybinds, and a CLI. Details in `UX_DESIGN.md`.
 
-3. **Честность о железе.** R0N1N нигде не обещает того, чего STM32WB55 не
-   может. Функции, требующие внешних модулей или companion, помечаются в UI
-   отдельным значком и никогда не выглядят как «встроенные». Технические
-   основания — `HARDWARE.md`.
+3. **Honesty about the hardware.** R0N1N never promises what the STM32WB55
+   can't deliver. Features that require external modules or a companion
+   are marked with a distinct badge in the UI and never presented as
+   "built-in." Technical grounding in `HARDWARE.md`.
 
-## Аналогия
+## The analogy
 
-Не «ещё один Unleashed», а то, чем GrapheneOS/LineageOS являются для
-Android: тщательно собранная оболочка поверх открытой базы, со своей
-философией UX и экосистемой — а не низкоуровневый форк ядра.
+Not "yet another Unleashed," but what GrapheneOS/LineageOS are to Android:
+a carefully assembled shell on top of an open base, with its own UX
+philosophy and ecosystem — not a low-level kernel fork.
 
-## Границы проекта (white-hat / легальность)
+## Project boundaries (white-hat / legality)
 
-R0N1N — легальный open-source проект кастомизации прошивки коммерчески
-доступного устройства, в духе Momentum/Unleashed/RogueMaster (все GPL-3.0,
-см. `LICENSE`). Все security-функции (`SECURITY_TOOLKIT.md`) предназначены
-только для собственных устройств, лабораторных стендов, CTF и авторизованного
-пентеста, с явными предупреждениями в UI и подтверждением «острых» операций.
-Проект не разрабатывает и не распространяет инструменты для DoS, массового
-таргетирования, обхода detection в реальных вредоносных сценариях или
-компрометации цепочки поставок — это прямо исключено из скоупа.
+R0N1N is a legal open-source project that customizes the firmware of a
+commercially available device, in the spirit of Momentum/Unleashed/
+RogueMaster (all GPL-3.0, see `LICENSE`). All security features
+(`SECURITY_TOOLKIT.md`) are intended only for the user's own devices, lab
+benches, CTF competitions, and authorized penetration testing, with
+explicit UI warnings and confirmation prompts for "sharp" operations. The
+project does not develop or distribute tooling for DoS, mass targeting,
+evading detection in genuinely malicious scenarios, or supply-chain
+compromise — these are explicitly out of scope.
 
-## Что R0N1N не пытается сделать
+## What R0N1N does not try to do
 
-- Не переписывает ядро/HAL Flipper — работает поверх публичного API
-  (`furi_hal`), никогда напрямую со STM32 HAL (см. `ARCHITECTURE.md`).
-- Не обещает функции, требующие SDR/Wi-Fi/большого экрана нативно — эти вещи
-  честно вынесены в модульный/companion слой (`HARDWARE.md`, `COMPANION.md`).
+- It doesn't rewrite Flipper's kernel/HAL — it works on top of the public
+  API (`furi_hal`), never directly against the STM32 HAL (see
+  `ARCHITECTURE.md`).
+- It doesn't promise features that natively require an SDR/Wi-Fi/a large
+  screen — those are honestly pushed to the modular/companion layer
+  (`HARDWARE.md`, `COMPANION.md`).
 
-## Статус на данный момент
+## Current status
 
-R0N1N существует только как набор концептуальных документов в этом
-репозитории. Реальная разработка (форк, сборка, код) начинается отдельным
-решением после ревью этой документации — см. `ROADMAP.md`, Этап 0.
+Right now R0N1N exists only as a set of concept documents in this
+repository. Actual development (forking, building, code) begins as a
+separate decision after this documentation has been reviewed — see
+`ROADMAP.md`, Stage 0.
 
-## Как этот Vision проверять
+## How to sanity-check this Vision
 
-Любая функция, добавляемая в roadmap или архитектуру, должна отвечать на
-три вопроса:
-1. Сокращает ли она путь пользователя к цели (меньше нажатий/меньше
-   блуждания по меню), или просто добавляет ещё один пункт в список?
-2. Адаптируется ли она под профиль (Everyday/Pentest/Dev/CTF), или одинаково
-   загромождает интерфейс всем?
-3. Честно ли отражён в UI её реальный источник (нативно / нужен модуль /
-   нужен companion)?
+Any feature added to the roadmap or architecture should answer three
+questions:
+1. Does it shorten the user's path to their goal (fewer presses, less
+   menu-wandering), or does it just add one more list item?
+2. Does it adapt to the active profile (Everyday/Pentest/Dev/CTF), or does
+   it clutter the interface the same way for everyone?
+3. Does the UI honestly reflect where the capability actually comes from
+   (native / needs a module / needs a companion)?
 
-Если ответ на любой вопрос отрицательный — функция не готова к включению в
-R0N1N в текущем виде.
+If the answer to any question is no, the feature isn't ready to be
+included in R0N1N as currently framed.

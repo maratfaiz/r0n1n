@@ -1,66 +1,65 @@
-# Основной набор возможностей (core feature set)
+# Core feature set
 
-Наследуется от базы Unleashed, с UX-слоем, переработанным по образцу
-Momentum (см. `FIRMWARE_LANDSCAPE.md`). Это описание того, что должно
-работать «из коробки» — без учёта уникальных для R0N1N функций
-(см. `UNIQUE_FEATURES.md`) и security-инструментария
-(см. `SECURITY_TOOLKIT.md`).
+Inherited from the Unleashed base, with a UX layer reworked in the style of
+Momentum (see `FIRMWARE_LANDSCAPE.md`). This describes what should work
+"out of the box" — excluding R0N1N's unique differentiators (see
+`UNIQUE_FEATURES.md`) and the security toolkit (see `SECURITY_TOOLKIT.md`).
 
 ## Sub-GHz
 
-Приём/сохранение/повтор сигналов, частотный и спектр-анализатор (в рамках
-возможностей CC1101 — см. ограничение «не SDR» в `HARDWARE.md`), брутфорс
-fixed-code протоколов (только лабораторно, см. `SECURITY_TOOLKIT.md`),
-расширенный диапазон и протоколы из Unleashed, Subdriving (привязка
-GPS-координат к сигналу), плейлисты сигналов. Внешний CC1101 —
-first-class модуль, а не «второй сорт».
+Receive/save/replay signals, a frequency and spectrum analyzer (within
+what CC1101 allows — see the "not an SDR" constraint in `HARDWARE.md`),
+fixed-code brute force (lab use only, see `SECURITY_TOOLKIT.md`), the
+extended range and protocols from Unleashed, Subdriving (tagging a signal
+with GPS coordinates), signal playlists. External CC1101 is a first-class
+module, not a second-class citizen.
 
-## NFC (13.56 МГц)
+## NFC (13.56 MHz)
 
-Чтение/сохранение/эмуляция, словарные атаки, mfkey32/nested/card-only на
-MIFARE Classic, MIFARE Plus SL3 (AES) из Unleashed, NFC Magic, NFC Maker
+Read/save/emulate, dictionary attacks, mfkey32/nested/card-only attacks on
+MIFARE Classic, MIFARE Plus SL3 (AES) from Unleashed, NFC Magic, NFC Maker
 (NDEF/vcard).
 
-## RFID 125 кГц
+## 125 kHz RFID
 
-Чтение/запись/эмуляция (EM4100/HID Prox/Indala/Cyfral), RFID Fuzzer
-(лабораторно).
+Read/write/emulate (EM4100/HID Prox/Indala/Cyfral), RFID Fuzzer (lab use).
 
-## Инфракрасный порт
+## Infrared
 
-Универсальный пульт на базе IRDB, обучение новым командам, «выключить всё».
+A universal remote built on the IRDB, learning new commands, "turn
+everything off."
 
 ## iButton / 1-Wire
 
-Чтение/запись/эмуляция.
+Read/write/emulate.
 
 ## BadUSB / BadKB
 
-DuckyScript + расширения, USB и BLE HID, подмена VID/PID/имени/MAC,
-редактор/раннер с шаблонами, JS-BadUSB (условия, циклы, GUI, экспорт в
-виртуальный disk-образ).
+DuckyScript plus extensions, USB and BLE HID, VID/PID/name/MAC spoofing, an
+editor/runner with templates, JS-BadUSB (conditionals, loops, GUI, export
+to a virtual disk image).
 
 ## U2F/FIDO + TOTP
 
-Нативный U2F по USB (из OFW/Unleashed); дальнейшее расширение до
-FIDO2/passkey и TOTP/HOTP — предмет отдельной оценки на Этапе, когда до неё
-дойдёт очередь в roadmap (нужна проверка совместимых community-библиотек
-перед обещанием в roadmap).
+Native U2F over USB (from OFW/Unleashed); extending this to FIDO2/passkey
+and TOTP/HOTP is a separate evaluation once its turn comes up in the
+roadmap (compatible community libraries need to be checked before this
+gets promised in the roadmap).
 
 ## GPIO / Dev
 
-USB-UART/SPI/I2C-мост, SWD/JTAG-отладка (DAP Link), i2c-сканер, датчики
-через GPIO/I2C/1-Wire, базовый логический анализатор, GPS NMEA.
+USB-UART/SPI/I2C bridge, SWD/JTAG debugging (DAP Link), an I2C scanner,
+sensors over GPIO/I2C/1-Wire, a basic logic analyzer, GPS NMEA.
 
-## Системные возможности (UX-слой)
+## System capabilities (UX layer)
 
-Control Center, кастомизируемый Home/Desktop, Asset Packs, keybind-система,
-продвинутый файловый менеджер с виртуальным монтированием disk-образов,
-JS-движок как основа для сценариев (см. `UNIQUE_FEATURES.md`).
+Control Center, a customizable Home/Desktop, Asset Packs, the keybind
+system, an advanced file manager with virtual disk-image mounting, the JS
+engine as a foundation for scripting (see `UNIQUE_FEATURES.md`).
 
-## Явно вне core feature set (see `HARDWARE.md`)
+## Explicitly outside the core feature set (see `HARDWARE.md`)
 
-Wi-Fi-атаки, wardriving, nRF24-инструменты, video-out, AI — не входят в
-core, так как требуют внешнего железа или companion. Они описаны отдельно
-как модульные/companion-функции, чтобы не создавать ложных ожиданий от
-базовой прошивки.
+Wi-Fi attacks, wardriving, nRF24 tooling, video-out, AI — none of these are
+part of the core, since they require external hardware or a companion.
+They're described separately as modular/companion features so the base
+firmware never sets false expectations.

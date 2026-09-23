@@ -1,85 +1,86 @@
-# Архитектура прошивки
+# Firmware architecture
 
-## Базовое решение
+## Base decision
 
-Форк **Unleashed** (см. `FIRMWARE_LANDSCAPE.md` для обоснования выбора
-базы); UX-компоненты портируются/переосмысливаются из **Momentum**. Мы не
-пишем ОС с нуля — это сломало бы совместимость с каталогом приложений и
-выбросило бы годы работы сообщества над стабильностью радиостека, драйверов
-и HAL.
+A fork of **Unleashed** (see `FIRMWARE_LANDSCAPE.md` for why this base was
+chosen); UX components are ported and reworked from **Momentum**. We're not
+writing an OS from scratch — that would break compatibility with the app
+catalog and throw away years of community work on radio-stack stability,
+drivers, and the HAL.
 
-## Слои (наследуют модель официальной прошивки)
+## Layers (inherited from the official firmware's model)
 
-1. **Hardware / `furi_hal`** — не трогаем ничего ниже HAL; работаем только
-   через публичный `furi_hal`, никогда напрямую со STM32 HAL — это условие
-   кросс-совместимости с апстримом и будущими обновлениями Unleashed.
-2. **FreeRTOS + Furi (Furi OS)** — планировщик, потоки, записи
-   (`record_open`/`record_close`), сервисы. Не модифицируется.
-3. **Сервисы** — GUI/`ViewDispatcher`, storage (LittleFS + SD), input,
-   notification, RPC (управление по USB/BLE — транспорт для companion,
-   см. `COMPANION.md`), BLE.
-4. **Core-приложения** — Sub-GHz, NFC, RFID, IR, GPIO, iButton, BadUSB,
-   U2F — наследуются от Unleashed почти без изменений логики, только
-   точки интеграции с новым UX-слоем (см. ниже).
-5. **R0N1N-слой** — главный технический вклад проекта, преимущественно как
-   системные приложения/сервисы поверх Furi, чтобы не раздувать монолит:
-   - новый **Desktop/Home** (дашборд + псевдо-свайпы),
-   - **навигационный менеджер** (рабочие столы),
+1. **Hardware / `furi_hal`** — nothing below the HAL is touched; we work
+   only through the public `furi_hal`, never directly against the STM32
+   HAL — a precondition for cross-compatibility with upstream and future
+   Unleashed updates.
+2. **FreeRTOS + Furi (Furi OS)** — the scheduler, threads, records
+   (`record_open`/`record_close`), services. Not modified.
+3. **Services** — GUI/`ViewDispatcher`, storage (LittleFS + SD), input,
+   notification, RPC (control over USB/BLE — the companion transport, see
+   `COMPANION.md`), BLE.
+4. **Core apps** — Sub-GHz, NFC, RFID, IR, GPIO, iButton, BadUSB, U2F —
+   inherited from Unleashed with almost no logic changes, only integration
+   points with the new UX layer (see below).
+5. **R0N1N layer** — the project's main technical contribution,
+   implemented mostly as system apps/services on top of Furi so the
+   monolith doesn't grow:
+   - the new **Desktop/Home** (dashboard + pseudo-swipes),
+   - the **navigation manager** (desktops),
    - **Profile Manager**,
-   - **Global Search** (индекс на SD),
-   - **Capture Timeline** сервис (хуки на сохранение в core-приложениях),
-   - **R0N1N Hub** (каталог с фильтром совместимости),
-   - **Workflow/JS-раннер** (поверх mJS).
-6. **FAP-приложения на SD** — вся дальнейшая расширяемость, без роста
-   монолита (см. `ECOSYSTEM.md`).
+   - **Global Search** (index on SD),
+   - the **Capture Timeline** service (hooks into core apps' save paths),
+   - **R0N1N Hub** (catalog with a compatibility filter),
+   - the **Workflow/JS runner** (built on mJS).
+6. **FAP apps on SD** — all further extensibility, without growing the
+   monolith (see `ECOSYSTEM.md`).
 
-## Управление памятью (критично — см. `HARDWARE.md`)
+## Memory management (critical — see `HARDWARE.md`)
 
-Реальные лимиты нужно уважать, а не проектировать «в расчёте на будущее
-железо»:
-- Одно user-приложение активно за раз.
-- Экономные `View`, без тяжёлых статических буферов в новых сервисах.
-- Профилирование через `top`/`free` CLI-команды прошивки на каждом
-  значимом изменении R0N1N-слоя, а не только «в конце».
-- Минимальный `stack_size` у новых потоков, чтобы не съедать heap
-  впустую.
-- R0N1N-сервисы должны быть «ленивыми»: данные (поисковый индекс,
-  Capture Timeline) хранятся на SD, в RAM — только рабочее окно текущего
-  экрана.
-- **Дизайн-цель:** R0N1N-слой не должен ухудшать свободный heap
-  относительно исходного Unleashed на той же версии API — измеримо,
-  проверяется на этапе прототипа (`ROADMAP.md`, Этап 1).
+Real limits need to be respected, not designed around "future hardware
+that might exist":
+- One user app active at a time.
+- Frugal `View`s, no heavy static buffers in new services.
+- Profile with the firmware's own `top`/`free` CLI on every significant
+  change to the R0N1N layer, not only "at the end."
+- Minimal `stack_size` for new threads, so they don't waste heap.
+- R0N1N services must be "lazy": data (the search index, Capture Timeline)
+  lives on SD, with only the current screen's working set in RAM.
+- **Design goal:** the R0N1N layer must not make free heap worse than
+  stock Unleashed on the same API version — measurable, verified during
+  the prototype stage (`ROADMAP.md`, Stage 1).
 
-## Обновления прошивки
+## Firmware updates
 
-Сохраняется механика OFW/Unleashed: пакет обновления пишется на SD в
-`/ext/update/`, применяется офлайн на ребуте небольшим загрузчиком, не
-затрагивая пользовательские данные; DFU через qFlipper — аварийное
-восстановление. Подписанные релизы, публичный changelog.
+The OFW/Unleashed mechanism is kept as-is: the update package is written to
+SD at `/ext/update/`, applied offline on reboot by a small bootloader,
+without touching user data; DFU via qFlipper serves as emergency recovery.
+Signed releases, a public changelog.
 
-## Стабильность и совместимость
+## Stability and compatibility
 
-- Обязательные интеграционные тесты перед каждым релизом (по аналогии с
-  текущей практикой апстрима OFW).
-- Региональный TX-lock — настраиваемая опция (см. `SECURITY_TOOLKIT.md`).
-- «Острые» security-функции — за явным подтверждением в UI.
-- Отдельные dev/release-каналы сборок.
-- Совместимость с экосистемой Flipper — через публичный Furi API и
-  версионирование `api_symbols.csv` (см. `ECOSYSTEM.md`).
+- Mandatory integration tests before every release (mirroring current
+  upstream OFW practice).
+- Regional TX-lock as a configurable option (see `SECURITY_TOOLKIT.md`).
+- "Sharp" security features gated behind explicit UI confirmation.
+- Separate dev/release build channels.
+- Compatibility with the Flipper ecosystem through the public Furi API and
+  `api_symbols.csv` versioning (see `ECOSYSTEM.md`).
 
-## Companion-канал
+## Companion channel
 
-RPC поверх USB/BLE (уже присутствует в прошивке как сервис) — единственный
-транспорт для companion и AI-моста. На устройстве — тонкий клиент; тяжёлые
-вычисления остаются на companion (см. `COMPANION.md`). Это архитектурный
-принцип, а не техническая деталь: ни одна функция, критичная для базовой
-автономной работы устройства, не может зависеть от companion.
+RPC over USB/BLE (already present in the firmware as a service) — the only
+transport for the companion and the AI bridge. The device stays a thin
+client; heavy computation stays on the companion (see `COMPANION.md`).
+This is an architectural principle, not an implementation detail: no
+feature critical to the device's base, standalone operation may depend on
+the companion.
 
-## Открытый вопрос
+## Open question
 
-Точная граница между «R0N1N-слоем как системным сервисом» и «R0N1N-слоем
-как FAP-приложением поверх стандартного SDK» — требует прототипирования на
-Этапе 1 roadmap: часть сервисов (Global Search, Capture Timeline) может
-оказаться проще и безопаснее для апстрим-совместимости реализовать как
-привилегированные FAP, а не патчи в core. Решение — по факту профилирования,
-не заранее.
+The exact boundary between "R0N1N layer as a system service" and "R0N1N
+layer as a FAP app on top of the standard SDK" needs prototyping in
+Roadmap Stage 1: some services (Global Search, Capture Timeline) may turn
+out to be simpler and safer for upstream compatibility as privileged FAPs
+rather than core patches. That decision follows from profiling, not from
+deciding it up front.

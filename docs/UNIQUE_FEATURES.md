@@ -1,83 +1,85 @@
-# Уникальные функции R0N1N
+# R0N1N's unique features
 
-Функции, интеграция или сама постановка которых не встречается цельно ни в
-одном существующем форке. Часть из них — тонкие клиенты на companion, а не
-код на STM32 (см. `HARDWARE.md` про пределы платформы, `COMPANION.md` про
-архитектуру companion-слоя). Это осознанное следствие аппаратных
-ограничений, а не обход.
+Features whose integration — or even framing — doesn't exist as a cohesive
+whole in any existing fork. Some of these are thin clients running on a
+companion rather than code on the STM32 (see `HARDWARE.md` for the
+platform's limits, `COMPANION.md` for the companion-layer architecture).
+That's a deliberate consequence of the hardware constraints, not a
+workaround.
 
-## 1. Профили + Global Search + Capture Timeline
+## 1. Profiles + Global Search + Capture Timeline
 
-По отдельности похожие идеи встречаются в разных форках, но именно как
-единая ОС-парадигма (см. `UX_DESIGN.md`) — не встречается нигде. Это
-основной, наименее рискованный (полностью нативный, не требует внешнего
-железа) источник дифференциации R0N1N — приоритет в roadmap, см.
-`ROADMAP.md`, Этап 2.
+Similar ideas show up individually across different forks, but as a single
+OS-level paradigm (see `UX_DESIGN.md`) they don't exist anywhere. This is
+R0N1N's primary, lowest-risk source of differentiation (fully native,
+requires no external hardware) — top priority in the roadmap, see
+`ROADMAP.md`, Stage 2.
 
-## 2. R0N1N Companion + AI-мост (agentic слой)
+## 2. R0N1N Companion + AI bridge (agentic layer)
 
-Опциональный companion, который:
-- объясняет захваченный сигнал/карту простым языком;
-- генерирует BadUSB/JS-скрипты по описанию задачи;
-- управляет Flipper по USB/BLE.
+An optional companion that can:
+- explain a captured signal/card in plain language;
+- generate BadUSB/JS scripts from a description of the task;
+- control the Flipper over USB/BLE.
 
-В сообществе уже есть работающие прототипы этого класса (LLM-мосты,
-управляющие Flipper через RPC по USB/BLE, MCP-серверы для agentic-управления)
-— это подтверждает техническую реализуемость подхода, но конкретные
-сторонние проекты нужно заново проверить на актуальность и лицензии перед
-тем, как на них опираться в реализации (см. `COMPANION.md`).
+The community already has working prototypes of this class (LLM bridges
+controlling a Flipper via RPC over USB/BLE, MCP servers for agentic
+control) — this confirms the approach is technically feasible, but any
+specific third-party projects need to be re-checked for current status and
+licensing before we rely on them in implementation (see `COMPANION.md`).
 
-R0N1N-версия должна быть:
-- **безопасной по умолчанию**: approve-per-action, риск-тиры действий,
-  полный лог;
-- **офлайн-способной**: локальная модель (например, через Ollama) как
-  вариант, без обязательной отправки данных во внешний сервис;
-- **выключенной по умолчанию** (off-by-default) — включается явным
-  действием пользователя.
+The R0N1N version needs to be:
+- **secure by default**: approve-per-action, risk tiers for actions, a
+  full log;
+- **capable offline**: a local model (e.g. via Ollama) as an option,
+  without mandatory data sent to an external service;
+- **off by default** — enabled only through an explicit user action.
 
-AI живёт на companion/внешнем мосте, не на STM32 — сам Flipper остаётся
-тонким RPC-клиентом.
+AI lives on the companion/an external bridge, not on the STM32 — the
+Flipper itself stays a thin RPC client.
 
-## 3. R0N1N Sync — companion ↔ каталог/GitHub
+## 3. R0N1N Sync — companion ↔ catalog/GitHub
 
-Авто-подтягивание IR-базы, Sub-GHz-протоколов, словарей и приложений из
-курируемых репозиториев через companion, с версионированием и проверкой
-совместимости по API (решает «API mismatch» — основную боль сообщества,
-см. `ECOSYSTEM.md`).
+Auto-pulling the IR database, Sub-GHz protocols, dictionaries, and apps
+from curated repositories through the companion, with versioning and
+API-compatibility checks (solving "API mismatch" — the community's main
+pain point, see `ECOSYSTEM.md`).
 
-## 4. Workflow-движок на JS («рецепты»)
+## 4. JS workflow engine ("recipes")
 
-Цепочки действий («при вставке SD загрузить профиль X», «по кнопке —
-эмулировать карту Y и залогировать в Capture Timeline»), редактируемые в
-companion, исполняемые нативно на движке mJS (подтверждено: на 32-бит ARM
-mJS — около 50 КБ flash и менее 1 КБ RAM, то есть дёшево по ресурсам —
-см. `HARDWARE.md`). Технически реализуется как JS-модуль поверх системных
-сервисов R0N1N (Capture Timeline, Profile Manager), а не отдельный рантайм.
+Chains of actions ("load profile X when an SD card is inserted," "on
+button press, emulate card Y and log it to Capture Timeline"), edited on
+the companion, executed natively on the mJS engine (confirmed: on 32-bit
+ARM, mJS takes about 50 KB of flash and under 1 KB of RAM — i.e. cheap on
+resources — see `HARDWARE.md`). Implemented technically as a JS module on
+top of R0N1N's system services (Capture Timeline, Profile Manager), not a
+separate runtime.
 
-## 5. Sweep-режим (counter-surveillance)
+## 5. Sweep mode (counter-surveillance)
 
-RSSI «теплее/холоднее» по одной выбранной цели на встроенном радио;
-BLE/Wi-Fi присутствие-детект — только через внешний модуль (ESP32),
-честно помечено как модульная функция; тихий LED-only режим индикации.
+RSSI "warmer/colder" tracking of a single chosen target on the built-in
+radio; BLE/Wi-Fi presence detection only through an external module
+(ESP32), honestly labeled as a modular feature; a silent, LED-only
+indication mode.
 
-## 6. Учебный / CTF-слой
+## 6. Educational / CTF layer
 
-Встроенные интерактивные лабораторные сценарии + CTF-режим (заметки, таймер,
-экспорт находок в companion) — прямой ответ на смешанную аудиторию проекта
-(см. `VISION.md`).
+Built-in interactive lab scenarios plus a CTF mode (notes, a timer,
+exporting findings to the companion) — a direct answer to the project's
+mixed audience (see `VISION.md`).
 
-## 7. «Explain this capture» — офлайн-эвристики без AI
+## 7. "Explain this capture" — offline heuristics, no AI
 
-Без сети и без companion: по метаданным (частота/модуляция/протокол,
-уже определённым существующими декодерами) — человекочитаемая подсказка
-вида «похоже на: пульт ворот с fixed-кодом / TPMS-датчик / погодная
-станция». Полностью нативная функция, не требует внешнего железа —
-хороший кандидат на раннюю реализацию, не завязанную на companion.
+No network, no companion: from metadata (frequency/modulation/protocol,
+already determined by existing decoders) produce a human-readable hint like
+"looks like: a fixed-code gate remote / a TPMS sensor / a weather station."
+A fully native feature that requires no external hardware — a good
+candidate for early implementation, not tied to the companion.
 
-## Приоритизация (для roadmap)
+## Prioritization (for the roadmap)
 
-Из перечисленного **пункт 1 и пункт 7** реализуемы полностью нативно и не
-зависят от companion/внешнего железа — они должны идти раньше остальных.
-Пункты 2–4 и частично 5 требуют companion или внешнего модуля — их
-разумно планировать после того, как companion-транспорт (RPC по USB/BLE)
-стабилизирован (см. `ROADMAP.md`, `COMPANION.md`).
+Of the items above, **1 and 7** are fully native and don't depend on a
+companion/external hardware — they should come earlier than the rest.
+Items 2–4 and part of 5 require a companion or an external module — it
+makes sense to plan them once the companion transport (RPC over USB/BLE)
+has stabilized (see `ROADMAP.md`, `COMPANION.md`).

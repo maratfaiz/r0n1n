@@ -1,95 +1,98 @@
-# Ландшафт существующих прошивок и стратегия базы R0N1N
+# Landscape of existing firmwares and R0N1N's base strategy
 
-## Метод
+## Method
 
-Ниже — сведение двух независимых ресёрчей (наш детальный разбор + разбор
-внешней модели) плюс проверка репозиториев на GitHub (сентябрь 2026). Версии
-и даты релизов у обоих источников были не идентичны и местами похожи на
-галлюцинированные конкретные номера — поэтому здесь приводятся только
-проверенные вещи (репозитории, факт активной разработки, общая архитектура
-отличий), а не вымышленные номера сборок. Перед стартом Этапа 0 (fork)
-нужно заново проверить актуальный `HEAD` каждого репозитория — ссылки ниже.
+Below is a reconciliation of two independent research passes (our detailed
+breakdown plus a supporting pass from another model), cross-checked against
+GitHub repositories (September 2026). Version numbers and release dates
+didn't match between the two sources and in places resembled hallucinated
+specifics — so only verified facts are listed here (repositories, active
+development status, general architectural differences), not invented build
+numbers. Before starting Stage 0 (fork), re-check the current `HEAD` of
+each repository — links below.
 
-## Официальная прошивка (OFW)
+## Official Firmware (OFW)
 
-- Репозиторий: `flipperdevices/flipperzero-firmware`.
-- FreeRTOS + Furi, слоистая архитектура (HAL → сервисы → приложения).
-- Максимальная стабильность, подписанные OTA, официальный App Catalog.
-- Региональные TX-ограничения включены по умолчанию, не хранит захваченные
-  rolling-коды, минимум кастомизации UI.
-- По данным на 2026 год Flipper Devices вернули активную поддержку внешних
-  контрибуций с более строгим ревью (включая отдельное внимание к
-  AI-сгенерированному коду в низкоуровневых библиотеках) — это стоит
-  учитывать при планировании апстрим-совместимости R0N1N, но не блокирует
-  форк от Unleashed.
+- Repository: `flipperdevices/flipperzero-firmware`.
+- FreeRTOS + Furi, layered architecture (HAL → services → applications).
+- Maximum stability, signed OTA updates, official App Catalog.
+- Regional TX restrictions on by default, doesn't store captured rolling
+  codes, minimal UI customization.
+- As of 2026, Flipper Devices has resumed active support for external
+  contributions with stricter review (including specific attention to
+  AI-generated code touching low-level libraries) — worth factoring into
+  R0N1N's upstream-compatibility planning, though it doesn't block forking
+  from Unleashed.
 
-## Unleashed (DarkFlippers) — рекомендуемая база R0N1N
+## Unleashed (DarkFlippers) — recommended base for R0N1N
 
-- Репозиторий: `DarkFlippers/unleashed-firmware`, активно развивается
-  (релизы фиксировались вплоть до сентября 2026).
-- «Официальный, но разлоченный»: расширенный диапазон Sub-GHz, снятые
-  региональные ограничения, дополнительные протоколы, сохранение и повтор
-  захваченных сигналов, поддержка внешнего CC1101 по SPI, security-опции
-  (Lock on Boot, сброс на неверном PIN).
-- Самая распространённая стабильная база, фундамент и для Momentum, и для
-  RogueMaster — то есть максимальная совместимость с community-приложениями
-  из обоих направлений.
-- Слабое место — UI близок к стоковому, глубокой переработки интерфейса нет.
+- Repository: `DarkFlippers/unleashed-firmware`, actively maintained
+  (releases were still landing through September 2026).
+- "Official but unlocked": extended Sub-GHz range, regional restrictions
+  removed, additional protocols, saving and replaying captured signals,
+  external CC1101 support over SPI, security options (Lock on Boot, reset
+  on wrong PIN).
+- The most widely used stable base, and the foundation for both Momentum
+  and RogueMaster — i.e. maximum compatibility with community apps from
+  both directions.
+- Weak spot — UI stays close to stock, no deep interface rework.
 
-**Вывод:** Unleashed остаётся правильным выбором базы для форка: стабильность
-+ разлочка + широкая совместимость API, при этом UI-слой почти не
-переработан — то есть не будет конфликтовать с UX-слоем R0N1N.
+**Conclusion:** Unleashed remains the right choice for the fork base:
+stability + unlock + broad API compatibility, while its UI layer is barely
+reworked — meaning it won't fight the R0N1N UX layer.
 
-## Momentum (Next-Flip) — источник UX-идей
+## Momentum (Next-Flip) — source of UX ideas
 
-- Репозиторий: `Next-Flip/Momentum-Firmware` (плюс сателлиты
-  `Momentum-Apps`, `Asset-Packs`); прямое продолжение Xtreme Firmware,
-  которую делала та же команда (Xtreme официально прекратила разработку
-  в конце 2024 года, разработчики перешли на Momentum).
-- Самый проработанный UX среди форков: несколько стилей главного меню,
-  Control Center с быстрыми переключателями, продвинутый файловый менеджер,
-  Asset Packs, keybind-система (ремап кнопок, press/hold), JS-модули
-  (Storage, GUI, BLE, SubGHz, USB Disk), Bad-KB (USB+BLE), FindMy, BLE Spam,
-  GPS Subdriving.
-- **Для R0N1N Momentum — главный источник UX-идей и лучший технический
-  ориентир по интерфейсу**, но не база форка: мы портируем/переосмысливаем
-  конкретные компоненты (Control Center, file manager, keybinds, JS-модули)
-  поверх Unleashed, а не форкаем Momentum целиком — это сохраняет узкую,
-  предсказуемую дельту от апстрима.
+- Repository: `Next-Flip/Momentum-Firmware` (plus the `Momentum-Apps` and
+  `Asset-Packs` satellite repos); a direct continuation of Xtreme
+  Firmware, built by the same team (Xtreme officially stopped development
+  in late 2024, and its developers moved to Momentum).
+- The most polished UX among the forks: multiple home-menu styles, a
+  Control Center with quick toggles, an advanced file manager, Asset
+  Packs, a keybind system (button remapping, press/hold), JS modules
+  (Storage, GUI, BLE, SubGHz, USB Disk), Bad-KB (USB+BLE), FindMy, BLE
+  Spam, GPS Subdriving.
+- **For R0N1N, Momentum is the main source of UX ideas and the best
+  technical reference for the interface**, but not the fork base: we port
+  and rethink specific components (Control Center, file manager, keybinds,
+  JS modules) on top of Unleashed rather than forking Momentum wholesale —
+  this keeps a narrow, predictable delta from upstream.
 
-## RogueMaster (RogueMaster/The-Flipper-Files) — карта каталога, не база
+## RogueMaster (RogueMaster/The-Flipper-Files) — catalog map, not a base
 
-- Репозиторий: `RogueMaster/flipperzero-firmware-wPlugins`, база — Unleashed.
-- «Kitchen sink»: максимум приложений, игр, плагинов, анимаций; релизы
-  выходят часто (еженедельно/по обновлениям OFW).
-- Плюс — широта охвата community-приложений; минус — самая непредсказуемая
-  стабильность и «тяжесть», собственные заметки о необходимости чистить
-  `/ext/apps` при обновлении — признак хрупкости миграций.
-- **Роль в R0N1N:** источник кандидатов для каталога (см. `ECOSYSTEM.md`),
-  через жёсткий отбор по стабильности и памяти — не форкается напрямую.
+- Repository: `RogueMaster/flipperzero-firmware-wPlugins`, based on
+  Unleashed.
+- "Kitchen sink": maximum apps, games, plugins, animations; releases ship
+  frequently (weekly / with each OFW update).
+- Upside — breadth of community app coverage; downside — the least
+  predictable stability and the "heaviest" build; the project's own notes
+  about needing to clear `/ext/apps` before updating are a sign of fragile
+  migrations.
+- **Role for R0N1N:** a source of catalog candidates (see `ECOSYSTEM.md`),
+  filtered hard for stability and memory footprint — not forked directly.
 
-## Xtreme Firmware — историческая справка
+## Xtreme Firmware — historical note
 
-- Была флагманом по стабильности и полноте фич среди форков; официально
-  прекращена (Flipper-XFW) в конце 2024 года.
-- Команда и наработки перешли в Momentum — то есть все актуальные идеи
-  Xtreme уже доступны через Momentum, отдельно рассматривать Xtreme как
-  источник для R0N1N не нужно.
+- Was once the stability/feature-completeness flagship among the forks;
+  officially discontinued (Flipper-XFW) in late 2024.
+- The team and its work moved into Momentum — meaning every current Xtreme
+  idea worth having is already available through Momentum; there's no need
+  to treat Xtreme as a separate source for R0N1N.
 
-## Синтез: стратегия базы R0N1N
+## Synthesis: R0N1N's base strategy
 
-1. **Форк Unleashed** — фундамент (Этап 0): совместимость API/приложений,
-   разлочка, поддержка внешних модулей, активная поддержка апстрима.
-2. **Портирование UX-слоя из Momentum**, переработанное под собственную
-   информационную архитектуру R0N1N (Home-дашборд, псевдо-свайпы, профили —
-   см. `UX_DESIGN.md`), а не слепое копирование меню Momentum.
-3. **RogueMaster и другие community-форки — источник кандидатов** в каталог
-   приложений (`ECOSYSTEM.md`), не код для форка.
-4. **Дисциплинированный rebase на Unleashed** как постоянный процесс —
-   главный риск этой стратегии — дрейф от апстрима (см. `ROADMAP.md`,
-   раздел рисков).
+1. **Fork Unleashed** — the foundation (Stage 0): API/app compatibility,
+   the unlock, external-module support, active upstream maintenance.
+2. **Port the UX layer from Momentum**, reworked into R0N1N's own
+   information architecture (Home dashboard, pseudo-swipes, profiles — see
+   `UX_DESIGN.md`), not a blind copy of Momentum's menus.
+3. **RogueMaster and other community forks are a source of catalog
+   candidates** (`ECOSYSTEM.md`), not code to fork.
+4. **Disciplined, continuous rebasing onto Unleashed** — the main risk of
+   this strategy is drifting from upstream (see `ROADMAP.md`, risks
+   section).
 
-## Источники для повторной проверки перед Этапом 0
+## Sources to re-verify before Stage 0
 
 - `https://github.com/DarkFlippers/unleashed-firmware`
 - `https://github.com/Next-Flip/Momentum-Firmware`

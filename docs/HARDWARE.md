@@ -1,118 +1,127 @@
-# Железо Flipper Zero: возможности и ограничения
+# Flipper Zero hardware: capabilities and constraints
 
-Этот документ — техническая база для всех остальных концептов R0N1N. Все решения
-по UX, архитектуре и roadmap должны быть совместимы с тем, что описано здесь.
+This document is the technical foundation for every other R0N1N concept doc.
+All UX, architecture, and roadmap decisions must stay compatible with what's
+described here.
 
-Часть цифр в оригинальных ресёрчах (наш и вспомогательный от внешней модели)
-не совпадала. Ниже — сведённая версия, где расхождения отмечены явно, а факты,
-проверенные по официальной документации Flipper (`docs.flipper.net/zero/development/hardware/tech-specs`)
-и апстрим-репозиториям на момент подготовки (сентябрь 2026), помечены как подтверждённые.
+Some numbers in the original research passes (our own detailed one plus a
+supporting pass from another model) didn't match. What follows is a
+reconciled version where disagreements are called out explicitly, and facts
+checked against the official Flipper documentation
+(`docs.flipper.net/zero/development/hardware/tech-specs`) and upstream
+repositories as of this writing (September 2026) are marked as confirmed.
 
-## Базовая платформа (подтверждено)
+## Base platform (confirmed)
 
-- **MCU:** STM32WB55RG — два ядра: ARM Cortex-M4 @ 64 МГц (основное приложение) +
-  ARM Cortex-M0+ @ 32 МГц (радиостек BLE/802.15.4, закрытая прошивка ST/FUS).
-- **Память:** Flash 1024 КБ и SRAM 256 КБ — **обе делятся между приложением и радио**
-  (официальная формулировка "shared between application and radio"). Официальные
-  спеки не публикуют точное разбиение flash между радиостеком и прошивкой;
-  community-оценка (не официальная) — порядка 300 КБ на радиостек+FUS,
-  ~700 КБ на основную прошивку, остаток делит динамический LittleFS. Это надо
-  трактовать как ориентир, а не гарантию — прежде чем проектировать бюджет
-  памяти R0N1N-слоя, стоит замерить фактический свободный flash/heap на целевой
-  версии Unleashed.
-- **Экран:** монохромный LCD 128×64, контроллер ST7567, SPI, 1.4" — подтверждено.
-  5-кнопочный D-pad + Back. Тачскрина нет.
-- **Sub-GHz:** TI CC1101, диапазоны 300–348 / 387–464 / 779–928 МГц (стоковая
-  антенна/усилитель), ASK/OOK/(G)FSK/MSK. Подтверждённая выходная мощность
-  встроенного модуля — **около 10 dBm** (не 100 мВт/≈20 dBm, как утверждал один
-  из источников — это явное расхождение, ниже реальной характеристики почти на
-  порядок). Внешние CC1101-модули с усилителем достигают ~14–15 dBm.
-  **CC1101 не SDR** — нужно заранее задать модуляцию и частоту, «водопада»
-  спектра без внешнего железа нет.
-- **NFC:** ST25R3916, 13.56 МГц (ISO-14443A/B, MIFARE Classic/Ultralight/DESFire,
-  FeliCa, отчасти iClass/PicoPass через community-приложения).
-- **RFID 125 кГц:** реализован программно на MCU, отдельного чипа нет
+- **MCU:** STM32WB55RG — two cores: ARM Cortex-M4 @ 64 MHz (main
+  application) + ARM Cortex-M0+ @ 32 MHz (BLE/802.15.4 radio stack, closed
+  ST/FUS firmware).
+- **Memory:** 1024 KB flash and 256 KB SRAM — **both shared between the
+  application and the radio** (the official spec literally says "shared
+  between application and radio"). The official specs don't publish the
+  exact flash split between the radio stack and the firmware; a
+  community estimate (not official) puts it around 300 KB for the radio
+  stack + FUS, ~700 KB for the main firmware, with the rest shared by the
+  dynamic LittleFS. Treat this as a rough guide, not a guarantee — before
+  budgeting memory for the R0N1N layer, measure actual free flash/heap on
+  the target Unleashed build rather than relying on the community estimate
+  above.
+- **Screen:** monochrome 128×64 LCD, ST7567 controller, SPI, 1.4" —
+  confirmed. 5-button D-pad + Back. No touchscreen.
+- **Sub-GHz:** TI CC1101, 300–348 / 387–464 / 779–928 MHz bands (stock
+  antenna/amp), ASK/OOK/(G)FSK/MSK. Confirmed transmit power of the
+  built-in module is **around 10 dBm** (not 100 mW/≈20 dBm as one of the
+  source documents claimed — that's an explicit discrepancy, almost an
+  order of magnitude above the real figure). External CC1101 modules with
+  an amplifier reach roughly 14–15 dBm.
+  **CC1101 is not an SDR** — modulation and frequency must be set up front;
+  there's no spectrum waterfall without external hardware.
+- **NFC:** ST25R3916, 13.56 MHz (ISO-14443A/B, MIFARE Classic/Ultralight/
+  DESFire, FeliCa, partial iClass/PicoPass via community apps).
+- **125 kHz RFID:** implemented in software on the MCU, no dedicated chip
   (EM4100, HID Prox, Indala, Cyfral/Metakom).
-- **IR:** приёмник TSOP (38 кГц) + 3 передающих LED.
-- **iButton / 1-Wire:** чтение/запись/эмуляция (Dallas DS1990A, Cyfral).
-- **GPIO:** 18 пинов, UART/SPI/I2C/ADC/SWD, логика 3.3 В (вход 5В-tolerant),
-  пины питания 5 В и 3.3 В.
-- **Bluetooth:** BLE 5.4 (через ядро M0+). Радиочасть STM32WB55 аппаратно
-  поддерживает и 802.15.4 (Thread/Zigbee), но на Flipper этот стек не
-  выведен ни в одной популярной прошивке — по сути «спящая» возможность,
-  которую нельзя активировать без переписывания части радиостека/FUS, то
-  есть вне разумного скоупа R0N1N.
-- **Прочее:** USB 2.0 Type-C, пьезобуззер, вибромотор, RGB LED, LiPo 2100
-  мА·ч (официально «до 28 дней» в режиме ожидания), microSD до 256 ГБ
-  (FAT12/16/32/exFAT).
+- **IR:** TSOP receiver (38 kHz) + 3 transmitting LEDs.
+- **iButton / 1-Wire:** read/write/emulate (Dallas DS1990A, Cyfral).
+- **GPIO:** 18 pins, UART/SPI/I2C/ADC/SWD, 3.3V logic (5V-tolerant input),
+  5V and 3.3V power pins.
+- **Bluetooth:** BLE 5.4 (via the M0+ core). The STM32WB55 radio hardware
+  also supports 802.15.4 (Thread/Zigbee), but no popular firmware exposes
+  that stack on Flipper — effectively a dormant capability that can't be
+  activated without rewriting part of the radio stack/FUS, i.e. out of
+  reasonable scope for R0N1N.
+- **Other:** USB 2.0 Type-C, piezo buzzer, vibration motor, RGB LED, 2100
+  mAh LiPo battery (officially "up to 28 days" standby), microSD up to
+  256 GB (FAT12/16/32/exFAT).
 
-## Официальный модуль расширения: Video Game Module (подтверждено)
+## Official expansion module: Video Game Module (confirmed)
 
-- MCU: Raspberry Pi RP2040 (dual-core Cortex-M0+, до 133 МГц, 264 КБ
+- MCU: Raspberry Pi RP2040 (dual-core Cortex-M0+, up to 133 MHz, 264 KB
   on-chip SRAM).
-- IMU: TDK ICM-42688-P (6-осевой акселерометр/гироскоп).
-- Видео: DVI-D 640×480 @ 60 Hz.
-- USB-C на самом модуле (device/host, без USB PD).
-- 11 GPIO, работает и как самостоятельная Pico-плата.
+- IMU: TDK ICM-42688-P (6-axis accelerometer/gyroscope).
+- Video: DVI-D 640×480 @ 60 Hz.
+- USB-C on the module itself (device/host, no USB PD).
+- 11 GPIO pins, also works as a standalone Pico board.
 
-## Что реально даёт microSD
+## What microSD actually enables
 
-Хранилище захватов, динамическая загрузка .fap (position-independent code,
-копируется в RAM при запуске), словари ключей, ИК-база, asset packs,
-JS-скрипты, пакет OTA-обновления (пишется в `/ext/update`, применяется на
-ребуте). Практически вся расширяемость R0N1N должна опираться на SD, а не
-на рост монолитной прошивки.
+Capture storage, dynamic loading of .fap apps (position-independent code,
+copied into RAM at launch), key dictionaries, the IR database, asset packs,
+JS scripts, the OTA update package (written to `/ext/update`, applied on
+reboot). Practically all of R0N1N's extensibility should lean on SD rather
+than growing the monolithic firmware.
 
-## Что требует внешнего железа (нативно недостижимо)
+## What requires external hardware (natively unreachable)
 
-| Функция | Требуемое железо |
+| Feature | Required hardware |
 |---|---|
-| Wi-Fi сканирование/деаутентификация/Evil Portal, wardriving | ESP32 / ESP32-S2/C5/C6 devboard по UART/GPIO |
-| 2.4 ГГц проприетарные протоколы (mousejack, сниффинг клавиатур/мышей) | внешний nRF24L01+/Si24R1 по SPI |
-| Усиленный/дальнобойный Sub-GHz, LoRa | внешний CC1101/LoRa-модуль с PA/LNA |
-| Video-out, IMU-управление играми, второй MCU для тяжёлых side-задач | официальный Video Game Module (RP2040) |
-| AI/LLM, тяжёлые вычисления, большой экран, голосовой ввод | companion (телефон/ПК) или мост на ESP32-S3 |
+| Wi-Fi scanning/deauth/Evil Portal, wardriving | ESP32 / ESP32-S2/C5/C6 dev board over UART/GPIO |
+| 2.4 GHz proprietary protocols (mousejack, keyboard/mouse sniffing) | external nRF24L01+/Si24R1 over SPI |
+| Boosted/long-range Sub-GHz, LoRa | external CC1101/LoRa module with PA/LNA |
+| Video-out, IMU-driven game controls, a second MCU for heavy side-tasks | official Video Game Module (RP2040) |
+| AI/LLM, heavy compute, a large screen, voice input | companion (phone/PC) or an ESP32-S3 bridge |
 
-## Жёсткие ограничения, которые обязаны уважать все решения R0N1N
+## Hard constraints every R0N1N decision must respect
 
-1. **RAM — главный лимит.** FAP грузится в кучу; сообщество фиксирует OOM
-   уже при единицах КБ свободной RAM, ~30 КБ считается практическим потолком
-   одной аллокации. Отсюда: одно пользовательское приложение активно за раз,
-   экономные view, без больших статических буферов в R0N1N-сервисах.
-2. **Flash — «потолок», а не резерв на будущее.** Расширение функционала —
-   через .fap на SD, а не через раздувание монолита.
-3. **Износ внутренней flash.** У ST заявлен **минимум** 10 000 циклов
-   записи (это нижняя гарантированная граница, а не жёсткий предел) —
-   поэтому приложения выполняются из RAM/SD, а не переписывают внутреннюю
-   flash на каждый чих.
-4. **Экран 128×64 монохром, 6 физических кнопок, нет тача** — потолок
-   плотности UI; любая «свайповая» метафора реализуется направлениями D-pad,
-   а не жестами.
-5. **Радиостек M0+/FUS закрыт.** R0N1N не имеет доступа ниже `furi_hal` —
-   ни к BLE-стеку, ни к сырому радио M0+.
-6. **CC1101 ≠ SDR.** Нельзя обещать «увидеть» произвольный сигнал без
-   заранее заданных параметров модуляции/частоты — это ограничение чипа,
-   не прошивки.
+1. **RAM is the primary limit.** A FAP loads into the heap; the community
+   reports OOM at just a few KB of free RAM, with ~30 KB considered a
+   practical ceiling for a single allocation. Implication: one user
+   application active at a time, frugal views, no large static buffers in
+   R0N1N services.
+2. **Flash is a ceiling, not a reserve for later.** Extend functionality
+   through .fap apps on SD, not by growing the monolith.
+3. **Internal flash wear.** ST guarantees a **minimum** of 10,000 write
+   cycles (a guaranteed floor, not a hard cap) — which is why applications
+   run from RAM/SD instead of rewriting internal flash on every action.
+4. **128×64 monochrome screen, 6 physical buttons, no touch** — a hard
+   ceiling on UI density; any "swipe" metaphor is implemented as D-pad
+   directions, not as a gesture.
+5. **The M0+/FUS radio stack is closed.** R0N1N has no access below
+   `furi_hal` — neither to the BLE stack nor to raw M0+ radio.
+6. **CC1101 ≠ SDR.** We can't promise "seeing" an arbitrary signal without
+   pre-set modulation/frequency parameters — that's a chip limitation, not
+   a firmware one.
 
-## Практический вывод для R0N1N
+## Practical takeaway for R0N1N
 
-«99% возможностей» достижимы как исчерпывающее и удобное раскрытие того, что
-уже позволяет железо + microSD + опциональные модули — не как выход за
-физические пределы платформы. Проектные решения по UX и архитектуре
-(см. `UX_DESIGN.md`, `ARCHITECTURE.md`) должны:
+"99% of the capabilities" is achievable as a thorough, convenient exposure
+of what the hardware + microSD + optional modules already allow — not as
+exceeding the platform's physical limits. UX and architecture decisions
+(see `UX_DESIGN.md`, `ARCHITECTURE.md`) must:
 
-- честно разделять в интерфейсе «нативные» функции и «модульные»/companion-функции;
-- держать тяжёлые данные (индексы поиска, ленту захватов, словари) на SD,
-  а не в RAM;
-- проверять фактический бюджет памяти на целевой версии Unleashed до того,
-  как проектировать новые системные сервисы (Профили, Global Search, Capture
-  Timeline — см. `UX_DESIGN.md`), а не полагаться на цифры из этого документа
-  как на точный бюджет.
+- honestly separate "native" features from "modular"/companion features in
+  the UI;
+- keep heavy data (search indexes, the capture timeline, dictionaries) on
+  SD rather than in RAM;
+- verify the actual memory budget on the target Unleashed version before
+  designing new system services (Profiles, Global Search, Capture Timeline
+  — see `UX_DESIGN.md`), rather than treating the numbers in this document
+  as an exact budget.
 
-## Открытые вопросы (требуют замера/уточнения на этапе 0)
+## Open questions (need measurement/confirmation at Stage 0)
 
-- Фактический свободный flash и heap на целевой базовой версии Unleashed
-  после её сборки — необходимо смерить `ufbt`-сборкой и профилировщиком
-  (`top`/`free` в CLI прошивки), а не полагаться на community-оценки выше.
-- Совместимость новых R0N1N-сервисов с текущим `api_symbols.csv` Unleashed —
-  см. `ECOSYSTEM.md`.
+- The actual free flash and heap on the target Unleashed base version after
+  it's built — needs to be measured with a `ufbt` build and the firmware's
+  own profiling (`top`/`free` in the firmware CLI), not inferred from the
+  community estimates above.
+- Compatibility of new R0N1N services with Unleashed's current
+  `api_symbols.csv` — see `ECOSYSTEM.md`.

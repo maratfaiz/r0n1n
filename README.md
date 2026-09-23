@@ -1,59 +1,61 @@
 # R0N1N
 
-**R0N1N** — концепция кастомной прошивки Flipper Zero как UX-first
-операционной оболочки, а не очередного «форка с кучей приложений».
+**R0N1N** is a concept for a custom Flipper Zero firmware built as a
+UX-first operating shell — not yet another "fork with a pile of apps."
 
-> **Статус: концептуальная стадия.** Разработка (форк, сборка, код) ещё
-> не начата. Этот репозиторий сейчас содержит только проработанную
-> документацию — vision, техническое обоснование и план. См.
-> [`docs/ROADMAP.md`](docs/ROADMAP.md), раздел «Статус на данный момент».
+> **Status: concept stage.** Development (forking, building, code) hasn't
+> started yet. Right now this repository holds fully fleshed-out
+> documentation — the vision, the technical case, and the plan. See
+> [`docs/ROADMAP.md`](docs/ROADMAP.md), "Current status."
 
-## Идея в двух словах
+## The idea in short
 
-Форки Flipper Zero (Official, Unleashed, Momentum, RogueMaster) к 2026 году
-функционально сошлись — они различаются стабильностью и полировкой, а не
-набором возможностей. R0N1N исходит из того, что незанятый дефицит рынка —
-не функции, а **связность и удобство**: единый Home-дашборд вместо списка
-приложений, предсказуемая навигация «псевдо-свайпами» на D-pad, сквозные
-профили режимов (Everyday / Pentest / Dev / CTF), единая лента захватов и
-глобальный поиск. Подробно — [`docs/VISION.md`](docs/VISION.md).
+By 2026, Flipper Zero forks (Official, Unleashed, Momentum, RogueMaster)
+have functionally converged — they differ in stability and polish, not in
+capability. R0N1N starts from the premise that the market's real gap isn't
+features, it's **coherence and usability**: a single Home dashboard instead
+of an app list, predictable "pseudo-swipe" navigation on the D-pad,
+cross-cutting mode profiles (Everyday / Pentest / Dev / CTF), a unified
+capture feed, and global search. Details in
+[`docs/VISION.md`](docs/VISION.md).
 
-Технически проект строится как форк стабильной базы Unleashed с UX-слоем,
-портированным и переосмысленным из Momentum — не переписывание ядра с нуля.
-Всё, что физически не помещается в STM32WB55 (Wi-Fi-атаки, AI, video-out,
-SDR), честно вынесено на уровень опциональных внешних модулей или
-companion-приложения, а не обещано как «встроенное».
+Technically, the project is built as a fork of the stable Unleashed base,
+with a UX layer ported and reworked from Momentum — not a from-scratch
+kernel rewrite. Anything that physically doesn't fit on the STM32WB55
+(Wi-Fi attacks, AI, video-out, SDR) is honestly pushed to the level of
+optional external modules or a companion app, rather than promised as
+"built-in."
 
-## Документация
+## Documentation
 
-| Документ | О чём |
+| Document | What it covers |
 |---|---|
-| [`docs/VISION.md`](docs/VISION.md) | Видение проекта, три принципа, границы (white-hat/легальность) |
-| [`docs/HARDWARE.md`](docs/HARDWARE.md) | Возможности и жёсткие ограничения железа Flipper Zero |
-| [`docs/FIRMWARE_LANDSCAPE.md`](docs/FIRMWARE_LANDSCAPE.md) | Анализ существующих прошивок и стратегия выбора базы |
-| [`docs/UX_DESIGN.md`](docs/UX_DESIGN.md) | Home-дашборд, навигация «псевдо-свайпы», профили, сквозные сервисы |
-| [`docs/FEATURES.md`](docs/FEATURES.md) | Базовый набор возможностей, наследуемый от Unleashed/Momentum |
-| [`docs/UNIQUE_FEATURES.md`](docs/UNIQUE_FEATURES.md) | Что отличает R0N1N от остальных форков |
-| [`docs/SECURITY_TOOLKIT.md`](docs/SECURITY_TOOLKIT.md) | White-hat security-инструментарий и его рамки применения |
-| [`docs/ECOSYSTEM.md`](docs/ECOSYSTEM.md) | Экосистема приложений и решение проблемы «API mismatch» |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Слоистая архитектура прошивки, управление памятью |
-| [`docs/COMPANION.md`](docs/COMPANION.md) | PC/mobile companion и опциональный AI-мост |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Этапы разработки, MVP vs. полная версия, риски |
+| [`docs/VISION.md`](docs/VISION.md) | Project vision, three principles, boundaries (white-hat/legality) |
+| [`docs/HARDWARE.md`](docs/HARDWARE.md) | Flipper Zero hardware capabilities and hard constraints |
+| [`docs/FIRMWARE_LANDSCAPE.md`](docs/FIRMWARE_LANDSCAPE.md) | Analysis of existing firmwares and the base-fork strategy |
+| [`docs/UX_DESIGN.md`](docs/UX_DESIGN.md) | Home dashboard, pseudo-swipe navigation, profiles, cross-cutting services |
+| [`docs/FEATURES.md`](docs/FEATURES.md) | Core feature set inherited from Unleashed/Momentum |
+| [`docs/UNIQUE_FEATURES.md`](docs/UNIQUE_FEATURES.md) | What sets R0N1N apart from other forks |
+| [`docs/SECURITY_TOOLKIT.md`](docs/SECURITY_TOOLKIT.md) | The white-hat security toolkit and its scope of use |
+| [`docs/ECOSYSTEM.md`](docs/ECOSYSTEM.md) | The app ecosystem and solving the "API mismatch" problem |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | The firmware's layered architecture, memory management |
+| [`docs/COMPANION.md`](docs/COMPANION.md) | The PC/mobile companion and the optional AI bridge |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Development stages, MVP vs. the full release, risks |
 
-## Легальность
+## Legality
 
-R0N1N — легальный open-source проект кастомизации прошивки коммерчески
-доступного устройства, в духе Unleashed/Momentum/RogueMaster. Все
-security-функции предназначены только для собственных устройств,
-лабораторных стендов, CTF и авторизованного пентеста. Подробнее —
-[`docs/VISION.md`](docs/VISION.md) («Границы проекта») и
-[`docs/SECURITY_TOOLKIT.md`](docs/SECURITY_TOOLKIT.md).
+R0N1N is a legal open-source project that customizes the firmware of a
+commercially available device, in the spirit of Unleashed/Momentum/
+RogueMaster. All security features are intended only for the user's own
+devices, lab benches, CTF competitions, and authorized penetration
+testing. Details in [`docs/VISION.md`](docs/VISION.md) ("Project
+boundaries") and [`docs/SECURITY_TOOLKIT.md`](docs/SECURITY_TOOLKIT.md).
 
-## Участие
+## Contributing
 
-См. [`CONTRIBUTING.md`](CONTRIBUTING.md) — на текущей стадии полезнее всего
-ревью и уточнение документации, а не код.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) — at this stage, reviewing and
+refining the documentation is more useful than code.
 
-## Лицензия
+## License
 
-[GPL-3.0](LICENSE) — как и прошивки, на которых основан R0N1N.
+[GPL-3.0](LICENSE) — same as the firmwares R0N1N is built on.

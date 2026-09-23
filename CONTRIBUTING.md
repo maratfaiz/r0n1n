@@ -1,48 +1,48 @@
 # Contributing to R0N1N
 
-## Текущая стадия проекта
+## Current stage of the project
 
-R0N1N сейчас находится в **концептуальной/предпроектной стадии**: весь
-репозиторий — это документация в `docs/`, описывающая vision, техническую
-базу и план разработки. Форк прошивки, сборка и код ещё не начаты (см.
-`docs/ROADMAP.md`, раздел «Статус на данный момент»).
+R0N1N is currently in a **conceptual/pre-development stage**: the whole
+repository is documentation under `docs/`, describing the vision, the
+technical foundation, and the development plan. Forking the firmware,
+building it, and writing code haven't started yet (see `docs/ROADMAP.md`,
+"Current status").
 
-Это значит, что на этой стадии полезнее всего:
+That means the most useful contributions right now are:
 
-- ревью и уточнение документов в `docs/` — фактические неточности,
-  устаревшие ссылки на релизы апстрима, нереалистичные оценки сроков;
-- обсуждение архитектурных решений до того, как они закреплены в коде;
-- расширение `docs/HARDWARE.md` и `docs/ECOSYSTEM.md` проверенными
-  фактами (со ссылками на источники), если что-то там помечено как
-  «требует уточнения».
+- reviewing and refining the documents in `docs/` — factual inaccuracies,
+  stale references to upstream releases, unrealistic timeline estimates;
+- discussing architectural decisions before they're locked into code;
+- expanding `docs/HARDWARE.md` and `docs/ECOSYSTEM.md` with verified facts
+  (cited to a source) wherever something is flagged as "needs
+  confirmation."
 
-Пулл-реквесты с кодом прошивки/приложений до завершения Этапа 0
-(см. `docs/ROADMAP.md`) приниматься не будут — сначала должна появиться
-сама форкнутая база.
+Pull requests with firmware/app code won't be merged before Stage 0 (see
+`docs/ROADMAP.md`) is complete — the forked base needs to exist first.
 
-## Как предлагать изменения в документацию
+## How to propose documentation changes
 
-1. Один PR — один документ или тесно связанная группа правок. Не смешивать
-   правки в `docs/HARDWARE.md` с правками в `docs/ROADMAP.md` в одном PR,
-   если они не следуют друг из друга.
-2. Любое фактическое утверждение о железе Flipper Zero или чужой прошивке
-   (версии, спецификации, лицензии) — со ссылкой на источник в тексте
-   PR-описания.
-3. Формулировки в духе «мы решили X» вместо «предлагается X» — только для
-   вещей, которые действительно уже закреплены в существующих документах.
+1. One PR per document, or a tightly related group of documents. Don't mix
+   edits to `docs/HARDWARE.md` with edits to `docs/ROADMAP.md` in the same
+   PR unless one directly follows from the other.
+2. Any factual claim about Flipper Zero hardware or another firmware
+   (versions, specs, licenses) should cite a source in the PR description.
+3. Use "this proposes X" rather than "we decided X" phrasing — reserve the
+   latter for things that are genuinely already settled in existing
+   documents.
 
-## White-hat / легальность
+## White-hat / legality
 
-Любой вклад, расширяющий `docs/SECURITY_TOOLKIT.md` или будущий
-security-функционал, обязан укладываться в границы, описанные в
-`docs/VISION.md` (раздел «Границы проекта») — только собственные
-устройства, лаборатории, CTF и авторизованный пентест. Предложения
-функций для DoS, массового таргетирования, обхода детекта во вредоносных
-сценариях или компрометации цепочки поставок отклоняются без обсуждения.
+Any contribution that extends `docs/SECURITY_TOOLKIT.md` or future
+security functionality must stay within the boundaries described in
+`docs/VISION.md` ("Project boundaries") — the user's own devices, labs,
+CTF, and authorized penetration testing only. Proposals for DoS tooling,
+mass targeting, evading detection in genuinely malicious scenarios, or
+supply-chain compromise are declined without discussion.
 
-## Лицензия
+## License
 
-Проект распространяется под GPL-3.0 (см. `LICENSE`) — как и Unleashed,
-Momentum и RogueMaster, чья кодовая база станет фундаментом R0N1N. Любой
-код, добавленный в проект после старта разработки, должен быть совместим
-с этой лицензией.
+The project is distributed under GPL-3.0 (see `LICENSE`) — like Unleashed,
+Momentum, and RogueMaster, whose codebase will become R0N1N's foundation.
+Any code added after development begins must be compatible with this
+license.

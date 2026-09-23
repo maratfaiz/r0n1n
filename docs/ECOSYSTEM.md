@@ -1,60 +1,61 @@
-# Экосистема приложений
+# App ecosystem
 
-## GitHub-экосистема — контекст
+## GitHub ecosystem — context
 
-Экосистема Flipper огромна и фрагментирована по каталогам: официальный
+The Flipper ecosystem is huge and fragmented across catalogs: the official
 Flipper Application Catalog (`flipperdevices/flipper-application-catalog`,
-показывается через Lab.Flipper.net), сателлитные каталоги форков
-(`Momentum-Apps`, приложения RogueMaster), независимые площадки и
-awesome-списки сообщества. Классы проектов, релевантные для R0N1N:
+surfaced through Lab.Flipper.net), fork-specific satellite catalogs
+(`Momentum-Apps`, RogueMaster's app collection), independent platforms, and
+community-maintained awesome-lists. Project classes relevant to R0N1N:
 
-- **Sub-GHz:** брутфорсеры fixed-code, спектр-анализаторы, POCSAG/TPMS/
-  weather-декодеры, .sub-редакторы.
-- **NFC/RFID:** атаки на MIFARE, NFC Magic, RFID Fuzzer, NFC Maker.
-- **IR:** расширения IRDB, конвертеры пультов.
-- **GPIO/hardware:** ESP-flasher, мосты UART/SPI/I2C, DAP Link/SWD.
-- **USB/BadUSB:** библиотеки DuckyScript-плейбуков, JS-BadUSB.
-- **Bluetooth/2.4 ГГц:** BLE-инструменты, nRF24-инструменты — модульные.
-- **Dev tools:** `ufbt` (быстрая сборка .fap), GitHub Actions для CI сборки
-  прошивок и приложений, SDK для нескольких языков.
+- **Sub-GHz:** fixed-code brute-forcers, spectrum analyzers, POCSAG/TPMS/
+  weather decoders, .sub editors.
+- **NFC/RFID:** MIFARE attacks, NFC Magic, RFID Fuzzer, NFC Maker.
+- **IR:** IRDB extensions, remote converters.
+- **GPIO/hardware:** ESP flashers, UART/SPI/I2C bridges, DAP Link/SWD.
+- **USB/BadUSB:** DuckyScript playbook libraries, JS-BadUSB.
+- **Bluetooth/2.4 GHz:** BLE tools, nRF24 tools — modular.
+- **Dev tools:** `ufbt` (fast .fap builds), GitHub Actions for CI-building
+  firmwares and apps, SDKs for several languages.
 
-Это карта возможностей, а не список того, что R0N1N обязана
-интегрировать в ядро — подавляющее большинство остаётся на уровне
-опциональных .fap на SD (см. `ARCHITECTURE.md`).
+This is a map of what's possible, not a list of things R0N1N is obligated
+to pull into core — the overwhelming majority stays as optional .fap apps
+on SD (see `ARCHITECTURE.md`).
 
-## Главная боль сообщества: «API mismatch»
+## The community's main pain point: "API mismatch"
 
-.fap собран под другую версию/форк — major-версия API не совпадает —
-приложение не загружается. Причина: у каждого форка свой `api_symbols.csv`
-и своя версия API; App Loader сверяет major-версию перед запуском. Это не
-гипотетическая проблема — она системно всплывает при любой попытке
-пользователя перенести приложение между форками.
+A .fap was built against a different version/fork — the major API version
+doesn't match — the app fails to load. Cause: every fork has its own
+`api_symbols.csv` and API version; the App Loader checks the major version
+before launching. This isn't a hypothetical problem — it surfaces reliably
+the moment a user tries to move an app between forks.
 
-## Стратегия R0N1N: системное решение, а не заплатки
+## R0N1N's strategy: a systemic fix, not patches
 
-1. **R0N1N Hub (on-device каталог)** — поиск, категории, избранное, статус
-   «установлено/доступно обновление», и **фильтр совместимости по API**:
-   показывать по умолчанию только .fap, совместимые с текущей версией API
-   R0N1N, явно предупреждать о несовместимых вместо тихого краша.
-2. **Companion-синхронизация каталога** — PC/mobile companion подбирает
-   правильный билд .fap под установленную версию R0N1N (аналог
-   Flipper Lab/мобильного приложения, но с кастомным API-таргетом) —
-   подробности транспорта в `COMPANION.md`.
-3. **CI-конвейер сборки** — официальный R0N1N-таргет в `ufbt` +
-   GitHub Actions, чтобы сборка под R0N1N была одной командой, а не ручным
-   патчем чужого `.fap`.
-4. **Стабильный API-контракт** — следовать семантике версий
-   `api_symbols.csv` (major = breaking change), минимизировать
-   breaking-изменения между релизами, публиковать таблицу совместимости.
-5. **Предсказуемая microSD-раскладка** — понятные папки
-   (`apps/Sub-GHz`, `apps/NFC`, `apps/GPIO`, `apps/Scripts`, `asset_packs`,
-   `update`) с авто-миграцией пользовательских файлов при обновлении версии
-   (по образцу того, как Momentum мигрирует файлы при вставке SD).
+1. **R0N1N Hub (on-device catalog)** — search, categories, favorites, an
+   "installed/update available" status, and an **API-compatibility
+   filter**: by default show only .fap apps compatible with the current
+   R0N1N API version, and warn explicitly about incompatible ones instead
+   of failing silently.
+2. **Companion catalog sync** — the PC/mobile companion picks the correct
+   .fap build for the installed R0N1N version (similar to Flipper
+   Lab/the mobile app, but targeting a custom API) — transport details in
+   `COMPANION.md`.
+3. **CI build pipeline** — an official R0N1N target in `ufbt` + GitHub
+   Actions, so building for R0N1N is one command, not a manual patch to
+   someone else's `.fap`.
+4. **A stable API contract** — follow `api_symbols.csv` version semantics
+   (major = breaking change), minimize breaking changes between releases,
+   publish a compatibility table.
+5. **A predictable microSD layout** — clear folders (`apps/Sub-GHz`,
+   `apps/NFC`, `apps/GPIO`, `apps/Scripts`, `asset_packs`, `update`) with
+   automatic migration of user files on version upgrades (following how
+   Momentum migrates files when an SD card is inserted).
 
-## Что из этого входит в MVP, а что — позже
+## What belongs in the MVP vs. later
 
-Фильтр совместимости в Hub и предсказуемая раскладка SD — часть MVP
-(Этап 2–3 в `ROADMAP.md`), так как без них любая экосистема приложений
-поверх R0N1N будет воспроизводить ту же боль, от которой мы отталкиваемся.
-CI-таргет и companion-синхронизация каталога — Этап 3–4, после того как
-стабилизируется сам API R0N1N-слоя.
+The compatibility filter in the Hub and a predictable SD layout are part of
+the MVP (Stage 2–3 in `ROADMAP.md`), since without them any app ecosystem
+built on top of R0N1N would just reproduce the same pain we're trying to
+solve. The CI target and companion catalog sync are Stage 3–4, once the
+R0N1N layer's own API has stabilized.
