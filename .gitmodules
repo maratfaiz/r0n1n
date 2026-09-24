@@ -1,0 +1,38 @@
+[submodule "lib/mlib"]
+	path = firmware/lib/mlib
+	url = https://github.com/P-p-H-d/mlib.git
+[submodule "lib/nanopb"]
+	path = firmware/lib/nanopb
+	url = https://github.com/nanopb/nanopb.git
+[submodule "assets/protobuf"]
+	path = firmware/assets/protobuf
+	url = https://github.com/DarkFlippers/flipperzero-protobuf.git
+	shallow = false
+[submodule "lib/libusb_stm32"]
+	path = firmware/lib/libusb_stm32
+	url = https://github.com/flipperdevices/libusb_stm32.git
+[submodule "lib/FreeRTOS-Kernel"]
+	path = firmware/lib/FreeRTOS-Kernel
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+[submodule "lib/microtar"]
+	path = firmware/lib/microtar
+	url = https://github.com/amachronic/microtar.git
+[submodule "lib/mbedtls"]
+	path = firmware/lib/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
+[submodule "lib/heatshrink"]
+	path = firmware/lib/heatshrink
+	url = https://github.com/flipperdevices/heatshrink.git
+[submodule "lib/st_cmsis_device_wb"]
+	path = firmware/lib/stm32wb_cmsis
+	url = https://github.com/STMicroelectronics/cmsis_device_wb
+[submodule "lib/stm32wbxx_hal_driver"]
+	path = firmware/lib/stm32wb_hal
+	url = https://github.com/STMicroelectronics/stm32wbxx_hal_driver
+[submodule "lib/stm32wb_copro"]
+	path = firmware/lib/stm32wb_copro
+	url = https://github.com/flipperdevices/stm32wb_copro.git
+[submodule "subghz_remote"]
+	path = firmware/applications/main/subghz_remote
+	url = https://github.com/DarkFlippers/SubGHz_Remote.git
+	branch = ufw_main_app
