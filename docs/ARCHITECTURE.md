@@ -31,7 +31,15 @@ drivers, and the HAL.
    - **Global Search** (index on SD),
    - the **Capture Timeline** service (hooks into core apps' save paths),
    - **R0N1N Hub** (catalog with a compatibility filter),
-   - the **Workflow/JS runner** (built on mJS).
+   - the **Workflow/JS runner** (built on mJS),
+   - a **Localization service**: UI strings resolved through a string
+     table keyed by locale, Russian as the default (see `VISION.md`,
+     "Localization as a differentiator"). Strings live in core apps and
+     the R0N1N layer alike are pulled through this service rather than
+     hardcoded, so adding a locale later doesn't require touching call
+     sites. The open risk isn't the string-table design — it's whether a
+     legible Cyrillic bitmap font fits the flash budget (see
+     `HARDWARE.md`).
 6. **FAP apps on SD** — all further extensibility, without growing the
    monolith (see `ECOSYSTEM.md`).
 

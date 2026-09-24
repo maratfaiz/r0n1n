@@ -34,6 +34,18 @@ polish, and the volume of bundled apps, not in raw capability (see
    are marked with a distinct badge in the UI and never presented as
    "built-in." Technical grounding in `HARDWARE.md`.
 
+## Localization as a differentiator
+
+None of the existing forks (OFW, Unleashed, Momentum, RogueMaster) ship a
+native, first-class localization layer — English (or hardcoded strings) is
+the assumption baked into their UI code. R0N1N's default UI language is
+**Russian**, driven by a proper string-table localization architecture
+(not hardcoded Cyrillic strings), so other locales can be added later
+without rework. This is a genuinely unoccupied niche, not a cosmetic
+choice — see `ARCHITECTURE.md` for the technical approach and
+`HARDWARE.md`/`ROADMAP.md` for the Cyrillic-font/flash-budget risk that
+comes with it.
+
 ## The analogy
 
 Not "yet another Unleashed," but what GrapheneOS/LineageOS are to Android:

@@ -125,3 +125,9 @@ exceeding the platform's physical limits. UX and architecture decisions
   community estimates above.
 - Compatibility of new R0N1N services with Unleashed's current
   `api_symbols.csv` — see `ECOSYSTEM.md`.
+- Cyrillic font feasibility for the default Russian UI (see `VISION.md`,
+  "Localization as a differentiator"). Unleashed/OFW's stock bitmap fonts
+  only cover Latin/ASCII glyphs — a legible Cyrillic set at 128×64 needs to
+  be sourced or hand-drawn, and its flash footprint measured against the
+  budget above before the localization service in `ARCHITECTURE.md` is
+  built out.

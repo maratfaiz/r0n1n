@@ -19,6 +19,11 @@ channels, branding, a reproducible build.
 Dependencies: the current `HEAD` of `DarkFlippers/unleashed-firmware` (see
 `FIRMWARE_LANDSCAPE.md`), the toolchain.
 Risk: drifting from upstream — mitigated by regular rebasing.
+Also part of this stage: a feasibility check for a legible Cyrillic bitmap
+font within the flash budget (see `HARDWARE.md`, `VISION.md` —
+"Localization as a differentiator"), since the default Russian UI depends
+on it before the localization service in `ARCHITECTURE.md` is worth
+building.
 Outcome: an R0N1N build == Unleashed + branding, installable via
 web/qFlipper.
 

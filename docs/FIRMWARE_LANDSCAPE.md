@@ -82,7 +82,12 @@ reworked — meaning it won't fight the R0N1N UX layer.
 ## Synthesis: R0N1N's base strategy
 
 1. **Fork Unleashed** — the foundation (Stage 0): API/app compatibility,
-   the unlock, external-module support, active upstream maintenance.
+   the unlock, external-module support, active upstream maintenance. The
+   fork lives inside this same repository, under `firmware/`, brought in
+   via `git subtree` so Unleashed's commit history (and GPL attribution)
+   is preserved rather than squashed — this also keeps `git subtree pull`
+   available for staying in sync with upstream, instead of a separate
+   repository under a different remote.
 2. **Port the UX layer from Momentum**, reworked into R0N1N's own
    information architecture (Home dashboard, pseudo-swipes, profiles — see
    `UX_DESIGN.md`), not a blind copy of Momentum's menus.

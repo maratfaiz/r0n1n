@@ -68,7 +68,18 @@ Built-in interactive lab scenarios plus a CTF mode (notes, a timer,
 exporting findings to the companion) — a direct answer to the project's
 mixed audience (see `VISION.md`).
 
-## 7. "Explain this capture" — offline heuristics, no AI
+## 7. Native Russian-language UI
+
+A proper localization layer (string tables, not hardcoded strings) with
+Russian as the default locale — something no existing fork treats as a
+first-class feature. Fully native, no companion or external hardware
+required, so it belongs in the same early-priority bucket as items 1 and 8
+below. The real risk is entirely on the hardware side: sourcing or drawing
+a Cyrillic bitmap font that's legible at 128×64 and fits the flash budget
+(see `HARDWARE.md`, `ARCHITECTURE.md`) — not a software-architecture
+problem.
+
+## 8. "Explain this capture" — offline heuristics, no AI
 
 No network, no companion: from metadata (frequency/modulation/protocol,
 already determined by existing decoders) produce a human-readable hint like
@@ -78,7 +89,7 @@ candidate for early implementation, not tied to the companion.
 
 ## Prioritization (for the roadmap)
 
-Of the items above, **1 and 7** are fully native and don't depend on a
+Of the items above, **1, 7, and 8** are fully native and don't depend on a
 companion/external hardware — they should come earlier than the rest.
 Items 2–4 and part of 5 require a companion or an external module — it
 makes sense to plan them once the companion transport (RPC over USB/BLE)
