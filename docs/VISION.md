@@ -42,9 +42,10 @@ the assumption baked into their UI code. R0N1N's default UI language is
 **Russian**, driven by a proper string-table localization architecture
 (not hardcoded Cyrillic strings), so other locales can be added later
 without rework. This is a genuinely unoccupied niche, not a cosmetic
-choice — see `ARCHITECTURE.md` for the technical approach and
-`HARDWARE.md`/`ROADMAP.md` for the Cyrillic-font/flash-budget risk that
-comes with it.
+choice — see `ARCHITECTURE.md` for the technical approach. The
+Cyrillic-font/flash-budget question this raised turned out cheap to answer
+(see `HARDWARE.md`): the glyphs already exist in the vendored `u8g2` font
+bundle, at a cost of a few KB.
 
 ## The analogy
 

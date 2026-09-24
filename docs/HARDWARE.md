@@ -147,9 +147,36 @@ R0N1N feature.
   inferred from the static numbers above.
 - Compatibility of new R0N1N services with Unleashed's current
   `api_symbols.csv` — see `ECOSYSTEM.md`.
-- Cyrillic font feasibility for the default Russian UI (see `VISION.md`,
-  "Localization as a differentiator"). Unleashed/OFW's stock bitmap fonts
-  only cover Latin/ASCII glyphs — a legible Cyrillic set at 128×64 needs to
-  be sourced or hand-drawn, and its flash footprint measured against the
-  budget above before the localization service in `ARCHITECTURE.md` is
-  built out.
+- ~~Cyrillic font feasibility~~ — **resolved, cheap.** See below.
+
+## Cyrillic font: resolved (Stage 0, September 2026)
+
+The original assumption — that a Cyrillic bitmap font would need to be
+sourced or hand-drawn — was wrong. `firmware/lib/u8g2` (already vendored,
+used for all of Flipper's screen rendering) ships 1,673 pre-generated
+fonts, of which ~23 are curated `_t_cyrillic` variants covering ASCII +
+Cyrillic in one table. `canvas.c` maps the five `Font` enum values to
+specific u8g2 fonts:
+
+| `Font` enum | Current (Latin) | Cyrillic sibling in the bundle | Measured/estimated cost |
+|---|---|---|---|
+| `FontSecondary` | `u8g2_font_haxrcorp4089_tr` | `u8g2_font_haxrcorp4089_t_cyrillic` (exact same face) | **+1,712 B, build-verified** (see below) |
+| `FontPrimary` | `u8g2_font_helvB08_tr` (bold) | no exact match; `u8g2_font_6x13B_t_cyrillic` is a bold alternative in the bundle | not measured — different metrics, needs a Stage 2 visual pick, but same order of magnitude (a few KB) |
+| `FontBigNumbers` | `u8g2_font_profont22_tn` | n/a | none needed — digits only |
+| `FontBatteryPercent` | `u8g2_font_5x7_tr` | n/a | none needed — digits/% only |
+| `FontKeyboard` | `u8g2_font_profont11_mr` | none in the `_t_cyrillic` set | only matters if a Cyrillic on-screen keyboard *layout* is built — a separate, larger Stage 2+ UX task, not a font-availability problem |
+
+The `FontSecondary` number is real, not estimated: swapping it to
+`u8g2_font_haxrcorp4089_t_cyrillic` in `canvas.c` and running a full
+`./fbt` build dropped `.free_flash` from 143,632 B to 141,920 B — a
+1,712 B cost (higher than the two fonts' raw declared-size difference of
+780 B because the old font stayed linked in for an unrelated height-adjust
+comparison elsewhere in the same file; a clean swap would cost less). That
+change was reverted after measuring it — actually wiring locale-aware font
+selection is Stage 2 work (the localization service in `ARCHITECTURE.md`),
+not Stage 0.
+
+**Conclusion:** against a ~140 KB free-flash budget, a few KB for Cyrillic
+glyph tables is noise. This was the one open item blocking "Localization
+as a differentiator" in `VISION.md` from being a confident claim rather
+than a hope — it no longer is.

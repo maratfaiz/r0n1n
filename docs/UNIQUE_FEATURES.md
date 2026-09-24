@@ -74,10 +74,13 @@ A proper localization layer (string tables, not hardcoded strings) with
 Russian as the default locale — something no existing fork treats as a
 first-class feature. Fully native, no companion or external hardware
 required, so it belongs in the same early-priority bucket as items 1 and 8
-below. The real risk is entirely on the hardware side: sourcing or drawing
-a Cyrillic bitmap font that's legible at 128×64 and fits the flash budget
-(see `HARDWARE.md`, `ARCHITECTURE.md`) — not a software-architecture
-problem.
+below. The font risk this raised is resolved and cheap (see
+`HARDWARE.md`): the vendored `u8g2` library already ships Cyrillic
+variants of Flipper's own fonts, at a cost of a few KB against a ~140 KB
+free-flash budget — confirmed with a real build, not estimated. What's
+left is a software/UX problem — the string-table service itself
+(`ARCHITECTURE.md`) and picking Cyrillic font substitutes for the two
+`Font` enum values that don't have an exact-face match in the bundle.
 
 ## 8. "Explain this capture" — offline heuristics, no AI
 

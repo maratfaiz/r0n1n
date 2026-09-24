@@ -24,10 +24,16 @@ Risk: drifting from upstream — mitigated by regular rebasing.
 `git subtree` (full history preserved), all 13 submodules resolve and
 check out cleanly, and a stock `f7-firmware-D` build succeeds end to end
 (toolchain fetch → compile → link → `.bin`/`.dfu`) — see `HARDWARE.md` for
-the measured flash numbers this produced. Still open: a feasibility check
-for a legible Cyrillic bitmap font within that measured flash budget (see
-`HARDWARE.md`, `VISION.md` — "Localization as a differentiator"), branding
-placeholders, release channels, and CI.
+the measured flash numbers this produced. `FIRMWARE_ORIGIN` and the
+on-device About screen are rebranded to R0N1N (verified with a full
+rebuild — the only real branding lever; it's never checked by name in
+application code, only as `#ifndef FW_ORIGIN_Official`, so Unleashed's
+unlock features are untouched). CI (`.github/workflows/build-firmware.yml`)
+builds on push/PR and its first run passed. Cyrillic font feasibility is
+resolved — see `HARDWARE.md`, it's cheap (~1-5 KB against ~140 KB free),
+using fonts already vendored in `lib/u8g2`, no sourcing/hand-drawing
+needed. Still open: release channels/versioning scheme, and a boot-splash
+asset (the text branding is done; the animated logo is still Unleashed's).
 Outcome: an R0N1N build == Unleashed + branding, installable via
 web/qFlipper.
 
