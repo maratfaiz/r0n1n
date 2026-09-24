@@ -117,12 +117,34 @@ exceeding the platform's physical limits. UX and architecture decisions
   — see `UX_DESIGN.md`), rather than treating the numbers in this document
   as an exact budget.
 
-## Open questions (need measurement/confirmation at Stage 0)
+## Measured, not estimated (Stage 0, September 2026)
 
-- The actual free flash and heap on the target Unleashed base version after
-  it's built — needs to be measured with a `ufbt` build and the firmware's
-  own profiling (`top`/`free` in the firmware CLI), not inferred from the
-  community estimates above.
+A stock build of the merged Unleashed base (`firmware/`, default `f7-firmware-D`
+target, no R0N1N changes yet) reports:
+
+| Section | Size |
+|---|---|
+| `.text` (code) | 727,180 B (710.1 KB) |
+| `.rodata` (constants) | 176,732 B (172.6 KB) |
+| `.data` (initialized) | 700 B |
+| `.bss` (RAM, uninitialized) | 7,548 B (7.4 KB) |
+| `.free_flash` | 143,624 B (140.3 KB) |
+
+Flash used by the firmware image (`.text` + `.rodata` + `.data`) is
+~883.4 KB, leaving ~140.3 KB free in the firmware partition — noticeably
+tighter than the ~300 KB the earlier community estimate implied, but still
+enough headroom to budget a Cyrillic font and the R0N1N-layer services
+against, as long as they're kept frugal (see `ARCHITECTURE.md`). This
+number will shift as Unleashed itself is updated (`git subtree pull`) and
+should be re-measured before locking in a flash budget for any specific
+R0N1N feature.
+
+## Open questions (still need confirmation)
+
+- Free **heap** at runtime (as opposed to flash) — the table above is a
+  static link-time report; actual free RAM needs the firmware's own
+  `free`/`top` CLI commands on real hardware or in the debug build, not
+  inferred from the static numbers above.
 - Compatibility of new R0N1N services with Unleashed's current
   `api_symbols.csv` — see `ECOSYSTEM.md`.
 - Cyrillic font feasibility for the default Russian UI (see `VISION.md`,

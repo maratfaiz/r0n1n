@@ -19,11 +19,15 @@ channels, branding, a reproducible build.
 Dependencies: the current `HEAD` of `DarkFlippers/unleashed-firmware` (see
 `FIRMWARE_LANDSCAPE.md`), the toolchain.
 Risk: drifting from upstream — mitigated by regular rebasing.
-Also part of this stage: a feasibility check for a legible Cyrillic bitmap
-font within the flash budget (see `HARDWARE.md`, `VISION.md` —
-"Localization as a differentiator"), since the default Russian UI depends
-on it before the localization service in `ARCHITECTURE.md` is worth
-building.
+
+**Progress:** Unleashed's `dev` branch is merged into `firmware/` via
+`git subtree` (full history preserved), all 13 submodules resolve and
+check out cleanly, and a stock `f7-firmware-D` build succeeds end to end
+(toolchain fetch → compile → link → `.bin`/`.dfu`) — see `HARDWARE.md` for
+the measured flash numbers this produced. Still open: a feasibility check
+for a legible Cyrillic bitmap font within that measured flash budget (see
+`HARDWARE.md`, `VISION.md` — "Localization as a differentiator"), branding
+placeholders, release channels, and CI.
 Outcome: an R0N1N build == Unleashed + branding, installable via
 web/qFlipper.
 
