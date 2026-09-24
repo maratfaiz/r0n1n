@@ -27,6 +27,14 @@ static void desktop_loader_callback(const void* message, void* context) {
     const LoaderEvent* event = message;
 
     if(event->type == LoaderEventTypeApplicationBeforeLoad) {
+        // R0N1N Recent apps: stash the name here (Loader's thread) before the
+        // custom event is even enqueued, so the handler on the ViewDispatcher's
+        // thread (DesktopGlobalBeforeAppStarted below) sees it once dequeued.
+        if(event->name) {
+            strlcpy(desktop->pending_app_name, event->name, sizeof(desktop->pending_app_name));
+        } else {
+            desktop->pending_app_name[0] = '\0';
+        }
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalBeforeAppStarted);
         furi_check(furi_semaphore_acquire(desktop->animation_semaphore, 3000) == FuriStatusOk);
     } else if(event->type == LoaderEventTypeNoMoreAppsInQueue) {
@@ -124,6 +132,26 @@ static void desktop_stealth_mode_icon_draw_callback(Canvas* canvas, void* contex
     canvas_draw_icon(canvas, 0, 0, &I_Muted_8x8);
 }
 
+// R0N1N Recent apps (docs/UX_DESIGN.md): most-recent first, capped ring
+// buffer, deduplicating an immediate repeat (relaunching the same app twice
+// in a row shouldn't produce two entries).
+static void desktop_recent_apps_push(Desktop* desktop, const char* name) {
+    if(!name || name[0] == '\0') return;
+    if(desktop->recent_apps_count > 0 && strncmp(desktop->recent_apps[0], name, DESKTOP_RECENT_APP_NAME_LEN) == 0) {
+        return;
+    }
+
+    uint8_t count = desktop->recent_apps_count;
+    if(count < DESKTOP_RECENT_APPS_COUNT) {
+        count++;
+    }
+    for(uint8_t i = count - 1; i > 0; i--) {
+        strlcpy(desktop->recent_apps[i], desktop->recent_apps[i - 1], DESKTOP_RECENT_APP_NAME_LEN);
+    }
+    strlcpy(desktop->recent_apps[0], name, DESKTOP_RECENT_APP_NAME_LEN);
+    desktop->recent_apps_count = count;
+}
+
 static bool desktop_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
     Desktop* desktop = (Desktop*)context;
@@ -136,6 +164,7 @@ static bool desktop_custom_event_callback(void* context, uint32_t event) {
         desktop_auto_lock_inhibit(desktop);
 
         desktop->app_running = true;
+        desktop_recent_apps_push(desktop, desktop->pending_app_name);
 
         furi_semaphore_release(desktop->animation_semaphore);
 
@@ -236,6 +265,18 @@ static void desktop_clock_timer_callback(void* context) {
     view_port_enabled_set(desktop->clock_viewport, clock_enabled);
 }
 
+// R0N1N Home dashboard (docs/UX_DESIGN.md): drives desktop_view_main's big
+// clock/date/profile display. Only ticks while desktop_scene_main is active
+// (started/stopped there), independent of the small status-bar clock above.
+static void desktop_dashboard_update_timer_callback(void* context) {
+    furi_assert(context);
+    Desktop* desktop = context;
+
+    DateTime datetime;
+    furi_hal_rtc_get_datetime(&datetime);
+    desktop_main_update_dashboard(desktop->main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+}
+
 static void desktop_apply_settings(Desktop* desktop) {
     desktop->in_transition = true;
 
@@ -273,7 +314,6 @@ static Desktop* desktop_alloc(void) {
     desktop->animation_semaphore = furi_semaphore_alloc(1, 0);
     desktop->animation_manager = animation_manager_alloc();
     desktop->gui = furi_record_open(RECORD_GUI);
-    desktop->scene_thread = furi_thread_alloc();
     desktop->view_dispatcher = view_dispatcher_alloc();
     desktop->scene_manager = scene_manager_alloc(&desktop_scene_handlers, desktop);
 
@@ -296,12 +336,20 @@ static Desktop* desktop_alloc(void) {
     desktop->pin_input_view = desktop_view_pin_input_alloc();
     desktop->pin_timeout_view = desktop_view_pin_timeout_alloc();
     desktop->slideshow_view = desktop_view_slideshow_alloc();
+    desktop->favorites_submenu = submenu_alloc();
+    desktop->recent_submenu = submenu_alloc();
 
     desktop->main_view_stack = view_stack_alloc();
     desktop->main_view = desktop_main_alloc();
     View* dolphin_view = animation_manager_get_animation_view(desktop->animation_manager);
     view_stack_add_view(desktop->main_view_stack, desktop_main_get_view(desktop->main_view));
     view_stack_add_view(desktop->main_view_stack, dolphin_view);
+    // R0N1N Home dashboard: added after dolphin_view so it draws on top of
+    // it; safe to do purely for draw order because it has no input callback
+    // (see desktop_view_main.c). desktop_main_get_view() above stays put for
+    // input priority -- do not reorder that one.
+    view_stack_add_view(
+        desktop->main_view_stack, desktop_main_get_dashboard_view(desktop->main_view));
     view_stack_add_view(
         desktop->main_view_stack, desktop_view_locked_get_view(desktop->locked_view));
 
@@ -344,6 +392,12 @@ static Desktop* desktop_alloc(void) {
         desktop->view_dispatcher,
         DesktopViewIdSlideshow,
         desktop_view_slideshow_get_view(desktop->slideshow_view));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher,
+        DesktopViewIdFavorites,
+        submenu_get_view(desktop->favorites_submenu));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher, DesktopViewIdRecent, submenu_get_view(desktop->recent_submenu));
 
     // Lock icon
     desktop->lock_icon_viewport = view_port_alloc();
@@ -395,6 +449,9 @@ static Desktop* desktop_alloc(void) {
 
     desktop->update_clock_timer =
         furi_timer_alloc(desktop_clock_timer_callback, FuriTimerTypePeriodic, desktop);
+
+    desktop->dashboard_update_timer =
+        furi_timer_alloc(desktop_dashboard_update_timer_callback, FuriTimerTypePeriodic, desktop);
 
     desktop->app_running = loader_is_locked(desktop->loader);
 

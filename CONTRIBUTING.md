@@ -2,23 +2,28 @@
 
 ## Current stage of the project
 
-R0N1N is currently in a **conceptual/pre-development stage**: the whole
-repository is documentation under `docs/`, describing the vision, the
-technical foundation, and the development plan. Forking the firmware,
-building it, and writing code haven't started yet (see `docs/ROADMAP.md`,
-"Current status").
+R0N1N is **in active development**: `firmware/` is a real fork of Unleashed
+(brought in via `git subtree`, see `docs/FIRMWARE_LANDSCAPE.md`), and
+Stages 0–1 of `docs/ROADMAP.md` are done — the Home dashboard, Control
+Center, Quick Actions, and Recent all exist and build. See
+`docs/ROADMAP.md`, "Current status," for exactly what's shipped, what's
+simplified, and what's next.
 
-That means the most useful contributions right now are:
+Useful contributions at this point:
 
+- code for the current or next roadmap stage — read the relevant
+  `docs/ROADMAP.md` section and the "Shipped"/"Deliberately not done"
+  notes under the last completed stage first, so a PR doesn't duplicate or
+  contradict a scope decision that was already made deliberately;
 - reviewing and refining the documents in `docs/` — factual inaccuracies,
   stale references to upstream releases, unrealistic timeline estimates;
-- discussing architectural decisions before they're locked into code;
 - expanding `docs/HARDWARE.md` and `docs/ECOSYSTEM.md` with verified facts
   (cited to a source) wherever something is flagged as "needs
   confirmation."
 
-Pull requests with firmware/app code won't be merged before Stage 0 (see
-`docs/ROADMAP.md`) is complete — the forked base needs to exist first.
+Firmware PRs are expected to build (`FBT_NO_SYNC=1 ./fbt` from `firmware/`)
+before review — CI (`.github/workflows/build-firmware.yml`) checks this on
+every PR regardless, but catching it locally first saves a round trip.
 
 ## How to propose documentation changes
 

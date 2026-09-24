@@ -1,12 +1,13 @@
 # R0N1N
 
-**R0N1N** is a concept for a custom Flipper Zero firmware built as a
-UX-first operating shell — not yet another "fork with a pile of apps."
+**R0N1N** is a custom Flipper Zero firmware built as a UX-first operating
+shell — not yet another "fork with a pile of apps."
 
-> **Status: concept stage.** Development (forking, building, code) hasn't
-> started yet. Right now this repository holds fully fleshed-out
-> documentation — the vision, the technical case, and the plan. See
-> [`docs/ROADMAP.md`](docs/ROADMAP.md), "Current status."
+> **Status: in development.** `firmware/` is a real, building fork of
+> Unleashed with R0N1N's Home dashboard, Control Center, Quick Actions, and
+> Recent implemented and verified against actual builds (Stages 0–1 of the
+> roadmap). See [`docs/ROADMAP.md`](docs/ROADMAP.md), "Current status," for
+> exactly what's shipped, what's simplified, and what's next.
 
 ## The idea in short
 

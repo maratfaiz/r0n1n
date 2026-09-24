@@ -17,12 +17,22 @@
 #include <gui/view_stack.h>
 #include <gui/view_dispatcher.h>
 #include <gui/modules/popup.h>
+#include <gui/modules/submenu.h>
 #include <gui/scene_manager.h>
 
 #include <loader/loader.h>
 #include <notification/notification_app.h>
 
 #define STATUS_BAR_Y_SHIFT 13
+
+// R0N1N Home dashboard placeholder (docs/UX_DESIGN.md, docs/ROADMAP.md Stage 2):
+// no Profile Manager exists yet, so the dashboard always shows this fixed name.
+#define DASHBOARD_DEFAULT_PROFILE_NAME "Everyday"
+
+// R0N1N Recent apps (docs/UX_DESIGN.md): most-recently-launched first, no
+// persistence across reboot in Stage 1 -- see desktop.c/desktop_scene_recent.c.
+#define DESKTOP_RECENT_APPS_COUNT   6
+#define DESKTOP_RECENT_APP_NAME_LEN 40
 
 typedef enum {
     DesktopViewIdMain,
@@ -34,6 +44,10 @@ typedef enum {
     DesktopViewIdPinInput,
     DesktopViewIdPinTimeout,
     DesktopViewIdSlideshow,
+    // R0N1N navigation law (docs/UX_DESIGN.md): Up-short opens Favorites
+    // ("Quick Actions"), long-press-OK opens Recent.
+    DesktopViewIdFavorites,
+    DesktopViewIdRecent,
     DesktopViewIdTotal,
 } DesktopViewId;
 
@@ -44,8 +58,6 @@ typedef struct {
 } DesktopClock;
 
 struct Desktop {
-    FuriThread* scene_thread;
-
     Gui* gui;
     ViewDispatcher* view_dispatcher;
     SceneManager* scene_manager;
@@ -59,6 +71,8 @@ struct Desktop {
     DesktopViewPinTimeout* pin_timeout_view;
     DesktopSlideshowView* slideshow_view;
     DesktopViewPinInput* pin_input_view;
+    Submenu* favorites_submenu;
+    Submenu* recent_submenu;
 
     ViewStack* main_view_stack;
     ViewStack* locked_view_stack;
@@ -78,12 +92,25 @@ struct Desktop {
 
     FuriTimer* auto_lock_timer;
     FuriTimer* update_clock_timer;
+    // R0N1N Home dashboard (desktop_view_main.c): runs only while the Main
+    // scene is on screen, started/stopped in desktop_scene_main_on_enter/exit.
+    FuriTimer* dashboard_update_timer;
 
     AnimationManager* animation_manager;
     FuriSemaphore* animation_semaphore;
 
     DesktopClock clock;
     DesktopSettings settings;
+
+    // R0N1N Recent apps (docs/UX_DESIGN.md). pending_app_name is a
+    // cross-thread scratch field: desktop_loader_callback (Loader's thread)
+    // writes it, the DesktopGlobalBeforeAppStarted handler (ViewDispatcher's
+    // thread, desktop_custom_event_callback) reads it once and pushes into
+    // recent_apps -- same unsynchronized-simple-field pattern already used
+    // for app_running/locked below.
+    char pending_app_name[DESKTOP_RECENT_APP_NAME_LEN];
+    char recent_apps[DESKTOP_RECENT_APPS_COUNT][DESKTOP_RECENT_APP_NAME_LEN];
+    uint8_t recent_apps_count;
 
     bool in_transition;
     bool app_running;

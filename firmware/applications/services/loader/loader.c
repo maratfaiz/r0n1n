@@ -655,6 +655,7 @@ static LoaderMessageLoaderStatusResult loader_start_external_app(
         loader->app.fap = NULL;
         LoaderEvent event;
         event.type = LoaderEventTypeApplicationLoadFailed;
+        event.name = NULL;
         furi_pubsub_publish(loader->pubsub, &event);
     }
 
@@ -879,6 +880,7 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
 
         LoaderEvent event;
         event.type = LoaderEventTypeApplicationBeforeLoad;
+        event.name = name;
         furi_pubsub_publish(loader->pubsub, &event);
 
         // Per launch, not per bracket: a deferred chain closes its outer bracket with the args of
@@ -955,6 +957,7 @@ static void loader_do_emit_queue_empty_event(Loader* loader) {
     FURI_LOG_I(TAG, "Launch queue empty");
     LoaderEvent event;
     event.type = LoaderEventTypeNoMoreAppsInQueue;
+    event.name = NULL;
     furi_pubsub_publish(loader->pubsub, &event);
 }
 
@@ -1034,6 +1037,7 @@ static void loader_do_app_closed(Loader* loader) {
 
     LoaderEvent event;
     event.type = LoaderEventTypeApplicationStopped;
+    event.name = NULL;
     furi_pubsub_publish(loader->pubsub, &event);
 
     loader_do_next_deferred_launch_if_available(loader);

@@ -84,11 +84,26 @@ This is an architectural principle, not an implementation detail: no
 feature critical to the device's base, standalone operation may depend on
 the companion.
 
-## Open question
+## Stage 1 finding: Home/Control Center/Quick Actions/Recent are core-service patches, not FAPs
 
-The exact boundary between "R0N1N layer as a system service" and "R0N1N
-layer as a FAP app on top of the standard SDK" needs prototyping in
-Roadmap Stage 1: some services (Global Search, Capture Timeline) may turn
-out to be simpler and safer for upstream compatibility as privileged FAPs
-rather than core patches. That decision follows from profiling, not from
-deciding it up front.
+Stage 1 (see `ROADMAP.md`) settled this for the pieces it touched, by
+building them rather than by deciding up front. Home, Control Center,
+Quick Actions, and Recent are all new scenes/views inside Unleashed's
+existing `desktop` service (`firmware/applications/services/desktop/`),
+not separate FAP apps — because they need to *replace and extend* that
+service's own Home screen, input law, and view stack, which isn't
+something a FAP sitting on top of the public SDK can reach into. The one
+change outside `desktop/` was additive and minimal: a `name` field on
+`LoaderEvent` (`loader.h`), needed for Recent to know what app was about
+to launch, populated at a single call site, every other subscriber
+unaffected.
+
+## Open question (Stage 2 and later)
+
+Whether *later* R0N1N services — Global Search, Capture Timeline, Profile
+Manager — follow the same core-patch pattern, or turn out simpler and
+safer for upstream compatibility as privileged FAPs, is still open. Their
+needs differ from Stage 1's: they're less about intercepting an existing
+service's input/draw and more about indexing and cross-app data, which a
+FAP has a more plausible path to without patching core. That decision
+still follows from prototyping each one, not from deciding it here.
