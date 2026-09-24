@@ -1,0 +1,58 @@
+# Builds firmware/ (the Unleashed base merged in via git subtree, see
+# docs/FIRMWARE_LANDSCAPE.md) on every push and PR, so a broken build is
+# caught before it lands. Deliberately minimal for Stage 0: default debug
+# build only, no release/COMPACT flavor and no PR-comment bot yet (see
+# docs/ROADMAP.md).
+#
+# firmware/ isn't its own git repo (it's subtree-merged into this one), so
+# fbt's own git-submodule sync would fail looking for firmware/.git -- we
+# skip it with FBT_NO_SYNC=1 and let actions/checkout's submodule support
+# (driven by the root .gitmodules) populate the submodules instead.
+
+name: Build firmware
+
+on:
+  push:
+    branches: [claude/r0n1n-flipper-firmware-btewpv]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: f7 firmware
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Build firmware
+        working-directory: firmware
+        run: FBT_NO_SYNC=1 ./fbt 2>&1 | tee build.log
+
+      - name: Firmware size summary
+        if: always()
+        run: |
+          {
+            echo '```'
+            grep -A6 '^Firmware size' firmware/build.log || echo "size report not found in build log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload firmware artifact
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: r0n1n-firmware-${{ github.sha }}
+          path: firmware/dist/f7-D/*
+          retention-days: 14
+          if-no-files-found: error
