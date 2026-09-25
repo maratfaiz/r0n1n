@@ -7,6 +7,7 @@
 #include <locale/locale.h>
 #include <storage/storage.h>
 
+#include <applications.h>
 #include <assets_icons.h>
 
 #include "scenes/desktop_scene.h"
@@ -18,6 +19,7 @@ static void desktop_auto_lock_arm(Desktop*);
 static void desktop_auto_lock_inhibit(Desktop*);
 static void desktop_start_auto_lock_timer(Desktop*);
 static void desktop_apply_settings(Desktop*);
+static void desktop_dashboard_update(Desktop*);
 
 static void desktop_loader_callback(const void* message, void* context) {
     furi_assert(context);
@@ -25,8 +27,20 @@ static void desktop_loader_callback(const void* message, void* context) {
     const LoaderEvent* event = message;
 
     if(event->type == LoaderEventTypeApplicationBeforeLoad) {
+        // R0N1N Recent apps: stash the name here (Loader's thread) before the
+        // custom event is even enqueued, so the handler on the ViewDispatcher's
+        // thread (DesktopGlobalBeforeAppStarted below) sees it once dequeued.
+        // A name too long to store whole is dropped rather than truncated: a
+        // truncated .fap path would sit in Recent and fail to relaunch.
+        if(!event->name ||
+           strlcpy(desktop->pending_app_name, event->name, sizeof(desktop->pending_app_name)) >=
+               sizeof(desktop->pending_app_name)) {
+            desktop->pending_app_name[0] = '\0';
+        }
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalBeforeAppStarted);
         furi_check(furi_semaphore_acquire(desktop->animation_semaphore, 3000) == FuriStatusOk);
+    } else if(event->type == LoaderEventTypeApplicationStopped) {
+        view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalAppStopped);
     } else if(event->type == LoaderEventTypeNoMoreAppsInQueue) {
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalAfterAppFinished);
     }
@@ -118,6 +132,29 @@ static void desktop_stealth_mode_icon_draw_callback(Canvas* canvas, void* contex
     canvas_draw_icon(canvas, 0, 0, &I_Muted_8x8);
 }
 
+// R0N1N Recent apps (docs/UX_DESIGN.md): most-recent first, capped at
+// DESKTOP_RECENT_APPS_COUNT. Relaunching an app already in the list moves it
+// to the front instead of adding a duplicate; otherwise the oldest entry is
+// dropped once the list is full.
+static void desktop_recent_apps_push(Desktop* desktop, const char* name) {
+    if(name[0] == '\0') return;
+
+    uint8_t i = 0;
+    while(i < desktop->recent_apps_count && strcmp(desktop->recent_apps[i], name) != 0) {
+        i++;
+    }
+    if(i == desktop->recent_apps_count) {
+        if(desktop->recent_apps_count < DESKTOP_RECENT_APPS_COUNT) {
+            desktop->recent_apps_count++;
+        }
+        i = desktop->recent_apps_count - 1;
+    }
+    for(; i > 0; i--) {
+        strlcpy(desktop->recent_apps[i], desktop->recent_apps[i - 1], DESKTOP_RECENT_APP_NAME_LEN);
+    }
+    strlcpy(desktop->recent_apps[0], name, DESKTOP_RECENT_APP_NAME_LEN);
+}
+
 static bool desktop_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
     Desktop* desktop = (Desktop*)context;
@@ -129,6 +166,10 @@ static bool desktop_custom_event_callback(void* context, uint32_t event) {
 
         desktop_auto_lock_inhibit(desktop);
         desktop->app_running = true;
+        strlcpy(
+            desktop->launched_app_name,
+            desktop->pending_app_name,
+            sizeof(desktop->launched_app_name));
 
         furi_semaphore_release(desktop->animation_semaphore);
 
@@ -136,6 +177,16 @@ static bool desktop_custom_event_callback(void* context, uint32_t event) {
         animation_manager_load_and_continue_animation(desktop->animation_manager);
         desktop_auto_lock_arm(desktop);
         desktop->app_running = false;
+        // The dashboard timer skips ticks while an app runs (see its
+        // callback); repaint now so Home doesn't show a stale clock for up
+        // to a second after returning.
+        if(furi_timer_is_running(desktop->dashboard_update_timer)) {
+            desktop_dashboard_update(desktop);
+        }
+
+    } else if(event == DesktopGlobalAppStopped) {
+        desktop_recent_apps_push(desktop, desktop->launched_app_name);
+        desktop->launched_app_name[0] = '\0';
 
     } else if(event == DesktopGlobalAutoLock) {
         if(!desktop->app_running && !desktop->locked) {
@@ -223,6 +274,26 @@ static void desktop_clock_timer_callback(void* context) {
     view_port_enabled_set(desktop->clock_viewport, clock_enabled);
 }
 
+// R0N1N Home dashboard (docs/UX_DESIGN.md): drives desktop_view_main's big
+// clock/date/profile display. Only ticks while desktop_scene_main is active
+// (started/stopped there), independent of the small status-bar clock above.
+static void desktop_dashboard_update(Desktop* desktop) {
+    DateTime datetime;
+    furi_hal_rtc_get_datetime(&datetime);
+    desktop_main_update_dashboard(desktop->main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+}
+
+static void desktop_dashboard_update_timer_callback(void* context) {
+    furi_assert(context);
+    Desktop* desktop = context;
+
+    // The Main scene stays current underneath a running app, so without this
+    // every tick would request a full GUI redraw for a screen nobody sees.
+    if(desktop->app_running) return;
+
+    desktop_dashboard_update(desktop);
+}
+
 static void desktop_apply_settings(Desktop* desktop) {
     desktop->in_transition = true;
 
@@ -280,12 +351,20 @@ static Desktop* desktop_alloc(void) {
     desktop->pin_input_view = desktop_view_pin_input_alloc();
     desktop->pin_timeout_view = desktop_view_pin_timeout_alloc();
     desktop->slideshow_view = desktop_view_slideshow_alloc();
+    desktop->favorites_submenu = submenu_alloc();
+    desktop->recent_submenu = submenu_alloc();
 
     desktop->main_view_stack = view_stack_alloc();
     desktop->main_view = desktop_main_alloc();
     View* dolphin_view = animation_manager_get_animation_view(desktop->animation_manager);
     view_stack_add_view(desktop->main_view_stack, desktop_main_get_view(desktop->main_view));
     view_stack_add_view(desktop->main_view_stack, dolphin_view);
+    // R0N1N Home dashboard: added after dolphin_view so it draws on top of
+    // it; safe to do purely for draw order because it has no input callback
+    // (see desktop_view_main.c). desktop_main_get_view() above stays put for
+    // input priority -- do not reorder that one.
+    view_stack_add_view(
+        desktop->main_view_stack, desktop_main_get_dashboard_view(desktop->main_view));
     view_stack_add_view(
         desktop->main_view_stack, desktop_view_locked_get_view(desktop->locked_view));
 
@@ -324,6 +403,12 @@ static Desktop* desktop_alloc(void) {
         desktop->view_dispatcher,
         DesktopViewIdSlideshow,
         desktop_view_slideshow_get_view(desktop->slideshow_view));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher,
+        DesktopViewIdFavorites,
+        submenu_get_view(desktop->favorites_submenu));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher, DesktopViewIdRecent, submenu_get_view(desktop->recent_submenu));
 
     // Lock icon
     desktop->lock_icon_viewport = view_port_alloc();
@@ -375,6 +460,9 @@ static Desktop* desktop_alloc(void) {
 
     desktop->update_clock_timer =
         furi_timer_alloc(desktop_clock_timer_callback, FuriTimerTypePeriodic, desktop);
+
+    desktop->dashboard_update_timer =
+        furi_timer_alloc(desktop_dashboard_update_timer_callback, FuriTimerTypePeriodic, desktop);
 
     desktop->app_running = loader_is_locked(desktop->loader);
 
@@ -459,6 +547,35 @@ void desktop_set_stealth_mode_state(Desktop* desktop, bool enabled) {
     view_port_enabled_set(desktop->stealth_mode_icon_viewport, enabled);
 
     desktop->in_transition = false;
+}
+
+// Archive is not a Loader app: it runs on the desktop's own thread so it can
+// start other apps through the Loader itself. The stock firmware only reaches
+// it from Down-short on Home; R0N1N gives Down to Control Center, so Quick
+// Actions (desktop_scene_favorites.c) is where it's launched from instead.
+void desktop_run_archive(Desktop* desktop) {
+    furi_assert(desktop);
+#ifdef APP_ARCHIVE
+    const FlipperInternalApplication* flipper_app = &FLIPPER_ARCHIVE;
+
+    if(furi_thread_get_state(desktop->scene_thread) != FuriThreadStateStopped) {
+        FURI_LOG_E("Desktop", "Thread is already running");
+        return;
+    }
+
+    FuriHalRtcHeapTrackMode mode = furi_hal_rtc_get_heap_track_mode();
+    if(mode > FuriHalRtcHeapTrackModeNone) {
+        furi_thread_enable_heap_trace(desktop->scene_thread);
+    } else {
+        furi_thread_disable_heap_trace(desktop->scene_thread);
+    }
+
+    furi_thread_set_name(desktop->scene_thread, flipper_app->name);
+    furi_thread_set_stack_size(desktop->scene_thread, flipper_app->stack_size);
+    furi_thread_set_callback(desktop->scene_thread, flipper_app->app);
+
+    furi_thread_start(desktop->scene_thread);
+#endif
 }
 
 /*

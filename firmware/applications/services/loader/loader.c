@@ -562,6 +562,7 @@ static LoaderMessageLoaderStatusResult loader_start_external_app(
         loader->app.fap = NULL;
         LoaderEvent event;
         event.type = LoaderEventTypeApplicationLoadFailed;
+        event.name = NULL;
         furi_pubsub_publish(loader->pubsub, &event);
     }
 
@@ -614,6 +615,10 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
 
     LoaderEvent event;
     event.type = LoaderEventTypeApplicationBeforeLoad;
+    // Published before the lock check below, so a start attempted while
+    // another app runs (and is about to be refused) doesn't carry a name --
+    // subscribers must not mistake it for the app that is actually running.
+    event.name = loader_do_is_locked(loader) ? NULL : name;
     furi_pubsub_publish(loader->pubsub, &event);
 
     do {
@@ -701,6 +706,7 @@ static void loader_do_emit_queue_empty_event(Loader* loader) {
     FURI_LOG_I(TAG, "Launch queue empty");
     LoaderEvent event;
     event.type = LoaderEventTypeNoMoreAppsInQueue;
+    event.name = NULL;
     furi_pubsub_publish(loader->pubsub, &event);
 }
 
@@ -778,6 +784,7 @@ static void loader_do_app_closed(Loader* loader) {
 
     LoaderEvent event;
     event.type = LoaderEventTypeApplicationStopped;
+    event.name = NULL;
     furi_pubsub_publish(loader->pubsub, &event);
 
     loader_do_next_deferred_launch_if_available(loader);

@@ -1,7 +1,5 @@
 #include <furi.h>
 #include <furi_hal.h>
-#include <applications.h>
-#include <assets_icons.h>
 #include <loader/loader.h>
 
 #include "../desktop_i.h"
@@ -31,34 +29,6 @@ static void desktop_scene_main_interact_animation_callback(void* context) {
     view_dispatcher_send_custom_event(
         desktop->view_dispatcher, DesktopAnimationEventInteractAnimation);
 }
-
-#ifdef APP_ARCHIVE
-static void
-    desktop_switch_to_app(Desktop* desktop, const FlipperInternalApplication* flipper_app) {
-    furi_assert(desktop);
-    furi_assert(flipper_app);
-    furi_assert(flipper_app->app);
-    furi_assert(flipper_app->name);
-
-    if(furi_thread_get_state(desktop->scene_thread) != FuriThreadStateStopped) {
-        FURI_LOG_E("Desktop", "Thread is already running");
-        return;
-    }
-
-    FuriHalRtcHeapTrackMode mode = furi_hal_rtc_get_heap_track_mode();
-    if(mode > FuriHalRtcHeapTrackModeNone) {
-        furi_thread_enable_heap_trace(desktop->scene_thread);
-    } else {
-        furi_thread_disable_heap_trace(desktop->scene_thread);
-    }
-
-    furi_thread_set_name(desktop->scene_thread, flipper_app->name);
-    furi_thread_set_stack_size(desktop->scene_thread, flipper_app->stack_size);
-    furi_thread_set_callback(desktop->scene_thread, flipper_app->app);
-
-    furi_thread_start(desktop->scene_thread);
-}
-#endif
 
 static void desktop_scene_main_open_app_or_profile(Desktop* desktop, FavoriteApp* application) {
     if(strlen(application->name_or_path) > 0) {
@@ -96,6 +66,13 @@ void desktop_scene_main_on_enter(void* context) {
 
     desktop_main_set_callback(main_view, desktop_scene_main_callback, desktop);
 
+    // R0N1N Home dashboard: paint immediately so the clock isn't blank/stale
+    // for the first second, then keep it ticking while this scene is shown.
+    DateTime datetime;
+    furi_hal_rtc_get_datetime(&datetime);
+    desktop_main_update_dashboard(main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+    furi_timer_start(desktop->dashboard_update_timer, furi_ms_to_ticks(1000));
+
     view_dispatcher_switch_to_view(desktop->view_dispatcher, DesktopViewIdMain);
 }
 
@@ -127,10 +104,13 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
             consumed = true;
             break;
 
-        case DesktopMainEventOpenArchive:
-#ifdef APP_ARCHIVE
-            desktop_switch_to_app(desktop, &FLIPPER_ARCHIVE);
-#endif
+        case DesktopMainEventOpenFavorites:
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneFavorites);
+            consumed = true;
+            break;
+
+        case DesktopMainEventOpenRecent:
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneRecent);
             consumed = true;
             break;
 
@@ -210,6 +190,8 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
 
 void desktop_scene_main_on_exit(void* context) {
     Desktop* desktop = (Desktop*)context;
+
+    furi_timer_stop(desktop->dashboard_update_timer);
 
     animation_manager_set_new_idle_callback(desktop->animation_manager, NULL);
     animation_manager_set_check_callback(desktop->animation_manager, NULL);

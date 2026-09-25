@@ -26,6 +26,12 @@ typedef enum {
 
 typedef struct {
     LoaderEventType type;
+    // Only set (non-NULL) on LoaderEventTypeApplicationBeforeLoad; NULL for
+    // every other event type. Points into the caller's own string for the
+    // duration of the (synchronous) furi_pubsub_publish call only -- copy it,
+    // don't hold the pointer. Added for R0N1N's Recent-apps tracking
+    // (docs/UX_DESIGN.md); see applications/services/desktop/desktop.c.
+    const char* name;
 } LoaderEvent;
 
 typedef enum {
