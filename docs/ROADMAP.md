@@ -3,10 +3,10 @@
 ## Current status
 
 **Stages 0 and 1 are done** — see their sections below for exactly what
-shipped and what was simplified. `firmware/` is a real, building fork of
-Unleashed (`git subtree`, full history) with R0N1N's Home dashboard,
-Control Center, Quick Actions, and Recent wired in and verified against
-actual `./fbt` builds, not just planned. Stage 2 (Profiles, Global Search,
+shipped and what was simplified. `firmware/` is the official Flipper Zero
+firmware, release 1.4.3 (`git subtree`, full history), with R0N1N's Home
+dashboard, Control Center, Quick Actions, and Recent wired in and verified
+against actual `./fbt` builds, not just planned. Stage 2 (Profiles, Global Search,
 Capture Timeline) is next and hasn't started.
 
 Stage-duration estimates are rough, carried over from the original
@@ -16,34 +16,33 @@ codebase.
 
 ## Stage 0 — Fork & Foundation — done
 
-Goal: assemble R0N1N as a fork of Unleashed, set up `ufbt`/CI, release
-channels, branding, a reproducible build.
-Dependencies: the current `HEAD` of `DarkFlippers/unleashed-firmware` (see
-`FIRMWARE_LANDSCAPE.md`), the toolchain.
-Risk: drifting from upstream — mitigated by regular rebasing.
+Goal: assemble R0N1N as a fork of the official Flipper Zero firmware, set
+up `ufbt`/CI, release channels, branding, a reproducible build.
+Dependencies: an official release tag of
+`flipperdevices/flipperzero-firmware` (see `FIRMWARE_LANDSCAPE.md`), the
+toolchain.
+Risk: drifting from upstream — mitigated by regular syncing with official
+releases.
 
-**Progress:** Unleashed's `dev` branch is merged into `firmware/` via
-`git subtree` (full history preserved), all 13 submodules resolve and
+**Progress:** official release `1.4.3` is merged into `firmware/` via
+`git subtree` (full history preserved), all 12 submodules resolve and
 check out cleanly, and a stock `f7-firmware-D` build succeeds end to end
 (toolchain fetch → compile → link → `.bin`/`.dfu`) — see `HARDWARE.md` for
-the measured flash numbers this produced. `FIRMWARE_ORIGIN` and the
-on-device About screen are rebranded to R0N1N (verified with a full
-rebuild — the only real branding lever; it's never checked by name in
-application code, only as `#ifndef FW_ORIGIN_Official`, so Unleashed's
-unlock features are untouched). CI (`.github/workflows/build-firmware.yml`)
-builds on push/PR and its first run passed. Cyrillic font feasibility is
-resolved — see `HARDWARE.md`, it's cheap (~1-5 KB against ~140 KB free),
-using fonts already vendored in `lib/u8g2`, no sourcing/hand-drawing
-needed. Still open: release channels/versioning scheme, and a boot-splash
-asset (the text branding is done; the animated logo is still Unleashed's).
-Outcome: an R0N1N build == Unleashed + branding, installable via
-web/qFlipper.
+the measured flash numbers this produced. `FIRMWARE_ORIGIN` is `R0N1N`
+(reported in version info) and About opens with an R0N1N screen crediting
+the official firmware. CI (`.github/workflows/build-firmware.yml`) builds
+on push/PR. Cyrillic font feasibility is resolved — see `HARDWARE.md`,
+it's cheap (~1-5 KB against ~245 KB free), using fonts already vendored in
+`lib/u8g2`, no sourcing/hand-drawing needed. Still open: release
+channels/versioning scheme, and an R0N1N boot-splash asset (the stock
+animations are brand-neutral).
+Outcome: an R0N1N build == official firmware + R0N1N UX layer, installable
+via qFlipper ("Install from file") or an SD-card update package.
 
 ## Stage 1 — MVP: Home + navigation + Control Center — done
 
 Goal: the new Desktop dashboard (time/date/battery/indicators),
-pseudo-swipes, Control Center (ported from Momentum), basic
-favorites/recent.
+pseudo-swipes, Control Center, basic favorites/recent.
 Dependencies: GUI/`ViewDispatcher`, notification (see `ARCHITECTURE.md`).
 Risk: Desktop RAM/performance — mitigated by profiling and lazy `View`s.
 Outcome: the device feels like a cohesive shell rather than an app list —
@@ -64,18 +63,22 @@ noted, each verified with a real `./fbt` build:
   before the dolphin's own view-level "poke" interaction (right button
   short) ever saw it. See the `dashboard_view` comment in
   `desktop_view_main.c`.
-- **Control Center (Down)**: no new screen — Unleashed's existing lock menu
-  (BT/silent/dummy-mode toggles, paging sideways into brightness/volume/
-  vibro) is reused as-is, just reached from Down instead of Up. USB-mode
-  and TX-lock toggles from the original `UX_DESIGN.md` list aren't wired in
-  yet — no existing settings surface to hang them off without inventing new
-  state, left for a later pass.
-- **Quick Actions (Up)**, `desktop_scene_favorites.c` (new): lists the five
+- **Control Center (Down)**: no new screen — the official firmware's
+  lock menu (Lock, dummy mode) is reused as-is, just reached from Down
+  instead of Up. Quick toggles (BT, sound, brightness/volume) and the
+  USB-mode and TX-lock toggles from the original `UX_DESIGN.md` list
+  aren't wired in yet — the official lock menu has no such pages, and
+  they need their own design pass rather than a stub.
+- **Quick Actions (Up)**, `desktop_scene_favorites.c` (new): lists the four
   existing `FavoriteApp` slots (previously each reachable only by its own
-  D-pad shortcut) as one list, launches on selection. Not the customizable
-  3×2 grid `UX_DESIGN.md` describes — it's Unleashed's existing favorite
-  slots in list form, which is what made this buildable without inventing
-  a second, parallel favorites store.
+  D-pad shortcut) as one list, launches on selection, plus a fixed
+  **Archive** entry: in the official firmware Archive isn't a Loader app
+  and was reachable only from Down-short on Home, which is now Control
+  Center — without this entry it would be unreachable (the linker even
+  dropped it from the image). Not the customizable 3×2 grid `UX_DESIGN.md`
+  describes — it's the existing favorite slots in list form, which is what
+  made this buildable without inventing a second, parallel favorites
+  store.
 - **Recent (hold OK)**, `desktop_scene_recent.c` (new): shows apps launched
   since boot, most-recent first, in-memory only (nothing persisted across
   reboot). Needed one small addition outside `desktop/`: `LoaderEvent`
@@ -83,8 +86,9 @@ noted, each verified with a real `./fbt` build:
   app's name, so `LoaderEventTypeApplicationBeforeLoad` subscribers had no
   way to know what was about to launch — confirmed by reading
   `loader_do_start_by_name`, not assumed. Added a `name` field, populated
-  only at that one call site (the other three publish sites set it `NULL`);
-  purely additive, every other subscriber (power, archive,
+  only at that one call site and only when the Loader isn't already
+  running an app (the official Loader publishes the event before its lock
+  check; the other three publish sites set it `NULL`); purely additive, every other subscriber (power, archive,
   loader_applications) only reads `.type` and is unaffected. An app is
   added to the list only once the Loader reports it stopped
   (`LoaderEventTypeApplicationStopped`), so failed launches (app not found,
@@ -92,19 +96,14 @@ noted, each verified with a real `./fbt` build:
   the front instead of duplicating it. Entries hold the full `.fap` path
   (same 128-byte limit as the favorite slots) but the list shows just the
   file name; Quick Actions labels its slots the same way.
-- **Navigation remap**: Up/Down swapped meaning (Quick Actions / Control
-  Center) and hold-OK now opens Recent instead of directly launching the
-  fifth favorite slot — that favorite is still reachable, as one of the
-  five entries Quick Actions lists. Archive's dedicated Down-short shortcut
-  is gone (Down now opens Control Center); Archive itself is unaffected,
-  still built in and reachable from the app launcher (OK). Removing that
-  shortcut also orphaned `desktop_switch_to_app` and the `scene_thread`
-  field it was the only user of — both removed rather than left dead.
+- **Navigation remap**: Up opens Quick Actions (was the lock menu), Down
+  opens Control Center (was Archive), hold-OK opens Recent (unused on
+  Home before). Archive moved into Quick Actions, as above.
 
 **Deliberately not done** (see `UX_DESIGN.md` for the full model these are
 part of):
 - **Left/Right "desktop" paging** — still direct favorite-app shortcuts,
-  unchanged from Unleashed. Real per-profile desktop sets need Stage 2's
+  unchanged from the official firmware. Real per-profile desktop sets need Stage 2's
   Profile Manager to define what the panes even are; building paging with
   no real content behind it now would've meant deleting a working shortcut
   for a stub.
@@ -150,7 +149,7 @@ Outcome: an ecosystem, not just firmware.
 
 Goal: JS "recipes," auto-detection and onboarding for ESP32/nRF24/
 CC1101/VGM, Sweep mode (see `UNIQUE_FEATURES.md`, items 4–5).
-Dependencies: JS modules (ported from Momentum), module drivers.
+Dependencies: the official JS engine and its modules, module drivers.
 Risk: JS-runner memory footprint, inconsistent pinouts across modules.
 Outcome: automation and modularity become first-class citizens.
 
@@ -166,10 +165,10 @@ Outcome: R0N1N 1.0.
 
 ## MVP vs. the full release
 
-**MVP (Stages 0–2):** a fork of Unleashed + the Home dashboard,
+**MVP (Stages 0–2):** a fork of the official firmware + the Home dashboard,
 pseudo-swipes, Control Center, profiles, Global Search, Capture Timeline.
-Functionally the MVP equals Unleashed (compatibility and power are already
-there); the added value is the UX layer on top.
+Functionally the MVP equals the official firmware (stability and app
+compatibility are already there); the added value is the UX layer on top.
 
 **Full release / R0N1N 1.0 (Stages 3–6):** adds the R0N1N Hub with app
 compatibility solved, the companion ecosystem, the workflow/JS engine,
@@ -179,9 +178,9 @@ educational/CTF layer.
 ## Main project risks
 
 1. **Memory/performance** — the R0N1N layer must not make free heap worse
-   than stock Unleashed (verified starting at Stage 1, see
+   than the stock official firmware (verified starting at Stage 1, see
    `ARCHITECTURE.md`).
-2. **Upstream drift** — disciplined, regular rebasing onto Unleashed.
+2. **Upstream drift** — disciplined, regular syncing with official releases.
 3. **App fragmentation** — API versioning and the CI target (Stage 3).
 4. **Staying within white-hat boundaries** — TX-lock as an option,
    confirmation for "sharp" operations, AI actions off-by-default (see

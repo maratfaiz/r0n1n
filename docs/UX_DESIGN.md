@@ -13,7 +13,7 @@ state**, not a list of things you could launch.
 
 Large **time**, **date** below it, **battery** in the corner, a thin strip
 of system indicators (BLE, USB, SD, active radio, current profile). A
-dolphin/animation is optional, via asset packs (ported from Momentum).
+dolphin/animation is optional, via asset packs.
 Minimal by design: the essentials are visible immediately, no menu diving
 required.
 
@@ -74,9 +74,11 @@ profiles takes 2 presses from the Control Center.
 
 ## Where each piece comes from technically
 
-Control Center, the advanced file manager, the keybind system, JS modules,
-and Asset Packs are ported and reworked from Momentum on top of the
-Unleashed base (see `FIRMWARE_LANDSCAPE.md`). The Home dashboard, the
+Everything here is written for R0N1N on top of the official Flipper Zero
+firmware (see `FIRMWARE_LANDSCAPE.md`), reusing its existing pieces where
+they fit (Control Center is the stock lock menu today, JS modules come
+from the official JS engine); ideas from other firmwares are
+reimplemented, not copied. The Home dashboard, the
 pseudo-swipe navigation model, profiles, Global Search, and Capture
 Timeline are R0N1N's own contribution, implemented as new system services
 on top of Furi (see `ARCHITECTURE.md`, "R0N1N layer" section).
