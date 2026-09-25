@@ -72,7 +72,7 @@ static DialogMessageButton compliance_screen(DialogsApp* dialogs, DialogMessage*
     return result;
 }
 
-static DialogMessageButton unleashed_info_screen(DialogsApp* dialogs, DialogMessage* message) {
+static DialogMessageButton r0n1n_info_screen(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
     const char* screen_header = "R0N1N Firmware\n";
@@ -90,7 +90,7 @@ static DialogMessageButton unleashed_info_screen(DialogsApp* dialogs, DialogMess
     return result;
 }
 
-static DialogMessageButton unleashed_info_screen2(DialogsApp* dialogs, DialogMessage* message) {
+static DialogMessageButton r0n1n_info_screen2(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
     const char* screen_text =
@@ -104,12 +104,12 @@ static DialogMessageButton unleashed_info_screen2(DialogsApp* dialogs, DialogMes
     return result;
 }
 
-static DialogMessageButton unleashed_info_screen3(DialogsApp* dialogs, DialogMessage* message) {
+static DialogMessageButton r0n1n_info_screen3(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
-    const char* screen_text = "Community apps included in\nall builds except `c` build\n"
-                              "For updates and more visit:\n"
-                              "github.com/maratfaiz/r0n1n";
+    const char* screen_text = "For updates and more visit:\n"
+                              "github.com/maratfaiz/\n"
+                              "r0n1n-firmware";
 
     dialog_message_set_text(message, screen_text, 0, 0, AlignLeft, AlignTop);
     result = dialog_message_show(dialogs, message);
@@ -190,9 +190,9 @@ static DialogMessageButton fw_version_screen(DialogsApp* dialogs, DialogMessage*
 }
 
 const AboutDialogScreen about_screens[] = {
-    unleashed_info_screen,
-    unleashed_info_screen2,
-    unleashed_info_screen3,
+    r0n1n_info_screen,
+    r0n1n_info_screen2,
+    r0n1n_info_screen3,
     product_screen,
     compliance_screen,
     address_screen,

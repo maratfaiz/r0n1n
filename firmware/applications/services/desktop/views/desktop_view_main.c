@@ -132,7 +132,7 @@ bool desktop_main_input_callback(InputEvent* event, void* context) {
                 // R0N1N navigation law (docs/UX_DESIGN.md): Up = Quick Actions.
                 main_view->callback(DesktopMainEventOpenFavorites, main_view->context);
             } else if(event->key == InputKeyDown) {
-                // Down = Control Center (Unleashed's lock menu + quick
+                // Down = Control Center (the stock lock menu + quick
                 // settings, unchanged, just reached from a different button).
                 main_view->callback(DesktopMainEventOpenLockMenu, main_view->context);
             } else if(event->key == InputKeyLeft) {

@@ -4,8 +4,8 @@ typedef enum {
     DesktopMainEventLock,
     // R0N1N navigation law (docs/UX_DESIGN.md): Down opens this same scene,
     // now framed as "Control Center" -- BT/silent/dummy-mode toggles paging
-    // sideways into brightness/volume/vibro, unchanged from Unleashed's own
-    // lock menu + quick settings, just reached from a different button.
+    // sideways into brightness/volume/vibro, unchanged from the stock lock
+    // menu + quick settings, just reached from a different button.
     DesktopMainEventOpenLockMenu,
     DesktopMainEventOpenFavoriteLeftShort,
     DesktopMainEventOpenFavoriteLeftLong,

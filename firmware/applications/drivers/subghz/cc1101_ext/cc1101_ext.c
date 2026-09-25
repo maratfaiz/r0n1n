@@ -804,7 +804,7 @@ bool subghz_device_cc1101_ext_start_async_tx(SubGhzDeviceCC1101ExtCallback callb
     subghz_device_cc1101_ext->async_tx.buffer =
         malloc(SUBGHZ_DEVICE_CC1101_EXT_ASYNC_TX_BUFFER_FULL * sizeof(uint32_t));
 
-    // here we do the same things as in /unleashed-firmware/targets/f7/furi_hal/furi_hal_subghz.c
+    // here we do the same things as in targets/f7/furi_hal/furi_hal_subghz.c
     // use first DMA to update timer TIM17 durations, but TIM17 have not output chanel
     // so we use second DMA to transfer data from gpio_tx_buff directly to gpio pin using BSSR.
     // BSSR allow us tranfer data directly to pin in gpio port.
