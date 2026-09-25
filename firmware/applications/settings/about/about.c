@@ -14,6 +14,25 @@
 
 typedef DialogMessageButton (*AboutDialogScreen)(DialogsApp* dialogs, DialogMessage* message);
 
+static DialogMessageButton about_screen_r0n1n(DialogsApp* dialogs, DialogMessage* message) {
+    DialogMessageButton result;
+
+    const char* screen_header = "R0N1N Firmware\n";
+
+    const char* screen_text = "Built on the official\n"
+                              "Flipper Zero firmware.\n"
+                              "github.com/maratfaiz/\n"
+                              "r0n1n-firmware";
+
+    dialog_message_set_header(message, screen_header, 0, 0, AlignLeft, AlignTop);
+    dialog_message_set_text(message, screen_text, 0, 13, AlignLeft, AlignTop);
+    result = dialog_message_show(dialogs, message);
+    dialog_message_set_header(message, NULL, 0, 0, AlignLeft, AlignTop);
+    dialog_message_set_text(message, NULL, 0, 0, AlignLeft, AlignTop);
+
+    return result;
+}
+
 static DialogMessageButton about_screen_product(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
@@ -197,6 +216,7 @@ static DialogMessageButton about_screen_fw_version(DialogsApp* dialogs, DialogMe
 }
 
 const AboutDialogScreen about_screens[] = {
+    about_screen_r0n1n,
     about_screen_product,
     about_screen_compliance,
     about_screen_address,
