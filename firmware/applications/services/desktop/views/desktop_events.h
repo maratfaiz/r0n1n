@@ -78,4 +78,7 @@ typedef enum {
     DesktopGlobalApiUnlock,
     DesktopGlobalSaveSettings,
     DesktopGlobalReloadSettings,
+    // R0N1N Recent apps: the app announced by the last BeforeAppStarted
+    // actually ran and has now exited -- see desktop.c.
+    DesktopGlobalAppStopped,
 } DesktopEvent;

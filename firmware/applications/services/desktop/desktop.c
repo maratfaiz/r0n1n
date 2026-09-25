@@ -20,6 +20,7 @@ static void desktop_auto_lock_arm(Desktop*);
 static void desktop_auto_lock_inhibit(Desktop*);
 static void desktop_start_auto_lock_timer(Desktop*);
 static void desktop_apply_settings(Desktop*);
+static void desktop_dashboard_update(Desktop*);
 
 static void desktop_loader_callback(const void* message, void* context) {
     furi_assert(context);
@@ -30,13 +31,17 @@ static void desktop_loader_callback(const void* message, void* context) {
         // R0N1N Recent apps: stash the name here (Loader's thread) before the
         // custom event is even enqueued, so the handler on the ViewDispatcher's
         // thread (DesktopGlobalBeforeAppStarted below) sees it once dequeued.
-        if(event->name) {
-            strlcpy(desktop->pending_app_name, event->name, sizeof(desktop->pending_app_name));
-        } else {
+        // A name too long to store whole is dropped rather than truncated: a
+        // truncated .fap path would sit in Recent and fail to relaunch.
+        if(!event->name ||
+           strlcpy(desktop->pending_app_name, event->name, sizeof(desktop->pending_app_name)) >=
+               sizeof(desktop->pending_app_name)) {
             desktop->pending_app_name[0] = '\0';
         }
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalBeforeAppStarted);
         furi_check(furi_semaphore_acquire(desktop->animation_semaphore, 3000) == FuriStatusOk);
+    } else if(event->type == LoaderEventTypeApplicationStopped) {
+        view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalAppStopped);
     } else if(event->type == LoaderEventTypeNoMoreAppsInQueue) {
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalAfterAppFinished);
     }
@@ -132,24 +137,27 @@ static void desktop_stealth_mode_icon_draw_callback(Canvas* canvas, void* contex
     canvas_draw_icon(canvas, 0, 0, &I_Muted_8x8);
 }
 
-// R0N1N Recent apps (docs/UX_DESIGN.md): most-recent first, capped ring
-// buffer, deduplicating an immediate repeat (relaunching the same app twice
-// in a row shouldn't produce two entries).
+// R0N1N Recent apps (docs/UX_DESIGN.md): most-recent first, capped at
+// DESKTOP_RECENT_APPS_COUNT. Relaunching an app already in the list moves it
+// to the front instead of adding a duplicate; otherwise the oldest entry is
+// dropped once the list is full.
 static void desktop_recent_apps_push(Desktop* desktop, const char* name) {
-    if(!name || name[0] == '\0') return;
-    if(desktop->recent_apps_count > 0 && strncmp(desktop->recent_apps[0], name, DESKTOP_RECENT_APP_NAME_LEN) == 0) {
-        return;
-    }
+    if(name[0] == '\0') return;
 
-    uint8_t count = desktop->recent_apps_count;
-    if(count < DESKTOP_RECENT_APPS_COUNT) {
-        count++;
+    uint8_t i = 0;
+    while(i < desktop->recent_apps_count && strcmp(desktop->recent_apps[i], name) != 0) {
+        i++;
     }
-    for(uint8_t i = count - 1; i > 0; i--) {
+    if(i == desktop->recent_apps_count) {
+        if(desktop->recent_apps_count < DESKTOP_RECENT_APPS_COUNT) {
+            desktop->recent_apps_count++;
+        }
+        i = desktop->recent_apps_count - 1;
+    }
+    for(; i > 0; i--) {
         strlcpy(desktop->recent_apps[i], desktop->recent_apps[i - 1], DESKTOP_RECENT_APP_NAME_LEN);
     }
     strlcpy(desktop->recent_apps[0], name, DESKTOP_RECENT_APP_NAME_LEN);
-    desktop->recent_apps_count = count;
 }
 
 static bool desktop_custom_event_callback(void* context, uint32_t event) {
@@ -164,7 +172,10 @@ static bool desktop_custom_event_callback(void* context, uint32_t event) {
         desktop_auto_lock_inhibit(desktop);
 
         desktop->app_running = true;
-        desktop_recent_apps_push(desktop, desktop->pending_app_name);
+        strlcpy(
+            desktop->launched_app_name,
+            desktop->pending_app_name,
+            sizeof(desktop->launched_app_name));
 
         furi_semaphore_release(desktop->animation_semaphore);
 
@@ -172,6 +183,16 @@ static bool desktop_custom_event_callback(void* context, uint32_t event) {
         animation_manager_load_and_continue_animation(desktop->animation_manager);
         desktop_auto_lock_arm(desktop);
         desktop->app_running = false;
+        // The dashboard timer skips ticks while an app runs (see its
+        // callback); repaint now so Home doesn't show a stale clock for up
+        // to a second after returning.
+        if(furi_timer_is_running(desktop->dashboard_update_timer)) {
+            desktop_dashboard_update(desktop);
+        }
+
+    } else if(event == DesktopGlobalAppStopped) {
+        desktop_recent_apps_push(desktop, desktop->launched_app_name);
+        desktop->launched_app_name[0] = '\0';
 
     } else if(event == DesktopGlobalAutoLock) {
         if(!desktop->app_running && !desktop->locked) {
@@ -268,13 +289,21 @@ static void desktop_clock_timer_callback(void* context) {
 // R0N1N Home dashboard (docs/UX_DESIGN.md): drives desktop_view_main's big
 // clock/date/profile display. Only ticks while desktop_scene_main is active
 // (started/stopped there), independent of the small status-bar clock above.
+static void desktop_dashboard_update(Desktop* desktop) {
+    DateTime datetime;
+    furi_hal_rtc_get_datetime(&datetime);
+    desktop_main_update_dashboard(desktop->main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+}
+
 static void desktop_dashboard_update_timer_callback(void* context) {
     furi_assert(context);
     Desktop* desktop = context;
 
-    DateTime datetime;
-    furi_hal_rtc_get_datetime(&datetime);
-    desktop_main_update_dashboard(desktop->main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+    // The Main scene stays current underneath a running app, so without this
+    // every tick would request a full GUI redraw for a screen nobody sees.
+    if(desktop->app_running) return;
+
+    desktop_dashboard_update(desktop);
 }
 
 static void desktop_apply_settings(Desktop* desktop) {

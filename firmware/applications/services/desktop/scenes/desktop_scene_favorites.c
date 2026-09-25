@@ -32,14 +32,16 @@ void desktop_scene_favorites_on_enter(void* context) {
     Submenu* submenu = desktop->favorites_submenu;
     submenu_reset(submenu);
 
+    FuriString* app_name = furi_string_alloc();
     for(size_t i = 0; i < FavoriteAppNumber; i++) {
         const char* path = desktop->settings.favorite_apps[i].name_or_path;
+        desktop_app_display_name(path, app_name);
         FuriString* label = furi_string_alloc_printf(
             "%s: %s",
             desktop_favorites_labels[i],
-            (strlen(path) == 0)      ? "Apps Menu" :
+            (strlen(path) == 0)                      ? "Apps Menu" :
             desktop_scene_favorites_check_none(path) ? "(none)" :
-                                                        path);
+                                                       furi_string_get_cstr(app_name));
         submenu_add_item(
             submenu,
             furi_string_get_cstr(label),
@@ -48,6 +50,7 @@ void desktop_scene_favorites_on_enter(void* context) {
             desktop);
         furi_string_free(label);
     }
+    furi_string_free(app_name);
 
     view_dispatcher_switch_to_view(desktop->view_dispatcher, DesktopViewIdFavorites);
 }

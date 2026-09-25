@@ -85,7 +85,13 @@ noted, each verified with a real `./fbt` build:
   `loader_do_start_by_name`, not assumed. Added a `name` field, populated
   only at that one call site (the other three publish sites set it `NULL`);
   purely additive, every other subscriber (power, archive,
-  loader_applications) only reads `.type` and is unaffected.
+  loader_applications) only reads `.type` and is unaffected. An app is
+  added to the list only once the Loader reports it stopped
+  (`LoaderEventTypeApplicationStopped`), so failed launches (app not found,
+  bad `.fap`) never appear; relaunching an app already listed moves it to
+  the front instead of duplicating it. Entries hold the full `.fap` path
+  (same 128-byte limit as the favorite slots) but the list shows just the
+  file name; Quick Actions labels its slots the same way.
 - **Navigation remap**: Up/Down swapped meaning (Quick Actions / Control
   Center) and hold-OK now opens Recent instead of directly launching the
   fifth favorite slot — that favorite is still reachable, as one of the
@@ -106,6 +112,13 @@ part of):
 - **Profile-aware anything** — the dashboard's profile label is a fixed
   `"Everyday"` string (`DASHBOARD_DEFAULT_PROFILE_NAME` in `desktop_i.h`);
   there is no Profile Manager to read from yet.
+- **Recent files** — `UX_DESIGN.md` has hold-OK list "last-used
+  apps/files"; Recent lists apps only, and relaunches them *without* the
+  arguments they were first started with. Replaying args blindly isn't
+  safe: they can be stale file paths or an RPC session marker from
+  qFlipper/mobile, and an app opened on a file from Archive would silently
+  reopen that file. Recent files belong with Stage 2's Capture Timeline,
+  which will know which files are captures worth reopening.
 
 ## Stage 2 — Profiles + Global Search + Capture Timeline
 

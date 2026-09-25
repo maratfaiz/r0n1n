@@ -22,6 +22,7 @@
 
 #include <loader/loader.h>
 #include <notification/notification_app.h>
+#include <toolbox/path.h>
 
 #define STATUS_BAR_Y_SHIFT 13
 
@@ -31,8 +32,11 @@
 
 // R0N1N Recent apps (docs/UX_DESIGN.md): most-recently-launched first, no
 // persistence across reboot in Stage 1 -- see desktop.c/desktop_scene_recent.c.
+// Entries are what the Loader was asked to start: an internal app's name or
+// a full .fap path, so the length matches FavoriteApp.name_or_path -- a
+// shorter buffer would truncate paths into something that can't relaunch.
 #define DESKTOP_RECENT_APPS_COUNT   6
-#define DESKTOP_RECENT_APP_NAME_LEN 40
+#define DESKTOP_RECENT_APP_NAME_LEN sizeof(((FavoriteApp*)NULL)->name_or_path)
 
 typedef enum {
     DesktopViewIdMain,
@@ -104,11 +108,14 @@ struct Desktop {
 
     // R0N1N Recent apps (docs/UX_DESIGN.md). pending_app_name is a
     // cross-thread scratch field: desktop_loader_callback (Loader's thread)
-    // writes it, the DesktopGlobalBeforeAppStarted handler (ViewDispatcher's
-    // thread, desktop_custom_event_callback) reads it once and pushes into
-    // recent_apps -- same unsynchronized-simple-field pattern already used
-    // for app_running/locked below.
+    // writes it, then blocks on animation_semaphore until the
+    // DesktopGlobalBeforeAppStarted handler (ViewDispatcher's thread) has
+    // copied it into launched_app_name. That copy is only pushed into
+    // recent_apps on DesktopGlobalAppStopped, so launches that fail (app not
+    // found, bad .fap) never show up in Recent -- the Loader only publishes
+    // ApplicationStopped for an app that actually ran.
     char pending_app_name[DESKTOP_RECENT_APP_NAME_LEN];
+    char launched_app_name[DESKTOP_RECENT_APP_NAME_LEN];
     char recent_apps[DESKTOP_RECENT_APPS_COUNT][DESKTOP_RECENT_APP_NAME_LEN];
     uint8_t recent_apps_count;
 
@@ -116,6 +123,17 @@ struct Desktop {
     bool app_running;
     bool locked;
 };
+
+// R0N1N Quick Actions/Recent: .fap paths are too long for a 128px-wide
+// list, so show just the file name without extension; internal app names
+// (no leading '/') are shown as-is.
+static inline void desktop_app_display_name(const char* name_or_path, FuriString* label) {
+    if(name_or_path[0] == '/') {
+        path_extract_filename_no_ext(name_or_path, label);
+    } else {
+        furi_string_set(label, name_or_path);
+    }
+}
 
 void desktop_lock(Desktop* desktop);
 void desktop_unlock(Desktop* desktop);

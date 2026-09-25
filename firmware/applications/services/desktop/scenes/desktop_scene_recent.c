@@ -6,10 +6,13 @@
 #include "desktop_scene.h"
 
 // R0N1N Recent apps (docs/UX_DESIGN.md), reached by holding OK. Tracking is
-// populated in desktop.c (desktop_recent_apps_push, fed from the Loader's
-// LoaderEventTypeApplicationBeforeLoad -- see loader.h/loader.c for the
-// event.name field this needed). In-memory only for Stage 1: the list is
-// empty again after a reboot, no persistence yet.
+// populated in desktop.c (desktop_recent_apps_push: the name comes from the
+// Loader's LoaderEventTypeApplicationBeforeLoad -- see loader.h/loader.c for
+// the event.name field this needed -- and is committed on
+// LoaderEventTypeApplicationStopped, so only apps that actually ran are
+// listed). In-memory only for Stage 1: the list is empty again after a
+// reboot, no persistence yet. Relaunches start the app without the args it
+// was originally given (see docs/ROADMAP.md, Stage 1).
 static void desktop_scene_recent_submenu_callback(void* context, uint32_t index) {
     Desktop* desktop = context;
     view_dispatcher_send_custom_event(desktop->view_dispatcher, index);
@@ -23,14 +26,17 @@ void desktop_scene_recent_on_enter(void* context) {
     if(desktop->recent_apps_count == 0) {
         submenu_add_item(submenu, "No recent apps yet", 0, NULL, NULL);
     } else {
+        FuriString* label = furi_string_alloc();
         for(uint8_t i = 0; i < desktop->recent_apps_count; i++) {
+            desktop_app_display_name(desktop->recent_apps[i], label);
             submenu_add_item(
                 submenu,
-                desktop->recent_apps[i],
+                furi_string_get_cstr(label),
                 i,
                 desktop_scene_recent_submenu_callback,
                 desktop);
         }
+        furi_string_free(label);
     }
 
     view_dispatcher_switch_to_view(desktop->view_dispatcher, DesktopViewIdRecent);
