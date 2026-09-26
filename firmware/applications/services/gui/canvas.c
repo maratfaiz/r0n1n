@@ -158,7 +158,10 @@ void canvas_set_font(Canvas* canvas, Font font) {
     if(font == FontPrimary) {
         u8g2_SetFont(&canvas->fb, u8g2_font_helvB08_tr);
     } else if(font == FontSecondary) {
-        u8g2_SetFont(&canvas->fb, u8g2_font_haxrcorp4089_tr);
+        // R0N1N: the same face with Cyrillic added (Russian UI). Its max char
+        // height is 11, i.e. what canvas_current_font_height() already reports
+        // for the Latin-only variant, so line spacing everywhere is unchanged.
+        u8g2_SetFont(&canvas->fb, u8g2_font_haxrcorp4089_t_cyrillic);
     } else if(font == FontKeyboard) {
         u8g2_SetFont(&canvas->fb, u8g2_font_profont11_mr);
     } else if(font == FontBigNumbers) {
