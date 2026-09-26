@@ -589,8 +589,10 @@ int32_t infrared_app(void* p) {
 
     bool is_remote_loaded = false;
     bool is_rpc_mode = false;
+    // R0N1N simple mode opens the universal TV remote directly
+    bool open_universal_tv = p && !strcmp(p, INFRARED_ARG_UNIVERSAL_TV);
 
-    if(p && strlen(p)) {
+    if(p && strlen(p) && !open_universal_tv) {
         uint32_t rpc_ctx = 0;
         if(sscanf(p, "RPC %lX", &rpc_ctx) == 1) {
             infrared->rpc_ctx = (void*)rpc_ctx;
@@ -628,6 +630,8 @@ int32_t infrared_app(void* p) {
             infrared->view_dispatcher, infrared->gui, ViewDispatcherTypeFullscreen);
         if(is_remote_loaded) { //-V547
             scene_manager_next_scene(infrared->scene_manager, InfraredSceneRemote);
+        } else if(open_universal_tv) {
+            scene_manager_next_scene(infrared->scene_manager, InfraredSceneUniversalTV);
         } else {
             scene_manager_next_scene(infrared->scene_manager, InfraredSceneStart);
         }

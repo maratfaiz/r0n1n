@@ -312,6 +312,7 @@ static void desktop_apply_settings(Desktop* desktop) {
     desktop->settings.dummy_mode = false;
 
     view_port_enabled_set(desktop->dummy_mode_icon_viewport, desktop->settings.dummy_mode);
+    desktop_main_set_simple_mode(desktop->main_view, desktop->r0n1n.simple_mode);
     desktop_main_set_dummy_mode_state(desktop->main_view, desktop->settings.dummy_mode);
     animation_manager_set_dummy_mode_state(
         desktop->animation_manager, desktop->settings.dummy_mode);
@@ -369,6 +370,7 @@ static Desktop* desktop_alloc(void) {
     desktop->r0n1n_list = r0n1n_list_alloc();
     desktop->r0n1n_grid = r0n1n_grid_alloc();
     desktop->r0n1n_carousel = r0n1n_carousel_alloc();
+    desktop->simple_menu = desktop_simple_menu_alloc();
     desktop->text_input = text_input_alloc();
     desktop->dialog_ex = dialog_ex_alloc();
 
@@ -433,6 +435,10 @@ static Desktop* desktop_alloc(void) {
         desktop->view_dispatcher,
         DesktopViewIdR0n1nCarousel,
         r0n1n_carousel_get_view(desktop->r0n1n_carousel));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher,
+        DesktopViewIdSimpleMenu,
+        desktop_simple_menu_get_view(desktop->simple_menu));
     view_dispatcher_add_view(
         desktop->view_dispatcher,
         DesktopViewIdTextInput,

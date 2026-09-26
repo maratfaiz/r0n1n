@@ -1,5 +1,7 @@
 #include "text_input.h"
 #include <gui/elements.h>
+#include <gui/utf8_i.h>
+#include "text_input_i.h"
 #include <assets_icons.h>
 #include <furi.h>
 
@@ -8,11 +10,24 @@ struct TextInput {
     FuriTimer* timer;
 };
 
+// R0N1N keyboard: three layouts cycled with one key (Russian, Latin,
+// digits/symbols). Letters take the left part of each row; the right
+// column holds Backspace, the layout key and Save. Text is UTF-8; unless the
+// caller allows Unicode (text_input_set_allow_unicode(), e.g. Search), the
+// Cyrillic is transliterated to Latin on Save, because file names on the SD
+// card (FAT, code page 850) can't hold it.
 typedef struct {
-    const char text;
+    const uint16_t code;
     const uint8_t x;
     const uint8_t y;
 } TextInputKey;
+
+typedef enum {
+    TextInputLayoutRu,
+    TextInputLayoutEn,
+    TextInputLayoutNum,
+    TextInputLayoutCount,
+} TextInputLayout;
 
 typedef struct {
     const char* header;
@@ -20,6 +35,8 @@ typedef struct {
     size_t text_buffer_size;
     size_t minimum_length;
     bool clear_default_text;
+    bool allow_unicode;
+    TextInputLayout layout;
 
     TextInputCallback callback;
     void* callback_context;
@@ -39,118 +56,223 @@ static const uint8_t keyboard_row_count = 3;
 
 #define ENTER_KEY     '\r'
 #define BACKSPACE_KEY '\b'
+#define LAYOUT_KEY    '\t'
 
-static const TextInputKey keyboard_keys_row_1[] = {
-    {'q', 1, 8},
-    {'w', 10, 8},
-    {'e', 19, 8},
-    {'r', 28, 8},
-    {'t', 37, 8},
-    {'y', 46, 8},
-    {'u', 55, 8},
-    {'i', 64, 8},
-    {'o', 73, 8},
-    {'p', 82, 8},
-    {'0', 91, 8},
-    {'1', 100, 8},
-    {'2', 110, 8},
-    {'3', 120, 8},
+// The layout new keyboards open with: the one used last
+static TextInputLayout text_input_last_layout = TextInputLayoutRu;
+
+#define KEY_RU(c, i, row)  {c, 1 + 9 * (i), 8 + 12 * (row)}
+#define KEY_EN(c, i, row)  {c, 1 + 10 * (i), 8 + 12 * (row)}
+#define KEYS_SPECIAL_ROW_1 {BACKSPACE_KEY, 106, 0}
+#define KEYS_SPECIAL_ROW_2 {LAYOUT_KEY, 103, 20}
+#define KEYS_SPECIAL_ROW_3 {ENTER_KEY, 103, 23}
+
+static const TextInputKey keys_ru_1[] = {
+    KEY_RU(0x439, 0, 0),
+    KEY_RU(0x446, 1, 0),
+    KEY_RU(0x443, 2, 0),
+    KEY_RU(0x43A, 3, 0),
+    KEY_RU(0x435, 4, 0),
+    KEY_RU(0x43D, 5, 0),
+    KEY_RU(0x433, 6, 0),
+    KEY_RU(0x448, 7, 0),
+    KEY_RU(0x449, 8, 0),
+    KEY_RU(0x437, 9, 0),
+    KEY_RU(0x445, 10, 0),
+    KEYS_SPECIAL_ROW_1,
+}; // й ц у к е н г ш щ з х
+static const TextInputKey keys_ru_2[] = {
+    KEY_RU(0x444, 0, 1),
+    KEY_RU(0x44B, 1, 1),
+    KEY_RU(0x432, 2, 1),
+    KEY_RU(0x430, 3, 1),
+    KEY_RU(0x43F, 4, 1),
+    KEY_RU(0x440, 5, 1),
+    KEY_RU(0x43E, 6, 1),
+    KEY_RU(0x43B, 7, 1),
+    KEY_RU(0x434, 8, 1),
+    KEY_RU(0x436, 9, 1),
+    KEY_RU(0x44D, 10, 1),
+    KEYS_SPECIAL_ROW_2,
+}; // ф ы в а п р о л д ж э
+static const TextInputKey keys_ru_3[] = {
+    KEY_RU(0x44F, 0, 2),
+    KEY_RU(0x447, 1, 2),
+    KEY_RU(0x441, 2, 2),
+    KEY_RU(0x43C, 3, 2),
+    KEY_RU(0x438, 4, 2),
+    KEY_RU(0x442, 5, 2),
+    KEY_RU(0x44C, 6, 2),
+    KEY_RU(0x431, 7, 2),
+    KEY_RU(0x44E, 8, 2),
+    KEY_RU(0x44A, 9, 2),
+    KEY_RU('_', 10, 2),
+    KEYS_SPECIAL_ROW_3,
+}; // я ч с м и т ь б ю ъ _
+
+static const TextInputKey keys_en_1[] = {
+    KEY_EN('q', 0, 0),
+    KEY_EN('w', 1, 0),
+    KEY_EN('e', 2, 0),
+    KEY_EN('r', 3, 0),
+    KEY_EN('t', 4, 0),
+    KEY_EN('y', 5, 0),
+    KEY_EN('u', 6, 0),
+    KEY_EN('i', 7, 0),
+    KEY_EN('o', 8, 0),
+    KEY_EN('p', 9, 0),
+    KEYS_SPECIAL_ROW_1,
+};
+static const TextInputKey keys_en_2[] = {
+    KEY_EN('a', 0, 1),
+    KEY_EN('s', 1, 1),
+    KEY_EN('d', 2, 1),
+    KEY_EN('f', 3, 1),
+    KEY_EN('g', 4, 1),
+    KEY_EN('h', 5, 1),
+    KEY_EN('j', 6, 1),
+    KEY_EN('k', 7, 1),
+    KEY_EN('l', 8, 1),
+    KEYS_SPECIAL_ROW_2,
+};
+static const TextInputKey keys_en_3[] = {
+    KEY_EN('z', 0, 2),
+    KEY_EN('x', 1, 2),
+    KEY_EN('c', 2, 2),
+    KEY_EN('v', 3, 2),
+    KEY_EN('b', 4, 2),
+    KEY_EN('n', 5, 2),
+    KEY_EN('m', 6, 2),
+    KEY_EN('_', 7, 2),
+    KEYS_SPECIAL_ROW_3,
 };
 
-static const TextInputKey keyboard_keys_row_2[] = {
-    {'a', 1, 20},
-    {'s', 10, 20},
-    {'d', 19, 20},
-    {'f', 28, 20},
-    {'g', 37, 20},
-    {'h', 46, 20},
-    {'j', 55, 20},
-    {'k', 64, 20},
-    {'l', 73, 20},
-    {BACKSPACE_KEY, 82, 12},
-    {'4', 100, 20},
-    {'5', 110, 20},
-    {'6', 120, 20},
+static const TextInputKey keys_num_1[] = {
+    KEY_EN('1', 0, 0),
+    KEY_EN('2', 1, 0),
+    KEY_EN('3', 2, 0),
+    KEY_EN('4', 3, 0),
+    KEY_EN('5', 4, 0),
+    KEY_EN('6', 5, 0),
+    KEY_EN('7', 6, 0),
+    KEY_EN('8', 7, 0),
+    KEY_EN('9', 8, 0),
+    KEY_EN('0', 9, 0),
+    KEYS_SPECIAL_ROW_1,
+};
+static const TextInputKey keys_num_2[] = {
+    KEY_EN('-', 0, 1),
+    KEY_EN('+', 1, 1),
+    KEY_EN('=', 2, 1),
+    KEY_EN('!', 3, 1),
+    KEY_EN('#', 4, 1),
+    KEY_EN('$', 5, 1),
+    KEY_EN('%', 6, 1),
+    KEY_EN('&', 7, 1),
+    KEY_EN('@', 8, 1),
+    KEYS_SPECIAL_ROW_2,
+};
+static const TextInputKey keys_num_3[] = {
+    KEY_EN('(', 0, 2),
+    KEY_EN(')', 1, 2),
+    KEY_EN('\'', 2, 2),
+    KEY_EN('_', 3, 2),
+    KEYS_SPECIAL_ROW_3,
 };
 
-static const TextInputKey keyboard_keys_row_3[] = {
-    {'z', 1, 32},
-    {'x', 10, 32},
-    {'c', 19, 32},
-    {'v', 28, 32},
-    {'b', 37, 32},
-    {'n', 46, 32},
-    {'m', 55, 32},
-    {'_', 64, 32},
-    {ENTER_KEY, 74, 23},
-    {'7', 100, 32},
-    {'8', 110, 32},
-    {'9', 120, 32},
+typedef struct {
+    const TextInputKey* rows[3];
+    uint8_t sizes[3];
+    const char* next_label; // shown on the layout key: where it leads
+} TextInputLayoutInfo;
+
+static const TextInputLayoutInfo text_input_layouts[TextInputLayoutCount] = {
+    [TextInputLayoutRu] =
+        {{keys_ru_1, keys_ru_2, keys_ru_3},
+         {COUNT_OF(keys_ru_1), COUNT_OF(keys_ru_2), COUNT_OF(keys_ru_3)},
+         "ENG"},
+    [TextInputLayoutEn] =
+        {{keys_en_1, keys_en_2, keys_en_3},
+         {COUNT_OF(keys_en_1), COUNT_OF(keys_en_2), COUNT_OF(keys_en_3)},
+         "123"},
+    [TextInputLayoutNum] =
+        {{keys_num_1, keys_num_2, keys_num_3},
+         {COUNT_OF(keys_num_1), COUNT_OF(keys_num_2), COUNT_OF(keys_num_3)},
+         "РУС"},
 };
 
-static uint8_t get_row_size(uint8_t row_index) {
-    uint8_t row_size = 0;
-
-    switch(row_index + 1) {
-    case 1:
-        row_size = COUNT_OF(keyboard_keys_row_1);
-        break;
-    case 2:
-        row_size = COUNT_OF(keyboard_keys_row_2);
-        break;
-    case 3:
-        row_size = COUNT_OF(keyboard_keys_row_3);
-        break;
-    default:
-        furi_crash();
-    }
-
-    return row_size;
+static uint8_t get_row_size(const TextInputModel* model, uint8_t row_index) {
+    furi_check(row_index < keyboard_row_count);
+    return text_input_layouts[model->layout].sizes[row_index];
 }
 
-static const TextInputKey* get_row(uint8_t row_index) {
-    const TextInputKey* row = NULL;
-
-    switch(row_index + 1) {
-    case 1:
-        row = keyboard_keys_row_1;
-        break;
-    case 2:
-        row = keyboard_keys_row_2;
-        break;
-    case 3:
-        row = keyboard_keys_row_3;
-        break;
-    default:
-        furi_crash();
-    }
-
-    return row;
+static const TextInputKey* get_row(const TextInputModel* model, uint8_t row_index) {
+    furi_check(row_index < keyboard_row_count);
+    return text_input_layouts[model->layout].rows[row_index];
 }
 
-static char get_selected_char(TextInputModel* model) {
-    return get_row(model->selected_row)[model->selected_column].text;
+static uint16_t get_selected_char(TextInputModel* model) {
+    return get_row(model, model->selected_row)[model->selected_column].code;
 }
 
-static bool char_is_lowercase(char letter) {
-    return letter >= 0x61 && letter <= 0x7A;
+static bool char_is_lowercase(uint16_t letter) {
+    return (letter >= 0x61 && letter <= 0x7A) || (letter >= 0x430 && letter <= 0x44F);
 }
 
-static char char_to_uppercase(const char letter) {
+static uint16_t char_to_uppercase(const uint16_t letter) {
     if(letter == '_') {
         return 0x20;
-    } else if(islower(letter)) {
+    } else if(letter >= 0x61 && letter <= 0x7A) {
+        return letter - 0x20;
+    } else if(letter >= 0x430 && letter <= 0x44F) {
         return letter - 0x20;
     } else {
         return letter;
     }
 }
 
+// Byte offset where the last UTF-8 character of `text` starts
+static size_t text_input_last_char_start(const char* text, size_t length) {
+    return length ? gui_utf8_char_start(text, length - 1) : 0;
+}
+
 static void text_input_backspace_cb(TextInputModel* model) {
-    uint8_t text_length = model->clear_default_text ? 1 : strlen(model->text_buffer);
-    if(text_length > 0) {
-        model->text_buffer[text_length - 1] = 0;
+    if(model->clear_default_text) {
+        model->text_buffer[0] = 0;
+        return;
     }
+    size_t text_length = strlen(model->text_buffer);
+    model->text_buffer[text_input_last_char_start(model->text_buffer, text_length)] = 0;
+}
+
+// Transliteration of the Russian alphabet (а..я), for names that must stay ASCII
+static const char* const text_input_translit[32] = {
+    "a", "b", "v", "g", "d", "e",  "zh", "z",  "i",  "y",    "k", "l", "m", "n", "o",  "p",
+    "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "",  "y", "",  "e", "yu", "ya",
+};
+
+static void text_input_transliterate(char* text, size_t size) {
+    char* out = malloc(size);
+    size_t o = 0;
+    for(const char* p = text; *p && o + 1 < size;) {
+        uint16_t code;
+        p += gui_utf8_char(p, &code);
+        if(code < 0x80) {
+            out[o++] = (char)code;
+            continue;
+        }
+        bool upper = code >= 0x410 && code <= 0x42F;
+        if(upper) code += 0x20;
+        if(code == 0x451) code = 0x435; // ё -> е
+        if(code < 0x430 || code > 0x44F) continue; // not representable: dropped
+        const char* latin = text_input_translit[code - 0x430];
+        for(size_t i = 0; latin[i] && o + 1 < size; i++) {
+            out[o++] = (upper && i == 0) ? (char)toupper((unsigned char)latin[i]) : latin[i];
+        }
+    }
+    out[o] = 0;
+    strlcpy(text, out, size);
+    free(out);
 }
 
 static void text_input_view_draw_callback(Canvas* canvas, void* _model) {
@@ -173,8 +295,10 @@ static void text_input_view_draw_callback(Canvas* canvas, void* _model) {
         needed_string_width -= 8;
     }
 
-    while(text != 0 && canvas_string_width(canvas, text) > needed_string_width) {
-        text++;
+    // Drop whole characters from the front until the tail fits
+    while(text && *text && canvas_string_width(canvas, text) > needed_string_width) {
+        uint16_t code;
+        text += gui_utf8_char(text, &code);
     }
 
     if(model->clear_default_text) {
@@ -187,74 +311,61 @@ static void text_input_view_draw_callback(Canvas* canvas, void* _model) {
     }
     canvas_draw_str(canvas, start_pos, 22, text);
 
-    canvas_set_font(canvas, FontKeyboard);
+    // Latin keys in the stock keyboard font, Cyrillic in the one that has it
+    const bool cyrillic = model->layout == TextInputLayoutRu;
+    const Font key_font = cyrillic ? FontSecondary : FontKeyboard;
+    const uint8_t key_box_width = cyrillic ? 8 : 7;
 
     for(uint8_t row = 0; row < keyboard_row_count; row++) {
-        const uint8_t column_count = get_row_size(row);
-        const TextInputKey* keys = get_row(row);
+        const uint8_t column_count = get_row_size(model, row);
+        const TextInputKey* keys = get_row(model, row);
 
         for(size_t column = 0; column < column_count; column++) {
-            if(keys[column].text == ENTER_KEY) {
-                canvas_set_color(canvas, ColorBlack);
-                if(model->selected_row == row && model->selected_column == column) {
-                    canvas_draw_icon(
-                        canvas,
-                        keyboard_origin_x + keys[column].x,
-                        keyboard_origin_y + keys[column].y,
-                        &I_KeySaveSelected_24x11);
-                } else {
-                    canvas_draw_icon(
-                        canvas,
-                        keyboard_origin_x + keys[column].x,
-                        keyboard_origin_y + keys[column].y,
-                        &I_KeySave_24x11);
-                }
-            } else if(keys[column].text == BACKSPACE_KEY) {
-                canvas_set_color(canvas, ColorBlack);
-                if(model->selected_row == row && model->selected_column == column) {
-                    canvas_draw_icon(
-                        canvas,
-                        keyboard_origin_x + keys[column].x,
-                        keyboard_origin_y + keys[column].y,
-                        &I_KeyBackspaceSelected_16x9);
-                } else {
-                    canvas_draw_icon(
-                        canvas,
-                        keyboard_origin_x + keys[column].x,
-                        keyboard_origin_y + keys[column].y,
-                        &I_KeyBackspace_16x9);
-                }
-            } else {
-                if(model->selected_row == row && model->selected_column == column) {
-                    canvas_set_color(canvas, ColorBlack);
-                    canvas_draw_box(
-                        canvas,
-                        keyboard_origin_x + keys[column].x - 1,
-                        keyboard_origin_y + keys[column].y - 8,
-                        7,
-                        10);
+            const bool selected = model->selected_row == row && model->selected_column == column;
+            const int32_t key_x = keyboard_origin_x + keys[column].x;
+            const int32_t key_y = keyboard_origin_y + keys[column].y;
+            canvas_set_color(canvas, ColorBlack);
+
+            if(keys[column].code == ENTER_KEY || keys[column].code == LAYOUT_KEY) {
+                // Key-shaped boxes: Save reads "ОК", the layout key shows
+                // the layout it switches to
+                const bool enter = keys[column].code == ENTER_KEY;
+                const int32_t box_y = enter ? key_y : key_y - 9;
+                canvas_set_font(canvas, FontSecondary);
+                if(selected) {
+                    canvas_draw_rbox(canvas, key_x, box_y, 24, 11, 2);
                     canvas_set_color(canvas, ColorWhite);
                 } else {
-                    canvas_set_color(canvas, ColorBlack);
+                    canvas_draw_rframe(canvas, key_x, box_y, 24, 11, 2);
                 }
-
-                if(model->clear_default_text ||
-                   (text_length == 0 && char_is_lowercase(keys[column].text))) {
-                    canvas_draw_glyph(
-                        canvas,
-                        keyboard_origin_x + keys[column].x,
-                        keyboard_origin_y + keys[column].y,
-                        char_to_uppercase(keys[column].text));
-                } else {
-                    canvas_draw_glyph(
-                        canvas,
-                        keyboard_origin_x + keys[column].x,
-                        keyboard_origin_y + keys[column].y,
-                        keys[column].text);
+                canvas_draw_str_aligned(
+                    canvas,
+                    key_x + 12,
+                    box_y + 9,
+                    AlignCenter,
+                    AlignBottom,
+                    enter ? "ОК" : text_input_layouts[model->layout].next_label);
+            } else if(keys[column].code == BACKSPACE_KEY) {
+                canvas_draw_icon(
+                    canvas,
+                    key_x,
+                    key_y,
+                    selected ? &I_KeyBackspaceSelected_16x9 : &I_KeyBackspace_16x9);
+            } else {
+                canvas_set_font(canvas, key_font);
+                if(selected) {
+                    canvas_draw_box(canvas, key_x - 1, key_y - 8, key_box_width, 10);
+                    canvas_set_color(canvas, ColorWhite);
                 }
+                uint16_t code = keys[column].code;
+                if(model->clear_default_text || (text_length == 0 && char_is_lowercase(code))) {
+                    code = char_to_uppercase(code);
+                }
+                canvas_draw_glyph(canvas, key_x, key_y, code);
             }
         }
     }
+    canvas_set_color(canvas, ColorBlack);
     if(model->validator_message_visible) {
         canvas_set_font(canvas, FontSecondary);
         canvas_set_color(canvas, ColorWhite);
@@ -264,27 +375,34 @@ static void text_input_view_draw_callback(Canvas* canvas, void* _model) {
         canvas_draw_rframe(canvas, 8, 8, 112, 50, 3);
         canvas_draw_rframe(canvas, 9, 9, 110, 48, 2);
         elements_multiline_text(canvas, 62, 20, furi_string_get_cstr(model->validator_text));
-        canvas_set_font(canvas, FontKeyboard);
     }
+    canvas_set_font(canvas, FontSecondary);
+}
+
+// Moving between rows of different length: the special keys in the right
+// column stay in it, letters keep their column as far as the row allows.
+static void text_input_move_row(TextInputModel* model, uint8_t new_row) {
+    const uint8_t old_size = get_row_size(model, model->selected_row);
+    const uint8_t new_size = get_row_size(model, new_row);
+    if(model->selected_column == old_size - 1) {
+        model->selected_column = new_size - 1;
+    } else if(model->selected_column > new_size - 2) {
+        model->selected_column = new_size - 2;
+    }
+    model->selected_row = new_row;
 }
 
 static void text_input_handle_up(TextInput* text_input, TextInputModel* model) {
     UNUSED(text_input);
     if(model->selected_row > 0) {
-        model->selected_row--;
-        if(model->selected_column > get_row_size(model->selected_row) - 6) {
-            model->selected_column = model->selected_column + 1;
-        }
+        text_input_move_row(model, model->selected_row - 1);
     }
 }
 
 static void text_input_handle_down(TextInput* text_input, TextInputModel* model) {
     UNUSED(text_input);
     if(model->selected_row < keyboard_row_count - 1) {
-        model->selected_row++;
-        if(model->selected_column > get_row_size(model->selected_row) - 4) {
-            model->selected_column = model->selected_column - 1;
-        }
+        text_input_move_row(model, model->selected_row + 1);
     }
 }
 
@@ -293,21 +411,32 @@ static void text_input_handle_left(TextInput* text_input, TextInputModel* model)
     if(model->selected_column > 0) {
         model->selected_column--;
     } else {
-        model->selected_column = get_row_size(model->selected_row) - 1;
+        model->selected_column = get_row_size(model, model->selected_row) - 1;
     }
 }
 
 static void text_input_handle_right(TextInput* text_input, TextInputModel* model) {
     UNUSED(text_input);
-    if(model->selected_column < get_row_size(model->selected_row) - 1) {
+    if(model->selected_column < get_row_size(model, model->selected_row) - 1) {
         model->selected_column++;
     } else {
         model->selected_column = 0;
     }
 }
 
+static void text_input_switch_layout(TextInputModel* model) {
+    const uint8_t old_size = get_row_size(model, model->selected_row);
+    const bool on_special = model->selected_column == old_size - 1;
+    model->layout = (model->layout + 1) % TextInputLayoutCount;
+    text_input_last_layout = model->layout;
+    const uint8_t new_size = get_row_size(model, model->selected_row);
+    if(on_special || model->selected_column > new_size - 1) {
+        model->selected_column = new_size - 1;
+    }
+}
+
 static void text_input_handle_ok(TextInput* text_input, TextInputModel* model, bool shift) {
-    char selected = get_selected_char(model);
+    uint16_t selected = get_selected_char(model);
     size_t text_length = strlen(model->text_buffer);
 
     bool toggle_case = text_length == 0 || model->clear_default_text;
@@ -316,7 +445,14 @@ static void text_input_handle_ok(TextInput* text_input, TextInputModel* model, b
         selected = char_to_uppercase(selected);
     }
 
-    if(selected == ENTER_KEY) {
+    if(selected == LAYOUT_KEY) {
+        text_input_switch_layout(model);
+        return;
+    } else if(selected == ENTER_KEY) {
+        if(!model->allow_unicode) {
+            text_input_transliterate(model->text_buffer, model->text_buffer_size);
+            text_length = strlen(model->text_buffer);
+        }
         if(model->validator_callback &&
            (!model->validator_callback(
                model->text_buffer, model->validator_text, model->validator_callback_context))) {
@@ -331,9 +467,16 @@ static void text_input_handle_ok(TextInput* text_input, TextInputModel* model, b
         if(model->clear_default_text) {
             text_length = 0;
         }
-        if(text_length < (model->text_buffer_size - 1)) {
-            model->text_buffer[text_length] = selected;
-            model->text_buffer[text_length + 1] = 0;
+        // UTF-8: one byte for ASCII, two for Cyrillic
+        const size_t char_size = selected < 0x80 ? 1 : 2;
+        if(text_length + char_size < model->text_buffer_size) {
+            if(char_size == 1) {
+                model->text_buffer[text_length] = (char)selected;
+            } else {
+                model->text_buffer[text_length] = (char)(0xC0 | (selected >> 6));
+                model->text_buffer[text_length + 1] = (char)(0x80 | (selected & 0x3F));
+            }
+            model->text_buffer[text_length + char_size] = 0;
         }
     }
     model->clear_default_text = false;
@@ -490,6 +633,8 @@ void text_input_reset(TextInput* text_input) {
             model->selected_column = 0;
             model->minimum_length = 1;
             model->clear_default_text = false;
+            model->allow_unicode = false;
+            model->layout = text_input_last_layout;
             model->text_buffer = NULL;
             model->text_buffer_size = 0;
             model->callback = NULL;
@@ -527,7 +672,7 @@ void text_input_set_result_callback(
             if(text_buffer && text_buffer[0] != '\0') {
                 // Set focus on Save
                 model->selected_row = 2;
-                model->selected_column = 8;
+                model->selected_column = get_row_size(model, 2) - 1;
             }
         },
         true);
@@ -581,4 +726,10 @@ void* text_input_get_validator_callback_context(TextInput* text_input) {
 void text_input_set_header_text(TextInput* text_input, const char* text) {
     furi_check(text_input);
     with_view_model(text_input->view, TextInputModel * model, { model->header = text; }, true);
+}
+
+void text_input_set_allow_unicode(TextInput* text_input, bool allow) {
+    furi_check(text_input);
+    with_view_model(
+        text_input->view, TextInputModel * model, { model->allow_unicode = allow; }, true);
 }

@@ -6,6 +6,7 @@
 #include "scenes/desktop_scene_r0n1n.h"
 
 #include <assets_icons.h>
+#include <gui/utf8_i.h>
 #include <datetime/datetime.h>
 #include <furi_hal_rtc.h>
 #include <storage/storage.h>
@@ -30,16 +31,29 @@ static const R0n1nCaptureType r0n1n_capture_types[] = {
     {EXT_PATH("ibutton"), ".ibtn", "iButton", &I_ibutt_10px},
 };
 
+// Case folding for search: ASCII and Russian letters, ё counts as е
+static uint16_t desktop_r0n1n_fold(uint16_t code) {
+    if(code < 0x80) return tolower(code);
+    if(code >= 0x410 && code <= 0x42F) code += 0x20;
+    if(code == 0x401 || code == 0x451) code = 0x435;
+    return code;
+}
+
 bool desktop_r0n1n_matches(const char* text, const char* query) {
     if(!query || !query[0]) return true;
-    const size_t query_len = strlen(query);
-    for(const char* start = text; *start; start++) {
-        size_t i = 0;
-        while(i < query_len && start[i] &&
-              tolower((unsigned char)start[i]) == tolower((unsigned char)query[i])) {
-            i++;
+    for(const char* start = text; *start;) {
+        const char* t = start;
+        const char* q = query;
+        uint16_t tc, qc;
+        while(*q && *t) {
+            size_t tl = gui_utf8_char(t, &tc);
+            size_t ql = gui_utf8_char(q, &qc);
+            if(desktop_r0n1n_fold(tc) != desktop_r0n1n_fold(qc)) break;
+            t += tl;
+            q += ql;
         }
-        if(i == query_len) return true;
+        if(!*q) return true;
+        start += gui_utf8_char(start, &tc);
     }
     return false;
 }

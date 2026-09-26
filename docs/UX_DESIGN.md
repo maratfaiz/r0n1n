@@ -65,7 +65,30 @@ Russian everywhere, stock apps included:
 - apps keep their FAM names for launching; the stock menus show Russian
   names (`loader_display_name()`);
 - not translated: protocol dumps and file formats (UID, ATQA, Sub-GHz
-  key lines), CLI, logs, debug apps; the on-screen keyboard is Latin.
+  key lines), CLI, logs, debug apps;
+- the keyboard (`text_input.c`) has Russian, Latin and 123 layouts behind
+  one key and edits whole UTF-8 characters. File names on the SD card
+  (FAT, code page 850) can't hold Cyrillic, so it is transliterated to
+  Latin on Save unless the caller keeps Unicode
+  (`text_input_set_allow_unicode()`, Search does);
+- FontSecondary gained the letters its source lacked (э, ё, Ё), rebuilt
+  with u8g2's bdfconv; the other glyphs are unchanged.
+
+## Simple mode
+
+For people who want the basics only (R0N1N Settings -> "Простой режим").
+Home shows a big clock and date and "OK Меню"; any arrow or OK opens a
+menu with one big item per screen (32 px icon, 10x20 font): TV remote
+(opens the universal TV remote directly), gates (Sub-GHz), cards (NFC),
+intercom key (iButton), key fob (125 kHz RFID), Files, Academy, power off,
+and "Обычный вид", which leaves simple mode after a confirmation.
+
+## Academy
+
+`applications/system/academy`, on the SD card in Tools and in the R0N1N
+menu: short lessons (buttons, Home, simple mode, TV remote, files,
+charging and SD card, updating, responsible use), each ending with one
+question; passed lessons are remembered.
 
 Brand moments carry the 77×20 R0N1N wordmark (`r0n1n_ui_logo`):
 

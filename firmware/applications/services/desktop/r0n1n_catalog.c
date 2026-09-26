@@ -34,6 +34,7 @@ const R0n1nApp r0n1n_system_apps[] = {
     {R0N1N_APP_ARCHIVE, "Файлы", &I_dir_10px, &A_FileManager_14},
     {R0N1N_APP_SETTINGS, "Настройки", &I_settings_10px, &A_Settings_14},
     {R0N1N_APP_ALL, "Все приложения", &I_R_Star_9x7, &A_Plugins_14},
+    {"academy.fap", "Академия", &I_R_Cap_10x7, &A_Plugins_14},
 };
 const size_t r0n1n_system_apps_count = COUNT_OF(r0n1n_system_apps);
 

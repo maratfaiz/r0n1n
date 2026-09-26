@@ -138,6 +138,11 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
             consumed = true;
             break;
 
+        case DesktopMainEventOpenSimpleMenu:
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneSimpleMenu);
+            consumed = true;
+            break;
+
         case DesktopMainEventOpenPowerOff: {
             loader_start_detached_with_gui_error(desktop->loader, "Power", "off");
             consumed = true;

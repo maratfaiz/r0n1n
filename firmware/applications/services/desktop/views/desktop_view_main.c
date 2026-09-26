@@ -8,6 +8,7 @@
 #include <locale/locale.h>
 #include <assets_icons.h>
 #include <gui/r0n1n_ui.h>
+#include <u8g2.h>
 
 #include "desktop_view_main.h"
 
@@ -23,6 +24,7 @@ typedef struct {
     char profile_name[32];
     uint8_t battery_pct;
     bool has_datetime;
+    bool simple_mode;
 } DesktopMainViewModel;
 
 struct DesktopMainView {
@@ -40,6 +42,7 @@ struct DesktopMainView {
     void* context;
     FuriTimer* poweroff_timer;
     bool dummy_mode;
+    bool simple_mode;
     bool back_held; // Back held past InputTypeLong: open Search on release
 };
 
@@ -76,6 +79,16 @@ void desktop_main_set_dummy_mode_state(DesktopMainView* main_view, bool dummy_mo
     main_view->dummy_mode = dummy_mode;
 }
 
+void desktop_main_set_simple_mode(DesktopMainView* main_view, bool simple_mode) {
+    furi_assert(main_view);
+    main_view->simple_mode = simple_mode;
+    with_view_model(
+        main_view->dashboard_view,
+        DesktopMainViewModel * model,
+        { model->simple_mode = simple_mode; },
+        true);
+}
+
 void desktop_main_update_dashboard(
     DesktopMainView* main_view,
     const DateTime* datetime,
@@ -96,6 +109,36 @@ void desktop_main_update_dashboard(
         true);
 }
 
+// Simple mode Home: only what matters, as large as the screen allows
+static void desktop_main_draw_simple(Canvas* canvas, DesktopMainViewModel* m) {
+    static const char* const weekdays[] = {"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"};
+    static const char* const months[] = {
+        "янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"};
+    const DateTime* dt = &m->datetime;
+
+    r0n1n_ui_battery(canvas, 127, 1, m->battery_pct);
+
+    FuriString* str = furi_string_alloc();
+    locale_format_time(str, dt, locale_get_time_format(), false);
+    canvas_set_font(canvas, FontBigNumbers);
+    canvas_draw_str_aligned(canvas, 64, 24, AlignCenter, AlignBottom, furi_string_get_cstr(str));
+
+    furi_string_printf(
+        str,
+        "%s, %u %s",
+        weekdays[(dt->weekday >= 1 && dt->weekday <= 7) ? dt->weekday - 1 : 0],
+        dt->day,
+        months[(dt->month >= 1 && dt->month <= 12) ? dt->month - 1 : 0]);
+    canvas_set_custom_u8g2_font(canvas, u8g2_font_10x20_t_cyrillic);
+    canvas_draw_str_aligned(canvas, 64, 43, AlignCenter, AlignBottom, furi_string_get_cstr(str));
+
+    // "(OK) Меню" at the bottom
+    canvas_draw_icon(canvas, 36, 52, &I_Ok_btn_9x9);
+    canvas_draw_str(canvas, 49, 62, "Меню");
+    canvas_set_font(canvas, FontSecondary);
+    furi_string_free(str);
+}
+
 static void desktop_main_draw_callback(Canvas* canvas, void* model) {
     static const char* const weekdays[] = {"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"};
     static const char* const months[] = {
@@ -106,6 +149,11 @@ static void desktop_main_draw_callback(Canvas* canvas, void* model) {
     canvas_set_color(canvas, ColorWhite);
     canvas_draw_box(canvas, 0, 0, 128, 64);
     canvas_set_color(canvas, ColorBlack);
+
+    if(m->simple_mode) {
+        desktop_main_draw_simple(canvas, m);
+        return;
+    }
 
     r0n1n_ui_battery(canvas, 127, 1, m->battery_pct);
     canvas_draw_icon(canvas, 77, 17, &I_R_Mountains_51x46);
@@ -136,6 +184,14 @@ static bool desktop_main_dashboard_input_callback(InputEvent* event, void* conte
     if(main_view->dummy_mode) {
         return false;
     }
+    if(main_view->simple_mode) {
+        // Simple mode: Right, like every arrow and OK, opens its menu
+        if(event->key != InputKeyBack && event->type == InputTypeShort) {
+            main_view->callback(DesktopMainEventOpenSimpleMenu, main_view->context);
+            return true;
+        }
+        return false;
+    }
     if(event->key == InputKeyRight && event->type == InputTypeShort) {
         main_view->callback(DesktopMainEventOpenSectionsRight, main_view->context);
         return true;
@@ -150,7 +206,13 @@ bool desktop_main_input_callback(InputEvent* event, void* context) {
 
     DesktopMainView* main_view = context;
 
-    if(main_view->dummy_mode == false) {
+    if(main_view->simple_mode) {
+        // Only the basics: any arrow or OK opens the simple menu; holding
+        // Back still reaches the power-off menu (below).
+        if(event->type == InputTypeShort && event->key != InputKeyBack) {
+            main_view->callback(DesktopMainEventOpenSimpleMenu, main_view->context);
+        }
+    } else if(main_view->dummy_mode == false) {
         if(event->type == InputTypeShort) {
             if(event->key == InputKeyOk) {
                 main_view->callback(DesktopMainEventOpenMenu, main_view->context);

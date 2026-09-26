@@ -21,6 +21,7 @@
 #include <gui/modules/r0n1n_list.h>
 #include <gui/modules/r0n1n_grid.h>
 #include <gui/modules/r0n1n_carousel.h>
+#include "views/desktop_view_simple.h"
 #include <gui/scene_manager.h>
 
 #include <loader/loader.h>
@@ -54,6 +55,7 @@ typedef enum {
     DesktopViewIdR0n1nList,
     DesktopViewIdR0n1nGrid,
     DesktopViewIdR0n1nCarousel,
+    DesktopViewIdSimpleMenu,
     DesktopViewIdTextInput,
     DesktopViewIdDialog,
     DesktopViewIdTotal,
@@ -69,7 +71,7 @@ typedef struct {
 // what to launch (Loader name, .fap path or R0N1N_APP_* target), `path` its
 // argument or empty, `label` the row text.
 #define R0N1N_ENTRIES_MAX 40
-#define R0N1N_QUERY_SIZE  32
+#define R0N1N_QUERY_SIZE  48
 
 typedef struct {
     FuriString* app;
@@ -97,6 +99,7 @@ struct Desktop {
     R0n1nList* r0n1n_list;
     R0n1nGrid* r0n1n_grid;
     R0n1nCarousel* r0n1n_carousel;
+    DesktopSimpleMenu* simple_menu;
     TextInput* text_input;
     DialogEx* dialog_ex;
 

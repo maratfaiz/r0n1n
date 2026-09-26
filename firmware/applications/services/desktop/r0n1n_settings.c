@@ -9,7 +9,7 @@
 
 #define R0N1N_SETTINGS_PATH  INT_PATH(".r0n1n.settings")
 #define R0N1N_SETTINGS_MAGIC (0x52)
-#define R0N1N_SETTINGS_VER   (1)
+#define R0N1N_SETTINGS_VER   (2)
 
 static const char* const r0n1n_quick_defaults[R0N1N_QUICK_SLOTS] = {
     "NFC",
@@ -20,6 +20,25 @@ static const char* const r0n1n_quick_defaults[R0N1N_QUICK_SLOTS] = {
     R0N1N_APP_SETTINGS,
 };
 
+// Version 1 had no simple_mode; its profile and slots are kept on upgrade
+typedef struct {
+    uint8_t profile;
+    char quick[R0N1N_QUICK_SLOTS][R0N1N_SLOT_NAME_SIZE];
+} R0n1nSettingsV1;
+
+static bool r0n1n_settings_load_v1(R0n1nSettings* settings) {
+    R0n1nSettingsV1* v1 = malloc(sizeof(R0n1nSettingsV1));
+    bool loaded = saved_struct_load(
+        R0N1N_SETTINGS_PATH, v1, sizeof(R0n1nSettingsV1), R0N1N_SETTINGS_MAGIC, 1);
+    if(loaded) {
+        memset(settings, 0, sizeof(R0n1nSettings));
+        settings->profile = v1->profile;
+        memcpy(settings->quick, v1->quick, sizeof(settings->quick));
+    }
+    free(v1);
+    return loaded;
+}
+
 void r0n1n_settings_load(R0n1nSettings* settings) {
     furi_assert(settings);
     if(!saved_struct_load(
@@ -27,7 +46,8 @@ void r0n1n_settings_load(R0n1nSettings* settings) {
            settings,
            sizeof(R0n1nSettings),
            R0N1N_SETTINGS_MAGIC,
-           R0N1N_SETTINGS_VER)) {
+           R0N1N_SETTINGS_VER) &&
+       !r0n1n_settings_load_v1(settings)) {
         FURI_LOG_I(TAG, "No settings, using defaults");
         memset(settings, 0, sizeof(R0n1nSettings));
         settings->profile = R0n1nProfileEveryday;

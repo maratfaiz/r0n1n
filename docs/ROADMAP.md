@@ -120,8 +120,8 @@ is working.
   launching them (see Stage 3 for installing).
 
 **Simplified / not done yet:**
-- **Search is a live scan, not an SD index**, and the system keyboard is
-  Latin-only, so Russian labels can only be found by their English app name.
+- **Search is a live scan, not an SD index**; queries can be typed in
+  Russian (the keyboard has a Russian layout).
 - **Captures aren't tagged or exported** (frequency, protocol, export to the
   companion), and there are no hooks in the apps' save paths — the timeline
   reads their folders.

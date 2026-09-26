@@ -39,9 +39,10 @@
 #include "views/infrared_debug_view.h"
 #include "views/infrared_move_view.h"
 
-#define INFRARED_FILE_NAME_SIZE  100
-#define INFRARED_TEXT_STORE_NUM  2
-#define INFRARED_TEXT_STORE_SIZE 128
+#define INFRARED_ARG_UNIVERSAL_TV "@tv" /**< App argument: open the universal TV remote */
+#define INFRARED_FILE_NAME_SIZE   100
+#define INFRARED_TEXT_STORE_NUM   2
+#define INFRARED_TEXT_STORE_SIZE  128
 
 #define INFRARED_MAX_BUTTON_NAME_LENGTH 23
 #define INFRARED_MAX_REMOTE_NAME_LENGTH 23

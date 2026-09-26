@@ -21,6 +21,8 @@ typedef enum {
     DesktopMainEventOpenMenu,
     DesktopMainEventOpenDebug,
     DesktopMainEventOpenPowerOff,
+    // R0N1N simple mode: any arrow or OK on its Home
+    DesktopMainEventOpenSimpleMenu,
 
     DesktopDummyEventOpenLeft,
     DesktopDummyEventOpenDown,

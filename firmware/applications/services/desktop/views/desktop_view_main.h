@@ -23,6 +23,9 @@ View* desktop_main_get_dashboard_view(DesktopMainView* main_view);
 
 void desktop_main_set_dummy_mode_state(DesktopMainView* main_view, bool dummy_mode);
 
+/** R0N1N simple mode: big clock and date on Home, any arrow or OK opens its menu. */
+void desktop_main_set_simple_mode(DesktopMainView* main_view, bool simple_mode);
+
 // R0N1N Home dashboard (see docs/UX_DESIGN.md): pushes the clock/date/profile
 // content the draw callback renders. Called from a periodic timer while the
 // Main scene is active (desktop_scene_main.c), not read from inside the view
