@@ -124,11 +124,11 @@ FlipperFormat* subghz_history_get_raw_data(SubGhzHistory* instance, uint16_t idx
 bool subghz_history_get_text_space_left(SubGhzHistory* instance, FuriString* output) {
     furi_assert(instance);
     if(memmgr_get_free_heap() < SUBGHZ_HISTORY_FREE_HEAP) {
-        if(output != NULL) furi_string_printf(output, "    Free heap LOW");
+        if(output != NULL) furi_string_printf(output, "  Мало памяти");
         return true;
     }
     if(instance->last_index_write == SUBGHZ_HISTORY_MAX) {
-        if(output != NULL) furi_string_printf(output, "   Memory is FULL");
+        if(output != NULL) furi_string_printf(output, "  Память заполнена");
         return true;
     }
     if(output != NULL)

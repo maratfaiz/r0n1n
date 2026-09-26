@@ -34,63 +34,63 @@ void desktop_settings_scene_quick_apps_direction_menu_on_enter(void* context) {
     if(favorite_id == SCENE_STATE_SET_FAVORITE_APP) {
         submenu_add_item(
             submenu,
-            "Left - Press",
+            "Влево - нажатие",
             QuickAppsSubmenuIndexFavoriteLeftClick,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
         submenu_add_item(
             submenu,
-            "Right - Press",
+            "Вправо - нажатие",
             QuickAppsSubmenuIndexFavoriteRightClick,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
         submenu_add_item(
             submenu,
-            "Left - Hold",
+            "Влево - удержание",
             QuickAppsSubmenuIndexFavoriteLeftHold,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
         submenu_add_item(
             submenu,
-            "Right - Hold",
+            "Вправо - удержание",
             QuickAppsSubmenuIndexFavoriteRightHold,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
-        submenu_set_header(app->submenu, "Default Mode");
+        submenu_set_header(app->submenu, "Обычный режим");
     } else {
         submenu_add_item(
             submenu,
-            "Left - Press",
+            "Влево - нажатие",
             QuickAppsSubmenuIndexDummyLeftClick,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
         submenu_add_item(
             submenu,
-            "Right - Press",
+            "Вправо - нажатие",
             QuickAppsSubmenuIndexDummyRightClick,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
         submenu_add_item(
             submenu,
-            "Down - Press",
+            "Вниз - нажатие",
             QuickAppsSubmenuIndexDummyDownClick,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
         submenu_add_item(
             submenu,
-            "Middle - Press",
+            "Центр - нажатие",
             QuickAppsSubmenuIndexDummyMiddleClick,
             desktop_settings_scene_quick_apps_direction_menu_submenu_callback,
             app);
 
-        submenu_set_header(app->submenu, "Dummy Mode");
+        submenu_set_header(app->submenu, "Режим Dummy");
     }
 
     submenu_set_selected_item(app->submenu, app->quick_apps_direction_menu_idx);

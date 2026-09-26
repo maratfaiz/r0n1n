@@ -73,7 +73,8 @@ I2C scanner, sensors, a logic analyzer, GPS NMEA.
 **Built in (R0N1N):** the Home dashboard, sections (Left/Right), Control
 Center (Down), Quick Actions (Up), Recent (hold OK), the Applications menu
 (OK), profiles, Global Search (hold Back), the Capture Timeline and a first
-Hub — in Russian — see `ROADMAP.md`.
+Hub — in Russian, like the stock apps (menus, dialogs, settings,
+card parsers) — see `ROADMAP.md`, `UX_DESIGN.md`.
 
 **Later:** an SD search index, capture tags and export, keybinds, an
 advanced file manager (see `UX_DESIGN.md`, `UNIQUE_FEATURES.md`).

@@ -223,17 +223,17 @@ static void
     if(brief) {
         furi_string_printf(
             result,
-            "Internal ID: %lu\n"
-            "FC: %lu; Card: %lu",
+            "Внутр. ID: %lu\n"
+            "FC: %lu; Карта: %lu",
             internal_id,
             fc,
             cn);
     } else {
         furi_string_printf(
             result,
-            "Internal ID: %lu\n"
+            "Внутр. ID: %lu\n"
             "FC: %lu\n"
-            "Card: %lu",
+            "Карта: %lu",
             internal_id,
             fc,
             cn);

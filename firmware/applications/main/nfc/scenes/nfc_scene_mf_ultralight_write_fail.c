@@ -17,8 +17,7 @@ void nfc_scene_mf_ultralight_write_fail_on_enter(void* context) {
     notification_message(instance->notifications, &sequence_error);
 
     widget_add_icon_element(widget, 83, 22, &I_WarningDolphinFlip_45x42);
-    widget_add_string_element(
-        widget, 7, 4, AlignLeft, AlignTop, FontPrimary, "Writing gone wrong!");
+    widget_add_string_element(widget, 7, 4, AlignLeft, AlignTop, FontPrimary, "Ошибка записи!");
     widget_add_string_multiline_element(
         widget,
         7,
@@ -26,12 +25,12 @@ void nfc_scene_mf_ultralight_write_fail_on_enter(void* context) {
         AlignLeft,
         AlignTop,
         FontSecondary,
-        "Card protected by\npassword, AUTH0\nor lock bits");
+        "Карта защищена\nпаролем, AUTH0\nили битами блок.");
 
     widget_add_button_element(
         widget,
         GuiButtonTypeLeft,
-        "Finish",
+        "Готово",
         nfc_scene_mf_ultralight_write_fail_widget_callback,
         instance);
 

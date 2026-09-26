@@ -26,8 +26,8 @@ void nfc_scene_mf_classic_keys_on_enter(void* context) {
 
     FuriString* temp_str = furi_string_alloc();
     widget_add_string_element(
-        instance->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, "MIFARE Classic Keys");
-    furi_string_printf(temp_str, "System dict: %lu", flipper_dict_keys_total);
+        instance->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, "Ключи MIFARE Classic");
+    furi_string_printf(temp_str, "Сист. словарь: %lu", flipper_dict_keys_total);
     widget_add_string_element(
         instance->widget,
         0,
@@ -36,7 +36,7 @@ void nfc_scene_mf_classic_keys_on_enter(void* context) {
         AlignTop,
         FontSecondary,
         furi_string_get_cstr(temp_str));
-    furi_string_printf(temp_str, "User dict: %lu", user_dict_keys_total);
+    furi_string_printf(temp_str, "Польз. словарь: %lu", user_dict_keys_total);
     widget_add_string_element(
         instance->widget,
         0,
@@ -49,14 +49,14 @@ void nfc_scene_mf_classic_keys_on_enter(void* context) {
     widget_add_button_element(
         instance->widget,
         GuiButtonTypeCenter,
-        "Add",
+        "Добавить",
         nfc_scene_mf_classic_keys_widget_callback,
         instance);
     if(user_dict_keys_total > 0) {
         widget_add_button_element(
             instance->widget,
             GuiButtonTypeRight,
-            "List",
+            "Список",
             nfc_scene_mf_classic_keys_widget_callback,
             instance);
     }

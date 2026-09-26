@@ -20,31 +20,31 @@ void nfc_scene_extra_actions_on_enter(void* context) {
 
     submenu_add_item(
         submenu,
-        "Read Specific Card Type",
+        "Читать тип карты",
         SubmenuIndexReadCardType,
         nfc_scene_extra_actions_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "MIFARE Classic Keys",
+        "Ключи MIFARE Classic",
         SubmenuIndexMfClassicKeys,
         nfc_scene_extra_actions_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "MIFARE Ultralight C Keys",
+        "Ключи MIFARE Ultralight C",
         SubmenuIndexMfUltralightCKeys,
         nfc_scene_extra_actions_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "Unlock NTAG/Ultralight",
+        "Разблок. NTAG/Ultralight",
         SubmenuIndexMfUltralightUnlock,
         nfc_scene_extra_actions_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "Unlock SLIX-L",
+        "Разблок. SLIX-L",
         SubmenuIndexSlixUnlock,
         nfc_scene_extra_actions_submenu_callback,
         instance);

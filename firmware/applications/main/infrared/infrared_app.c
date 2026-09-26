@@ -35,7 +35,7 @@ static const NotificationSequence*
 
 static void infrared_make_app_folder(InfraredApp* infrared) {
     if(!storage_simply_mkdir(infrared->storage, INFRARED_APP_FOLDER)) {
-        infrared_show_error_message(infrared, "Cannot create\napp folder");
+        infrared_show_error_message(infrared, "Не удалось создать\nпапку");
     }
 }
 
@@ -608,8 +608,8 @@ int32_t infrared_app(void* p) {
                 is_remote_loaded = false;
                 bool wrong_file_type = INFRARED_ERROR_CHECK(error, InfraredErrorCodeWrongFileType);
                 const char* format = wrong_file_type ?
-                                         "Library file\n\"%s\" can't be openned as a remote" :
-                                         "Failed to load\n\"%s\"";
+                                         "Файл библиотеки\n\"%s\" нельзя открыть\nкак пульт" :
+                                         "Не удалось\nзагрузить\n\"%s\"";
 
                 infrared_show_error_message(infrared, format, file_path);
                 return -1;

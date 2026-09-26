@@ -16,9 +16,9 @@ static void draw_menu(BadUsbApp* bad_usb) {
 
     variable_item_list_reset(var_item_list);
 
-    variable_item_list_add(var_item_list, "Keyboard Layout (global)", 0, NULL, NULL);
+    variable_item_list_add(var_item_list, "Раскладка (общая)", 0, NULL, NULL);
 
-    variable_item_list_add(var_item_list, "Remove Pairing", 0, NULL, NULL);
+    variable_item_list_add(var_item_list, "Удалить сопряжение", 0, NULL, NULL);
 }
 
 void bad_usb_scene_config_on_enter(void* context) {

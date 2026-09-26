@@ -15,7 +15,8 @@ void nfc_scene_slix_unlock_success_on_enter(void* context) {
     NfcApp* instance = context;
 
     Widget* widget = instance->widget;
-    widget_add_string_element(widget, 0, 0, AlignLeft, AlignTop, FontPrimary, "SLIX Unlocked!");
+    widget_add_string_element(
+        widget, 0, 0, AlignLeft, AlignTop, FontPrimary, "SLIX разблокирована!");
 
     FuriString* temp_str = furi_string_alloc_set_str("UID:");
     size_t uid_len = 0;
@@ -23,7 +24,7 @@ void nfc_scene_slix_unlock_success_on_enter(void* context) {
     for(size_t i = 0; i < uid_len; i++) {
         furi_string_cat_printf(temp_str, " %02X", uid[i]);
     }
-    furi_string_cat_printf(temp_str, "\nPrivacy Mode: Disabled");
+    furi_string_cat_printf(temp_str, "\nПриватность: выкл");
     widget_add_string_multiline_element(
         widget, 0, 12, AlignLeft, AlignTop, FontSecondary, furi_string_get_cstr(temp_str));
     furi_string_free(temp_str);
@@ -31,15 +32,11 @@ void nfc_scene_slix_unlock_success_on_enter(void* context) {
     widget_add_button_element(
         widget,
         GuiButtonTypeLeft,
-        "Retry",
+        "Повтор",
         nfc_scene_slix_unlock_success_widget_callback,
         instance);
     widget_add_button_element(
-        widget,
-        GuiButtonTypeRight,
-        "More",
-        nfc_scene_slix_unlock_success_widget_callback,
-        instance);
+        widget, GuiButtonTypeRight, "Еще", nfc_scene_slix_unlock_success_widget_callback, instance);
 
     view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewWidget);
 }

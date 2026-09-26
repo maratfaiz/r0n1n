@@ -7,6 +7,7 @@
 #include <gui/canvas.h>
 #include <gui/icon_i.h>
 #include <gui/icon_animation_i.h>
+#include <gui/utf8_i.h>
 
 #include <furi.h>
 
@@ -325,7 +326,8 @@ static size_t
     }
 
     furi_string_free(str);
-    return result;
+    // Never split a multi-byte (Cyrillic) character between lines
+    return gui_utf8_char_start(text, result);
 }
 
 void elements_multiline_text_aligned(
@@ -365,7 +367,7 @@ void elements_multiline_text_aligned(
         } else if((y + font_height) > canvas_height(canvas)) {
             line = furi_string_alloc_printf("%.*s...\n", chars_fit, start);
         } else {
-            chars_fit -= 1; // account for the dash
+            chars_fit = gui_utf8_char_start(start, chars_fit - 1); // account for the dash
             line = furi_string_alloc_printf("%.*s-\n", chars_fit, start);
         }
         canvas_draw_str_aligned(canvas, x, y, horizontal, vertical, furi_string_get_cstr(line));
@@ -639,7 +641,10 @@ void elements_string_fit_width(Canvas* canvas, FuriString* string, size_t width)
     if(len_px > width) {
         width -= canvas_string_width(canvas, "...");
         do {
-            furi_string_left(string, furi_string_size(string) - 1);
+            // Drop one whole character, not one byte of a Cyrillic one
+            size_t size = furi_string_size(string);
+            if(!size) break;
+            furi_string_left(string, gui_utf8_char_start(furi_string_get_cstr(string), size - 1));
             len_px = canvas_string_width(canvas, furi_string_get_cstr(string));
         } while(len_px > width);
         furi_string_cat(string, "...");
@@ -678,12 +683,18 @@ void elements_scrollable_text_line(
         if(scroll_size) {
             scroll_size += 3;
             scroll = scroll % scroll_size;
+            // Start at a character, not inside a Cyrillic one
+            const char* cstr = furi_string_get_cstr(line);
+            while(scroll < furi_string_size(line) && ((uint8_t)cstr[scroll] & 0xC0) == 0x80) {
+                scroll++;
+            }
             furi_string_right(line, scroll);
         }
 
         len_px = canvas_string_width(canvas, furi_string_get_cstr(line));
-        while(len_px > width) {
-            furi_string_left(line, furi_string_size(line) - 1);
+        while(len_px > width && furi_string_size(line)) {
+            furi_string_left(
+                line, gui_utf8_char_start(furi_string_get_cstr(line), furi_string_size(line) - 1));
             len_px = canvas_string_width(canvas, furi_string_get_cstr(line));
         }
 
@@ -773,13 +784,17 @@ void elements_text_box(
             }
             continue;
         }
+        uint16_t code = (uint8_t)text[i];
+        size_t code_len = 1;
         if(text[i] != '\n') {
-            line_width += canvas_glyph_width(canvas, text[i]);
+            code_len = gui_utf8_char(&text[i], &code);
+            line_width += canvas_glyph_width(canvas, code);
         }
         // Process new line
         if(text[i] == '\n' || text[i] == '\0' || line_width > width) {
             if(line_width > width) {
-                line_width -= canvas_glyph_width(canvas, text[i--]);
+                line_width -= canvas_glyph_width(canvas, code);
+                i--;
                 line_len--;
             }
             if(text[i] == '\0') {
@@ -817,6 +832,10 @@ void elements_text_box(
             line_descender = font_params->descender;
             line_width = 0;
             line_len = 0;
+        } else {
+            // Rest of a multi-byte (Cyrillic) character
+            i += code_len - 1;
+            line_len += code_len - 1;
         }
     }
 
@@ -881,28 +900,31 @@ void elements_text_box(
                     continue;
                 }
             }
+            uint16_t code;
+            size_t code_len = gui_utf8_char(&line[i].text[j], &code);
             if(inverse) {
                 canvas_draw_box(
                     canvas,
                     line[i].x - 1,
                     line[i].y - line[i].height - 1,
-                    canvas_glyph_width(canvas, line[i].text[j]) + 1,
+                    canvas_glyph_width(canvas, code) + 1,
                     line[i].height + line[i].descender + 2);
                 canvas_invert_color(canvas);
-                canvas_draw_glyph(canvas, line[i].x, line[i].y, line[i].text[j]);
+                canvas_draw_glyph(canvas, line[i].x, line[i].y, code);
                 canvas_invert_color(canvas);
             } else {
                 if((i == line_num - 1) && strip_to_dots) {
-                    size_t next_symbol_width = canvas_glyph_width(canvas, line[i].text[j]);
+                    size_t next_symbol_width = canvas_glyph_width(canvas, code);
                     if((line[i].x + (int32_t)next_symbol_width + (int32_t)dots_width) >
                        (x + (int32_t)width)) {
                         canvas_draw_str(canvas, line[i].x, line[i].y, "...");
                         break;
                     }
                 }
-                canvas_draw_glyph(canvas, line[i].x, line[i].y, line[i].text[j]);
+                canvas_draw_glyph(canvas, line[i].x, line[i].y, code);
             }
-            line[i].x += canvas_glyph_width(canvas, line[i].text[j]);
+            line[i].x += canvas_glyph_width(canvas, code);
+            j += code_len - 1;
         }
     }
     canvas_set_font(canvas, FontSecondary);

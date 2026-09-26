@@ -133,7 +133,7 @@ void dallas_ds1990_render_brief_data(FuriString* result, const iButtonProtocolDa
     for(size_t i = 0; i < sizeof(DallasCommonRomData); ++i) {
         furi_string_cat_printf(result, "%02X ", data->rom_data.bytes[i]);
     }
-    furi_string_cat_printf(result, "\nFamily Code: %02X\n", data->rom_data.bytes[0]);
+    furi_string_cat_printf(result, "\nКод семейства: %02X\n", data->rom_data.bytes[0]);
 }
 
 void dallas_ds1990_render_error(FuriString* result, const iButtonProtocolData* protocol_data) {

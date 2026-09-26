@@ -244,7 +244,7 @@ void protocol_gproxii_render_data(ProtocolGProxII* protocol, FuriString* result)
         // Print FC, Card and Length
         furi_string_cat_printf(
             result,
-            "FC: %u Card: %u LEN: %hhu\n",
+            "FC: %u Карта: %u Длина: %hhu\n",
             bit_lib_get_bits(protocol->decoded_data, 33, 8),
             bit_lib_get_bits_16(protocol->decoded_data, 41, 16),
             card_len);
@@ -259,7 +259,7 @@ void protocol_gproxii_render_data(ProtocolGProxII* protocol, FuriString* result)
         // Print FC, Card and Length
         furi_string_cat_printf(
             result,
-            "FC: %u Card: %u LEN: %hhu\n",
+            "FC: %u Карта: %u Длина: %hhu\n",
             bit_lib_get_bits_16(protocol->decoded_data, 33, 14),
             bit_lib_get_bits_16(protocol->decoded_data, 51, 16),
             card_len);
@@ -271,7 +271,7 @@ void protocol_gproxii_render_data(ProtocolGProxII* protocol, FuriString* result)
             crc_code,
             bit_lib_get_bits_16(protocol->decoded_data, 16, 16));
     } else {
-        furi_string_cat_printf(result, "Read Error\n");
+        furi_string_cat_printf(result, "Ошибка чтения\n");
     }
 }
 

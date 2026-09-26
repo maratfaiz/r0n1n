@@ -248,7 +248,7 @@ void nfc_make_app_folders(NfcApp* instance) {
     furi_assert(instance);
 
     if(!storage_simply_mkdir(instance->storage, NFC_APP_FOLDER)) {
-        dialog_message_show_storage_error(instance->dialogs, "Cannot create\napp folder");
+        dialog_message_show_storage_error(instance->dialogs, "Не удалось создать\nпапку");
     }
 }
 
@@ -259,7 +259,7 @@ bool nfc_save_file(NfcApp* instance, FuriString* path) {
     bool result = nfc_device_save(instance->nfc_device, furi_string_get_cstr(instance->file_path));
 
     if(!result) {
-        dialog_message_show_storage_error(instance->dialogs, "Cannot save\nkey file");
+        dialog_message_show_storage_error(instance->dialogs, "Не удалось сохранить\nфайл ключей");
     }
 
     return result;
@@ -366,7 +366,7 @@ bool nfc_load_file(NfcApp* instance, FuriString* path, bool show_dialog) {
     }
 
     if((!result) && (show_dialog)) {
-        dialog_message_show_storage_error(instance->dialogs, "Cannot load\nkey file");
+        dialog_message_show_storage_error(instance->dialogs, "Не удалось загрузить\nфайл ключей");
     }
 
     furi_string_free(load_path);
@@ -439,7 +439,7 @@ void nfc_append_filename_string_when_present(NfcApp* instance, FuriString* strin
     furi_assert(string);
 
     if(!furi_string_empty(instance->file_name)) {
-        furi_string_cat_printf(string, "Name: %s\n", furi_string_get_cstr(instance->file_name));
+        furi_string_cat_printf(string, "Имя: %s\n", furi_string_get_cstr(instance->file_name));
     }
 }
 
@@ -448,9 +448,14 @@ static bool nfc_is_hal_ready(void) {
         // No connection to the chip, show an error screen
         DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
         DialogMessage* message = dialog_message_alloc();
-        dialog_message_set_header(message, "Error: NFC Chip Failed", 64, 0, AlignCenter, AlignTop);
+        dialog_message_set_header(message, "Ошибка: сбой чипа NFC", 64, 0, AlignCenter, AlignTop);
         dialog_message_set_text(
-            message, "Send error photo via\nsupport.flipper.net", 0, 63, AlignLeft, AlignBottom);
+            message,
+            "Отправьте фото ошибки\nна support.flipper.net",
+            0,
+            63,
+            AlignLeft,
+            AlignBottom);
         dialog_message_set_icon(message, &I_err_09, 128 - 25, 64 - 25);
         dialog_message_show(dialogs, message);
         dialog_message_free(message);

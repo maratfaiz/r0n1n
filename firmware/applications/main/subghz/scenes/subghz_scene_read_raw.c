@@ -278,7 +278,7 @@ bool subghz_scene_read_raw_on_event(void* context, SceneManagerEvent event) {
                     subghz->state_notifications = SubGhzNotificationStateRx;
                     subghz_rx_key_state_set(subghz, SubGhzRxKeyStateAddKey);
                 } else {
-                    furi_string_set(subghz->error_str, "Function requires\nan SD card.");
+                    furi_string_set(subghz->error_str, "Нужна SD-карта.");
                     scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
                 }
             }

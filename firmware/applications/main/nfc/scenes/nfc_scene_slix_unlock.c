@@ -30,9 +30,9 @@ void nfc_scene_slix_unlock_on_enter(void* context) {
     NfcApp* instance = context;
 
     popup_set_icon(instance->popup, 0, 8, &I_NFC_manual_60x50);
-    popup_set_header(instance->popup, "Unlocking", 97, 15, AlignCenter, AlignTop);
+    popup_set_header(instance->popup, "Разблок...", 97, 15, AlignCenter, AlignTop);
     popup_set_text(
-        instance->popup, "Hold card next\nto Flipper's back", 94, 27, AlignCenter, AlignTop);
+        instance->popup, "Приложите\nкарту к задней\nстороне", 94, 27, AlignCenter, AlignTop);
     view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewPopup);
 
     instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolSlix);

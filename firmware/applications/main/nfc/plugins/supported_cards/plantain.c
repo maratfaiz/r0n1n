@@ -220,7 +220,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             bit_lib_bytes_to_num_be(sec_tr->key_a.data, COUNT_OF(sec_tr->key_a.data));
         if(key != cfg.keys[cfg.data_sector].a) break;
 
-        furi_string_printf(parsed_data, "\e#Plantain card\n");
+        furi_string_printf(parsed_data, "\e#Карта Подорожник\n");
 
         const uint8_t* temp_ptr = &uid[0];
 
@@ -263,12 +263,12 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             for(uint8_t i = 0; i < 4; i++) {
                 balance = (balance << 8) | data->block[16].data[3 - i];
             }
-            furi_string_cat_printf(parsed_data, "Balance: %ld rub\n", balance / 100);
+            furi_string_cat_printf(parsed_data, "Баланс: %ld руб\n", balance / 100);
 
             //trips
             uint8_t trips_metro = data->block[21].data[0];
             uint8_t trips_ground = data->block[21].data[1];
-            furi_string_cat_printf(parsed_data, "Trips: %d\n", trips_metro + trips_ground);
+            furi_string_cat_printf(parsed_data, "Поездок: %d\n", trips_metro + trips_ground);
             //trip time
             uint32_t last_trip_timestamp = 0;
             for(uint8_t i = 0; i < 3; i++) {
@@ -278,7 +278,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             from_minutes_to_datetime(last_trip_timestamp + 24 * 60, &last_trip, 2010);
             furi_string_cat_printf(
                 parsed_data,
-                "Trip start: %02d.%02d.%04d %02d:%02d\n",
+                "Начало поездки: %02d.%02d.%04d %02d:%02d\n",
                 last_trip.day,
                 last_trip.month,
                 last_trip.year,
@@ -286,14 +286,14 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
                 last_trip.minute);
             //validator
             uint16_t validator = (data->block[20].data[5] << 8) | data->block[20].data[4];
-            furi_string_cat_printf(parsed_data, "Validator: %d\n", validator);
+            furi_string_cat_printf(parsed_data, "Валидатор: %d\n", validator);
             //tariff
             uint16_t fare = (data->block[20].data[7] << 8) | data->block[20].data[6];
-            furi_string_cat_printf(parsed_data, "Tariff: %d rub\n", fare / 100);
+            furi_string_cat_printf(parsed_data, "Тариф: %d руб\n", fare / 100);
             //trips in metro
-            furi_string_cat_printf(parsed_data, "Trips (Metro): %d\n", trips_metro);
+            furi_string_cat_printf(parsed_data, "Поездок (метро): %d\n", trips_metro);
             //trips on ground
-            furi_string_cat_printf(parsed_data, "Trips (Ground): %d\n", trips_ground);
+            furi_string_cat_printf(parsed_data, "Поездок (наземный): %d\n", trips_ground);
             //last payment
             uint32_t last_payment_timestamp = 0;
             for(uint8_t i = 0; i < 3; i++) {
@@ -304,7 +304,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             from_minutes_to_datetime(last_payment_timestamp + 24 * 60, &last_payment_date, 2010);
             furi_string_cat_printf(
                 parsed_data,
-                "Last pay: %02d.%02d.%04d %02d:%02d\n",
+                "Последняя оплата: %02d.%02d.%04d %02d:%02d\n",
                 last_payment_date.day,
                 last_payment_date.month,
                 last_payment_date.year,
@@ -314,7 +314,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             uint16_t last_payment = ((data->block[18].data[10] << 16) |
                                      (data->block[18].data[9] << 8) | (data->block[18].data[8])) /
                                     100;
-            furi_string_cat_printf(parsed_data, "Amount: %d rub", last_payment);
+            furi_string_cat_printf(parsed_data, "Сумма: %d руб", last_payment);
             furi_string_free(card_number_s);
             furi_string_free(tmp_s);
             //This is for 4K Plantains.
@@ -324,12 +324,12 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             for(uint8_t i = 0; i < 4; i++) {
                 balance = (balance << 8) | data->block[16].data[3 - i];
             }
-            furi_string_cat_printf(parsed_data, "Balance: %ld rub\n", balance / 100);
+            furi_string_cat_printf(parsed_data, "Баланс: %ld руб\n", balance / 100);
 
             //trips
             uint8_t trips_metro = data->block[21].data[0];
             uint8_t trips_ground = data->block[21].data[1];
-            furi_string_cat_printf(parsed_data, "Trips: %d\n", trips_metro + trips_ground);
+            furi_string_cat_printf(parsed_data, "Поездок: %d\n", trips_metro + trips_ground);
             //trip time
             uint32_t last_trip_timestamp = 0;
             for(uint8_t i = 0; i < 3; i++) {
@@ -339,7 +339,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             from_minutes_to_datetime(last_trip_timestamp + 24 * 60, &last_trip, 2010);
             furi_string_cat_printf(
                 parsed_data,
-                "Trip start: %02d.%02d.%04d %02d:%02d\n",
+                "Начало поездки: %02d.%02d.%04d %02d:%02d\n",
                 last_trip.day,
                 last_trip.month,
                 last_trip.year,
@@ -347,14 +347,14 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
                 last_trip.minute);
             //validator
             uint16_t validator = (data->block[20].data[5] << 8) | data->block[20].data[4];
-            furi_string_cat_printf(parsed_data, "Validator: %d\n", validator);
+            furi_string_cat_printf(parsed_data, "Валидатор: %d\n", validator);
             //tariff
             uint16_t fare = (data->block[20].data[7] << 8) | data->block[20].data[6];
-            furi_string_cat_printf(parsed_data, "Tariff: %d rub\n", fare / 100);
+            furi_string_cat_printf(parsed_data, "Тариф: %d руб\n", fare / 100);
             //trips in metro
-            furi_string_cat_printf(parsed_data, "Trips (Metro): %d\n", trips_metro);
+            furi_string_cat_printf(parsed_data, "Поездок (метро): %d\n", trips_metro);
             //trips on ground
-            furi_string_cat_printf(parsed_data, "Trips (Ground): %d\n", trips_ground);
+            furi_string_cat_printf(parsed_data, "Поездок (наземный): %d\n", trips_ground);
             //last payment
             uint32_t last_payment_timestamp = 0;
             for(uint8_t i = 0; i < 3; i++) {
@@ -365,7 +365,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             from_minutes_to_datetime(last_payment_timestamp + 24 * 60, &last_payment_date, 2010);
             furi_string_cat_printf(
                 parsed_data,
-                "Last pay: %02d.%02d.%04d %02d:%02d\n",
+                "Последняя оплата: %02d.%02d.%04d %02d:%02d\n",
                 last_payment_date.day,
                 last_payment_date.month,
                 last_payment_date.year,
@@ -375,7 +375,7 @@ static bool plantain_parse(const NfcDevice* device, FuriString* parsed_data) {
             uint16_t last_payment = ((data->block[18].data[10] << 16) |
                                      (data->block[18].data[9] << 8) | (data->block[18].data[8])) /
                                     100;
-            furi_string_cat_printf(parsed_data, "Amount: %d rub", last_payment);
+            furi_string_cat_printf(parsed_data, "Сумма: %d руб", last_payment);
             furi_string_free(card_number_s);
             furi_string_free(tmp_s);
         }

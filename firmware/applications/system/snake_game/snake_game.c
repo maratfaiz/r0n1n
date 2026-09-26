@@ -125,11 +125,11 @@ static void snake_game_render_callback(Canvas* const canvas, void* ctx) {
         canvas_draw_frame(canvas, 34, 20, 62, 24);
 
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str(canvas, 37, 31, "Game Over");
+        canvas_draw_str_aligned(canvas, 65, 31, AlignCenter, AlignBottom, "Проигрыш");
 
         canvas_set_font(canvas, FontSecondary);
-        char buffer[12];
-        snprintf(buffer, sizeof(buffer), "Score: %u", snake_state->len - 7U);
+        char buffer[20];
+        snprintf(buffer, sizeof(buffer), "Счет: %u", snake_state->len - 7U);
         canvas_draw_str_aligned(canvas, 64, 41, AlignCenter, AlignBottom, buffer);
     }
 

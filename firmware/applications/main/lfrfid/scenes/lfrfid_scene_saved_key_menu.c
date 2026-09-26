@@ -21,17 +21,25 @@ void lfrfid_scene_saved_key_menu_on_enter(void* context) {
     Submenu* submenu = app->submenu;
 
     submenu_add_item(
-        submenu, "Emulate", SubmenuIndexEmulate, lfrfid_scene_saved_key_menu_submenu_callback, app);
+        submenu,
+        "Эмуляция",
+        SubmenuIndexEmulate,
+        lfrfid_scene_saved_key_menu_submenu_callback,
+        app);
     submenu_add_item(
-        submenu, "Write", SubmenuIndexWrite, lfrfid_scene_saved_key_menu_submenu_callback, app);
+        submenu, "Записать", SubmenuIndexWrite, lfrfid_scene_saved_key_menu_submenu_callback, app);
     submenu_add_item(
-        submenu, "Edit", SubmenuIndexEdit, lfrfid_scene_saved_key_menu_submenu_callback, app);
+        submenu, "Изменить", SubmenuIndexEdit, lfrfid_scene_saved_key_menu_submenu_callback, app);
     submenu_add_item(
-        submenu, "Rename", SubmenuIndexRename, lfrfid_scene_saved_key_menu_submenu_callback, app);
+        submenu,
+        "Переименовать",
+        SubmenuIndexRename,
+        lfrfid_scene_saved_key_menu_submenu_callback,
+        app);
     submenu_add_item(
-        submenu, "Delete", SubmenuIndexDelete, lfrfid_scene_saved_key_menu_submenu_callback, app);
+        submenu, "Удалить", SubmenuIndexDelete, lfrfid_scene_saved_key_menu_submenu_callback, app);
     submenu_add_item(
-        submenu, "Info", SubmenuIndexInfo, lfrfid_scene_saved_key_menu_submenu_callback, app);
+        submenu, "Инфо", SubmenuIndexInfo, lfrfid_scene_saved_key_menu_submenu_callback, app);
 
     submenu_set_selected_item(
         submenu, scene_manager_get_scene_state(app->scene_manager, LfRfidSceneSavedKeyMenu));

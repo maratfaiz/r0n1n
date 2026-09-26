@@ -88,7 +88,7 @@ static void nfc_protocol_support_scene_info_on_enter(NfcApp* instance) {
         widget_add_button_element(
             instance->widget,
             GuiButtonTypeRight,
-            "More",
+            "Еще",
             nfc_protocol_support_common_widget_callback,
             instance);
     }
@@ -145,7 +145,7 @@ static void nfc_protocol_support_scene_more_info_on_exit(NfcApp* instance) {
 
 // SceneRead
 static void nfc_protocol_support_scene_read_on_enter(NfcApp* instance) {
-    popup_set_header(instance->popup, "Don't move", 85, 27, AlignCenter, AlignTop);
+    popup_set_header(instance->popup, "Не двигайте", 85, 27, AlignCenter, AlignTop);
     popup_set_icon(instance->popup, 12, 23, &A_Loading_24);
 
     view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewPopup);
@@ -227,7 +227,7 @@ static void nfc_protocol_support_scene_read_menu_on_enter(NfcApp* instance) {
 
     submenu_add_item(
         submenu,
-        "Save",
+        "Сохранить",
         SubmenuIndexCommonSave,
         nfc_protocol_support_common_submenu_callback,
         instance);
@@ -235,7 +235,7 @@ static void nfc_protocol_support_scene_read_menu_on_enter(NfcApp* instance) {
     if(scene_manager_has_previous_scene(instance->scene_manager, NfcSceneGenerateInfo)) {
         submenu_add_item(
             submenu,
-            "Change UID",
+            "Сменить UID",
             SubmenuIndexCommonEdit,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -244,7 +244,7 @@ static void nfc_protocol_support_scene_read_menu_on_enter(NfcApp* instance) {
     if(nfc_protocol_support_has_feature(protocol, NfcProtocolFeatureEmulateUid)) {
         submenu_add_item(
             submenu,
-            "Emulate UID",
+            "Эмуляция UID",
             SubmenuIndexCommonEmulate,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -252,7 +252,7 @@ static void nfc_protocol_support_scene_read_menu_on_enter(NfcApp* instance) {
     } else if(nfc_protocol_support_has_feature(protocol, NfcProtocolFeatureEmulateFull)) {
         submenu_add_item(
             submenu,
-            "Emulate",
+            "Эмуляция",
             SubmenuIndexCommonEmulate,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -262,7 +262,7 @@ static void nfc_protocol_support_scene_read_menu_on_enter(NfcApp* instance) {
 
     submenu_add_item(
         submenu,
-        "Info",
+        "Инфо",
         SubmenuIndexCommonInfo,
         nfc_protocol_support_common_submenu_callback,
         instance);
@@ -324,9 +324,9 @@ static void nfc_protocol_support_scene_read_success_on_enter(NfcApp* instance) {
     furi_string_free(temp_str);
 
     widget_add_button_element(
-        widget, GuiButtonTypeLeft, "Retry", nfc_protocol_support_common_widget_callback, instance);
+        widget, GuiButtonTypeLeft, "Повтор", nfc_protocol_support_common_widget_callback, instance);
     widget_add_button_element(
-        widget, GuiButtonTypeRight, "More", nfc_protocol_support_common_widget_callback, instance);
+        widget, GuiButtonTypeRight, "Еще", nfc_protocol_support_common_widget_callback, instance);
 
     notification_message_block(instance->notifications, &sequence_set_green_255);
     view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewWidget);
@@ -369,7 +369,7 @@ static void nfc_protocol_support_scene_saved_menu_on_enter(NfcApp* instance) {
     if(nfc_protocol_support_has_feature(protocol, NfcProtocolFeatureEmulateUid)) {
         submenu_add_item(
             submenu,
-            "Emulate UID",
+            "Эмуляция UID",
             SubmenuIndexCommonEmulate,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -377,7 +377,7 @@ static void nfc_protocol_support_scene_saved_menu_on_enter(NfcApp* instance) {
     } else if(nfc_protocol_support_has_feature(protocol, NfcProtocolFeatureEmulateFull)) {
         submenu_add_item(
             submenu,
-            "Emulate",
+            "Эмуляция",
             SubmenuIndexCommonEmulate,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -386,7 +386,7 @@ static void nfc_protocol_support_scene_saved_menu_on_enter(NfcApp* instance) {
     if(nfc_protocol_support_has_feature(protocol, NfcProtocolFeatureEditUid)) {
         submenu_add_item(
             submenu,
-            "Edit UID",
+            "Изменить UID",
             SubmenuIndexCommonEdit,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -399,7 +399,7 @@ static void nfc_protocol_support_scene_saved_menu_on_enter(NfcApp* instance) {
     if(nfc_has_shadow_file(instance)) {
         submenu_add_item(
             submenu,
-            "Restore to Original State",
+            "Вернуть исходное",
             SubmenuIndexCommonRestore,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -407,19 +407,19 @@ static void nfc_protocol_support_scene_saved_menu_on_enter(NfcApp* instance) {
 
     submenu_add_item(
         submenu,
-        "Rename",
+        "Переименовать",
         SubmenuIndexCommonRename,
         nfc_protocol_support_common_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "Delete",
+        "Удалить",
         SubmenuIndexCommonDelete,
         nfc_protocol_support_common_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "Info",
+        "Инфо",
         SubmenuIndexCommonInfo,
         nfc_protocol_support_common_submenu_callback,
         instance);
@@ -488,7 +488,7 @@ static void nfc_protocol_support_scene_save_name_on_enter(NfcApp* instance) {
         path_extract_dirname(furi_string_get_cstr(instance->file_path), folder_path);
     }
 
-    text_input_set_header_text(text_input, "Name the card");
+    text_input_set_header_text(text_input, "Имя карты");
     text_input_set_result_callback(
         text_input,
         nfc_protocol_support_common_text_input_done_callback,
@@ -574,7 +574,7 @@ static void nfc_protocol_support_scene_emulate_on_enter(NfcApp* instance) {
 
     if(nfc_protocol_support_has_feature(protocol, NfcProtocolFeatureEmulateUid)) {
         widget_add_string_element(
-            widget, 90, 26, AlignCenter, AlignCenter, FontPrimary, "Emulating UID");
+            widget, 90, 26, AlignCenter, AlignCenter, FontPrimary, "Эмуляция UID");
 
         size_t uid_len;
         const uint8_t* uid = nfc_device_get_uid(instance->nfc_device, &uid_len);
@@ -587,13 +587,13 @@ static void nfc_protocol_support_scene_emulate_on_enter(NfcApp* instance) {
 
     } else {
         widget_add_string_element(
-            widget, 90, 26, AlignCenter, AlignCenter, FontPrimary, "Emulating");
+            widget, 90, 26, AlignCenter, AlignCenter, FontPrimary, "Эмуляция");
         if(!furi_string_empty(instance->file_name)) {
             furi_string_set(temp_str, instance->file_name);
         } else {
             furi_string_printf(
                 temp_str,
-                "Unsaved\n%s",
+                "Не сохранено\n%s",
                 nfc_device_get_name(instance->nfc_device, NfcDeviceNameTypeFull));
             furi_string_replace_str(temp_str, "Mifare", "MIFARE");
         }
@@ -631,7 +631,7 @@ static bool
                 widget_add_button_element(
                     instance->widget,
                     GuiButtonTypeCenter,
-                    "Log",
+                    "Журнал",
                     nfc_protocol_support_common_widget_callback,
                     instance);
                 scene_manager_set_scene_state(
@@ -693,7 +693,7 @@ static void nfc_protocol_support_scene_rpc_on_enter(NfcApp* instance) {
 }
 
 static void nfc_protocol_support_scene_rpc_setup_ui_and_emulate(NfcApp* instance) {
-    nfc_text_store_set(instance, "emulating\n%s", furi_string_get_cstr(instance->file_name));
+    nfc_text_store_set(instance, "эмуляция\n%s", furi_string_get_cstr(instance->file_name));
 
     popup_set_header(instance->popup, "NFC", 89, 42, AlignCenter, AlignBottom);
     popup_set_text(instance->popup, instance->text_store, 89, 44, AlignCenter, AlignTop);
@@ -723,7 +723,7 @@ static bool nfc_protocol_support_scene_rpc_on_event(NfcApp* instance, SceneManag
                 } else {
                     rpc_system_app_set_error_code(
                         instance->rpc_ctx, RpcAppSystemErrorCodeParseFile);
-                    rpc_system_app_set_error_text(instance->rpc_ctx, "Cannot load key file");
+                    rpc_system_app_set_error_text(instance->rpc_ctx, "Не удалось загрузить ключи");
                 }
             }
             rpc_system_app_confirm(instance->rpc_ctx, success);

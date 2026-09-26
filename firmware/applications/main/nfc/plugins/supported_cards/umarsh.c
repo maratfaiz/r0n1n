@@ -96,7 +96,7 @@ static bool umarsh_parse(const NfcDevice* device, FuriString* parsed_data) {
 
         furi_string_cat_printf(
             parsed_data,
-            "\e#Umarsh\nCard number: %lu\nRegion: %02u\nTerminal number: %lu\nRefill counter: %u\nBalance: %u.%02u RUR",
+            "\e#Умарш\nНомер карты: %lu\nРегион: %02u\nНомер терминала: %lu\nПополнений: %u\nБаланс: %u.%02u руб",
             card_number,
             region_number,
             terminal_number,
@@ -107,21 +107,21 @@ static bool umarsh_parse(const NfcDevice* device, FuriString* parsed_data) {
         if(is_expiry_datetime_valid)
             furi_string_cat_printf(
                 parsed_data,
-                "\nExpires: %02u.%02u.%u",
+                "\nИстекает: %02u.%02u.%u",
                 expiry_datetime.day,
                 expiry_datetime.month,
                 expiry_datetime.year);
         if(is_valid_to_datetime_valid)
             furi_string_cat_printf(
                 parsed_data,
-                "\nValid to: %02u.%02u.%u",
+                "\nДействует до: %02u.%02u.%u",
                 valid_to_datetime.day,
                 valid_to_datetime.month,
                 valid_to_datetime.year);
         if(is_last_refill_datetime_valid)
             furi_string_cat_printf(
                 parsed_data,
-                "\nLast refill: %02u.%02u.%u",
+                "\nПоследнее пополнение: %02u.%02u.%u",
                 last_refill_datetime.day,
                 last_refill_datetime.month,
                 last_refill_datetime.year);

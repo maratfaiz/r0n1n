@@ -42,8 +42,8 @@ const float raw_theshold_rssi_value[RAW_THRESHOLD_RSSI_COUNT] = {
 
 #define HOPPING_COUNT 2
 const char* const hopping_text[HOPPING_COUNT] = {
-    "OFF",
-    "ON",
+    "ВЫКЛ",
+    "ВКЛ",
 };
 const uint32_t hopping_value[HOPPING_COUNT] = {
     SubGhzHopperStateOFF,
@@ -52,8 +52,8 @@ const uint32_t hopping_value[HOPPING_COUNT] = {
 
 #define SPEAKER_COUNT 2
 const char* const speaker_text[SPEAKER_COUNT] = {
-    "OFF",
-    "ON",
+    "ВЫКЛ",
+    "ВКЛ",
 };
 const uint32_t speaker_value[SPEAKER_COUNT] = {
     SubGhzSpeakerStateShutdown,
@@ -61,8 +61,8 @@ const uint32_t speaker_value[SPEAKER_COUNT] = {
 };
 #define BIN_RAW_COUNT 2
 const char* const bin_raw_text[BIN_RAW_COUNT] = {
-    "OFF",
-    "ON",
+    "ВЫКЛ",
+    "ВКЛ",
 };
 const uint32_t bin_raw_value[BIN_RAW_COUNT] = {
     SubGhzProtocolFlag_Decodable,
@@ -249,7 +249,7 @@ void subghz_scene_receiver_config_on_enter(void* context) {
 
     item = variable_item_list_add(
         subghz->variable_item_list,
-        "Frequency:",
+        "Частота:",
         subghz_setting_get_frequency_count(setting),
         subghz_scene_receiver_config_set_frequency,
         subghz);
@@ -271,7 +271,7 @@ void subghz_scene_receiver_config_on_enter(void* context) {
        SubGhzCustomEventManagerSet) {
         item = variable_item_list_add(
             subghz->variable_item_list,
-            "Hopping:",
+            "Перебор:",
             HOPPING_COUNT,
             subghz_scene_receiver_config_set_hopping_running,
             subghz);
@@ -283,7 +283,7 @@ void subghz_scene_receiver_config_on_enter(void* context) {
 
     item = variable_item_list_add(
         subghz->variable_item_list,
-        "Modulation:",
+        "Модуляция:",
         subghz_setting_get_preset_count(setting),
         subghz_scene_receiver_config_set_preset,
         subghz);
@@ -308,7 +308,7 @@ void subghz_scene_receiver_config_on_enter(void* context) {
 
     item = variable_item_list_add(
         subghz->variable_item_list,
-        "Sound:",
+        "Звук:",
         SPEAKER_COUNT,
         subghz_scene_receiver_config_set_speaker,
         subghz);
@@ -319,7 +319,7 @@ void subghz_scene_receiver_config_on_enter(void* context) {
 
     if(scene_manager_get_scene_state(subghz->scene_manager, SubGhzSceneReadRAW) !=
        SubGhzCustomEventManagerSet) {
-        variable_item_list_add(subghz->variable_item_list, "Lock Keyboard", 1, NULL, NULL);
+        variable_item_list_add(subghz->variable_item_list, "Блок. кнопок", 1, NULL, NULL);
         variable_item_list_set_enter_callback(
             subghz->variable_item_list,
             subghz_scene_receiver_config_var_list_enter_callback,
@@ -329,7 +329,7 @@ void subghz_scene_receiver_config_on_enter(void* context) {
        SubGhzCustomEventManagerSet) {
         item = variable_item_list_add(
             subghz->variable_item_list,
-            "RSSI Threshold:",
+            "Порог RSSI:",
             RAW_THRESHOLD_RSSI_COUNT,
             subghz_scene_receiver_config_set_raw_threshold_rssi,
             subghz);

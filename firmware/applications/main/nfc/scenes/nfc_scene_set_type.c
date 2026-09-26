@@ -21,13 +21,13 @@ void nfc_scene_set_type_on_enter(void* context) {
     Submenu* submenu = instance->submenu;
     submenu_add_item(
         submenu,
-        "NFC-A 7-bytes UID",
+        "NFC-A, UID 7 байт",
         SubmenuIndexNFCA7,
         nfc_protocol_support_common_submenu_callback,
         instance);
     submenu_add_item(
         submenu,
-        "NFC-A 4-bytes UID",
+        "NFC-A, UID 4 байта",
         SubmenuIndexNFCA4,
         nfc_protocol_support_common_submenu_callback,
         instance);

@@ -117,11 +117,11 @@ void subghz_view_transmitter_draw(Canvas* canvas, SubGhzViewTransmitterModel* mo
 
     if(model->show_button) {
         if(model->model_type == SubGhzViewTransmitterModelTypeInfo) {
-            elements_button_center(canvas, "Send");
-            elements_button_right(canvas, "Save");
+            elements_button_center(canvas, "Отпр.");
+            elements_button_right(canvas, "Сохр.");
         } else {
             //default type SubGhzViewTransmitterModelTypeTx
-            subghz_view_transmitter_button_right(canvas, "Send");
+            subghz_view_transmitter_button_right(canvas, "Отпр.");
         }
 
         if(model->device_type == SubGhzRadioDeviceTypeInternal) {

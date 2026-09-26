@@ -41,7 +41,7 @@ bool subghz_tx_start(SubGhz* subghz, FlipperFormat* flipper_format) {
     switch(subghz_txrx_tx_start(subghz->txrx, flipper_format)) {
     case SubGhzTxRxStartTxStateErrorParserOthers:
         dialog_message_show_storage_error(
-            subghz->dialogs, "Error in protocol\nparameters\ndescription");
+            subghz->dialogs, "Ошибка в описании\nпараметров\nпротокола");
         break;
     case SubGhzTxRxStartTxStateErrorOnlyRx:
         subghz_dialog_message_show_only_rx(subghz);
@@ -58,11 +58,11 @@ void subghz_dialog_message_show_only_rx(SubGhz* subghz) {
     DialogsApp* dialogs = subghz->dialogs;
     DialogMessage* message = dialog_message_alloc();
 
-    const char* header_text = "Transmission is Blocked!";
-    const char* message_text = "Transmission on\nthis frequency is\nrestricted in your\nregion";
+    const char* header_text = "Передача запрещена!";
+    const char* message_text = "Передача на этой\nчастоте запрещена\nв вашем регионе";
     if(!furi_hal_region_is_provisioned()) {
-        header_text = "Firmware update needed";
-        message_text = "Please update\nfirmware before\nusing this feature\nflipp.dev/upd";
+        header_text = "Нужно обновление";
+        message_text = "Обновите прошивку,\nчтобы использовать\nэту функцию";
     }
 
     dialog_message_set_header(message, header_text, 63, 0, AlignCenter, AlignTop);
@@ -199,7 +199,7 @@ bool subghz_key_load(SubGhz* subghz, const char* file_path, bool show_dialog) {
     case SubGhzLoadKeyStateProtocolDescriptionErr:
         if(show_dialog) {
             dialog_message_show_storage_error(
-                subghz->dialogs, "Error in protocol\nparameters\ndescription");
+                subghz->dialogs, "Ошибка в описании\nпараметров\nпротокола");
         }
         return false;
 

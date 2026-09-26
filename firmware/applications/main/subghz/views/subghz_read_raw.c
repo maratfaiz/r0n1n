@@ -304,14 +304,14 @@ void subghz_read_raw_draw(Canvas* canvas, SubGhzReadRAWModel* model) {
 
     switch(model->status) {
     case SubGhzReadRAWStatusIDLE:
-        elements_button_left(canvas, "Erase");
-        elements_button_center(canvas, "Send");
-        elements_button_right(canvas, "Save");
+        elements_button_left(canvas, "Стереть");
+        elements_button_center(canvas, "Отпр.");
+        elements_button_right(canvas, "Сохр.");
         break;
     case SubGhzReadRAWStatusLoadKeyIDLE:
-        elements_button_left(canvas, "New");
-        elements_button_center(canvas, "Send");
-        elements_button_right(canvas, "More");
+        elements_button_left(canvas, "Новый");
+        elements_button_center(canvas, "Отпр.");
+        elements_button_right(canvas, "Еще");
         elements_text_box(
             canvas,
             4,
@@ -329,16 +329,16 @@ void subghz_read_raw_draw(Canvas* canvas, SubGhzReadRAWModel* model) {
     case SubGhzReadRAWStatusLoadKeyTX:
     case SubGhzReadRAWStatusLoadKeyTXRepeat:
         graphics_mode = 0;
-        elements_button_center(canvas, "Hold to repeat");
+        elements_button_center(canvas, "Держи для повтора");
         break;
 
     case SubGhzReadRAWStatusStart:
-        elements_button_left(canvas, "Config");
-        elements_button_center(canvas, "REC");
+        elements_button_left(canvas, "Настр.");
+        elements_button_center(canvas, "ЗАП");
         break;
 
     default:
-        elements_button_center(canvas, "Stop");
+        elements_button_center(canvas, "Стоп");
         break;
     }
 

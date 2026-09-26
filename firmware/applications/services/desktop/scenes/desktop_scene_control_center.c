@@ -18,7 +18,7 @@ typedef enum {
     CcVibro,
     CcStealth,
     CcLock,
-    CcDummy,
+    CcPower,
     CcProfile,
     CcSettings,
     CcCount,
@@ -65,7 +65,7 @@ static void desktop_cc_caption(Desktop* desktop, CcItem item, char* out, size_t 
         [CcVibro] = "Вибро",
         [CcStealth] = "Тихий режим",
         [CcLock] = "Заблокировать",
-        [CcDummy] = "Режим Dummy",
+        [CcPower] = "Питание",
         [CcProfile] = "Профиль",
         [CcSettings] = "Настройки",
     };
@@ -95,7 +95,7 @@ void desktop_scene_control_center_on_enter(void* context) {
         [CcVibro] = &I_R_Vibro_9x7,
         [CcStealth] = &I_R_Stealth_9x7,
         [CcLock] = &I_R_Lock_7x7,
-        [CcDummy] = &I_R_Dummy_8x8,
+        [CcPower] = &I_R_Power_9x8,
         [CcProfile] = &I_R_Profile_7x7,
         [CcSettings] = &I_R_Gear_9x7,
     };
@@ -159,10 +159,8 @@ bool desktop_scene_control_center_on_event(void* context, SceneManagerEvent even
         scene_manager_set_scene_state(desktop->scene_manager, DesktopSceneControlCenter, 0);
         desktop_lock(desktop);
         return true;
-    case CcDummy:
-        desktop_set_dummy_mode_state(desktop, true);
-        scene_manager_search_and_switch_to_previous_scene(
-            desktop->scene_manager, DesktopSceneMain);
+    case CcPower:
+        loader_start_detached_with_gui_error(desktop->loader, "Power", "off");
         return true;
     case CcProfile:
         scene_manager_next_scene(desktop->scene_manager, DesktopSceneProfiles);

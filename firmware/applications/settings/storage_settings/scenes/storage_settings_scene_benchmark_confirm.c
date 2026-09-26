@@ -15,22 +15,22 @@ void storage_settings_scene_benchmark_confirm_on_enter(void* context) {
 
     if(sd_status == FSE_NOT_READY) {
         dialog_ex_set_icon(dialog_ex, 83, 22, &I_WarningDolphinFlip_45x42);
-        dialog_ex_set_header(dialog_ex, "SD Card Not Mounted", 64, 3, AlignCenter, AlignTop);
+        dialog_ex_set_header(dialog_ex, "Нет SD-карты", 64, 3, AlignCenter, AlignTop);
         dialog_ex_set_text(
-            dialog_ex, "Try to reinsert\nor format SD\ncard.", 3, 19, AlignLeft, AlignTop);
-        dialog_ex_set_center_button_text(dialog_ex, "Ok");
+            dialog_ex, "Вставьте заново\nили отформатируйте\nкарту.", 3, 19, AlignLeft, AlignTop);
+        dialog_ex_set_center_button_text(dialog_ex, "OK");
     } else {
-        dialog_ex_set_header(dialog_ex, "Benchmark SD Card?", 64, 0, AlignCenter, AlignTop);
+        dialog_ex_set_header(dialog_ex, "Тест скорости SD?", 64, 0, AlignCenter, AlignTop);
         dialog_ex_set_text(
             dialog_ex,
-            "SD will be tested in SPI\nmode. Learn more:\nr.flipper.net/sd_test",
+            "Тест в режиме SPI.\nПодробнее:\nr.flipper.net/sd_test",
             0,
             12,
             AlignLeft,
             AlignTop);
         dialog_ex_set_icon(dialog_ex, 103, 12, &I_qr_benchmark_25x25);
-        dialog_ex_set_left_button_text(dialog_ex, "Cancel");
-        dialog_ex_set_right_button_text(dialog_ex, "Benchmark");
+        dialog_ex_set_left_button_text(dialog_ex, "Отмена");
+        dialog_ex_set_right_button_text(dialog_ex, "Тест");
     }
 
     dialog_ex_set_context(dialog_ex, app);

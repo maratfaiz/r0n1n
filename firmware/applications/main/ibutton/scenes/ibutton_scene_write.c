@@ -42,7 +42,7 @@ void ibutton_scene_write_on_enter(void* context) {
 
     if(furi_string_empty(ibutton->file_path)) {
         furi_string_printf(
-            tmp, "Unsaved\n%s", ibutton_protocols_get_name(ibutton->protocols, protocol_id));
+            tmp, "Не сохранено\n%s", ibutton_protocols_get_name(ibutton->protocols, protocol_id));
     } else {
         furi_string_printf(tmp, "%s", ibutton->key_name);
     }
@@ -53,11 +53,11 @@ void ibutton_scene_write_on_enter(void* context) {
     ibutton_worker_write_set_callback(worker, ibutton_scene_write_callback, ibutton);
 
     if(ibutton->write_mode == iButtonWriteModeId) {
-        furi_string_set(tmp, "Writing ID");
+        furi_string_set(tmp, "Запись ID");
         ibutton_worker_write_id_start(worker, key);
 
     } else if(ibutton->write_mode == iButtonWriteModeCopy) {
-        furi_string_set(tmp, "Full Writing");
+        furi_string_set(tmp, "Полная запись");
         ibutton_worker_write_copy_start(worker, key);
     }
 

@@ -17,10 +17,10 @@ typedef DialogMessageButton (*AboutDialogScreen)(DialogsApp* dialogs, DialogMess
 static DialogMessageButton about_screen_r0n1n(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
-    const char* screen_header = "R0N1N Firmware\n";
+    const char* screen_header = "Прошивка R0N1N\n";
 
-    const char* screen_text = "Built on the official\n"
-                              "Flipper Zero firmware.\n"
+    const char* screen_text = "На основе официальной\n"
+                              "прошивки Flipper Zero.\n"
                               "github.com/maratfaiz/\n"
                               "r0n1n-firmware";
 
@@ -37,8 +37,8 @@ static DialogMessageButton about_screen_product(DialogsApp* dialogs, DialogMessa
     DialogMessageButton result;
 
     FuriString* screen_header = furi_string_alloc_printf(
-        "Product: %s\n"
-        "Model: %s",
+        "Продукт: %s\n"
+        "Модель: %s",
         furi_hal_version_get_model_name(),
         furi_hal_version_get_model_code());
 
@@ -77,8 +77,8 @@ static DialogMessageButton about_screen_address(DialogsApp* dialogs, DialogMessa
 static DialogMessageButton about_screen_compliance(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
-    const char* screen_text = "For all compliance\n"
-                              "certificates, please visit:\n"
+    const char* screen_text = "Сертификаты\n"
+                              "соответствия:\n"
                               "www.flipp.dev/compliance";
 
     dialog_message_set_text(message, screen_text, 0, 0, AlignLeft, AlignTop);
@@ -162,15 +162,15 @@ static DialogMessageButton about_screen_hw_version(DialogsApp* dialogs, DialogMe
         furi_hal_version_get_hw_connect(),
         furi_hal_version_get_hw_region_name(),
         furi_hal_region_get_name(),
-        my_name ? my_name : "Unknown");
+        my_name ? my_name : "Неизвестно");
 
-    furi_string_cat_printf(buffer, "Serial Number:\n");
+    furi_string_cat_printf(buffer, "Серийный номер:\n");
     const uint8_t* uid = furi_hal_version_uid();
     for(size_t i = 0; i < furi_hal_version_uid_size(); i++) {
         furi_string_cat_printf(buffer, "%02X", uid[i]);
     }
 
-    dialog_message_set_header(message, "HW Version Info:", 0, 0, AlignLeft, AlignTop);
+    dialog_message_set_header(message, "Версия железа:", 0, 0, AlignLeft, AlignTop);
     dialog_message_set_text(message, furi_string_get_cstr(buffer), 0, 13, AlignLeft, AlignTop);
     result = dialog_message_show(dialogs, message);
     furi_string_free(buffer);
@@ -189,7 +189,7 @@ static DialogMessageButton about_screen_fw_version(DialogsApp* dialogs, DialogMe
 #endif
 
     if(!ver) { //-V1051
-        furi_string_cat_printf(buffer, "No info\n");
+        furi_string_cat_printf(buffer, "Нет данных\n");
     } else {
         uint16_t api_major, api_minor;
         furi_hal_info_get_api_version(&api_major, &api_minor);
@@ -202,12 +202,12 @@ static DialogMessageButton about_screen_fw_version(DialogsApp* dialogs, DialogMe
             version_get_githash(ver),
             api_major,
             api_minor,
-            c2_ver ? c2_ver->StackTypeString : "<none>",
+            c2_ver ? c2_ver->StackTypeString : "<нет>",
             version_get_target(ver),
             version_get_gitbranch(ver));
     }
 
-    dialog_message_set_header(message, "FW Version Info:", 0, 0, AlignLeft, AlignTop);
+    dialog_message_set_header(message, "Версия прошивки:", 0, 0, AlignLeft, AlignTop);
     dialog_message_set_text(message, furi_string_get_cstr(buffer), 0, 13, AlignLeft, AlignTop);
     result = dialog_message_show(dialogs, message);
     furi_string_free(buffer);
@@ -248,11 +248,11 @@ int32_t about_settings_app(void* p) {
 
     while(1) {
         if(screen_index >= COUNT_OF(about_screens) - 1) {
-            dialog_message_set_buttons(message, "Prev.", NULL, NULL);
+            dialog_message_set_buttons(message, "Назад", NULL, NULL);
         } else if(screen_index == 0) {
-            dialog_message_set_buttons(message, NULL, NULL, "Next");
+            dialog_message_set_buttons(message, NULL, NULL, "Далее");
         } else {
-            dialog_message_set_buttons(message, "Prev.", NULL, "Next");
+            dialog_message_set_buttons(message, "Назад", NULL, "Далее");
         }
 
         screen_result = about_screens[screen_index](dialogs, message);

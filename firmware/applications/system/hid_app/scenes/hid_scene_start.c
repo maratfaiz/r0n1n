@@ -22,43 +22,35 @@ static void hid_scene_start_submenu_callback(void* context, uint32_t index) {
 void hid_scene_start_on_enter(void* context) {
     Hid* app = context;
     submenu_add_item(
-        app->submenu, "Keynote", HidSubmenuIndexKeynote, hid_scene_start_submenu_callback, app);
+        app->submenu, "Слайды", HidSubmenuIndexKeynote, hid_scene_start_submenu_callback, app);
     submenu_add_item(
         app->submenu,
-        "Keynote Vertical",
+        "Слайды (вертикально)",
         HidSubmenuIndexKeynoteVertical,
         hid_scene_start_submenu_callback,
         app);
     submenu_add_item(
-        app->submenu, "Keyboard", HidSubmenuIndexKeyboard, hid_scene_start_submenu_callback, app);
+        app->submenu, "Клавиат.", HidSubmenuIndexKeyboard, hid_scene_start_submenu_callback, app);
     submenu_add_item(
-        app->submenu, "Media", HidSubmenuIndexMedia, hid_scene_start_submenu_callback, app);
+        app->submenu, "Медиа", HidSubmenuIndexMedia, hid_scene_start_submenu_callback, app);
     submenu_add_item(
-        app->submenu, "Mouse", HidSubmenuIndexMouse, hid_scene_start_submenu_callback, app);
+        app->submenu, "Мышь", HidSubmenuIndexMouse, hid_scene_start_submenu_callback, app);
 #ifdef HID_TRANSPORT_BLE
     submenu_add_item(
-        app->submenu,
-        "TikTok Controller",
-        HidSubmenuIndexTikTok,
-        hid_scene_start_submenu_callback,
-        app);
+        app->submenu, "Пульт TikTok", HidSubmenuIndexTikTok, hid_scene_start_submenu_callback, app);
 #endif
     submenu_add_item(
-        app->submenu,
-        "Mouse Clicker",
-        HidSubmenuIndexMouseClicker,
-        hid_scene_start_submenu_callback,
-        app);
+        app->submenu, "Кликер", HidSubmenuIndexMouseClicker, hid_scene_start_submenu_callback, app);
     submenu_add_item(
         app->submenu,
-        "Mouse Jiggler",
+        "Джиглер",
         HidSubmenuIndexMouseJiggler,
         hid_scene_start_submenu_callback,
         app);
 #ifdef HID_TRANSPORT_BLE
     submenu_add_item(
         app->submenu,
-        "Bluetooth Unpairing",
+        "Забыть Bluetooth",
         HidSubmenuIndexRemovePairing,
         hid_scene_start_submenu_callback,
         app);

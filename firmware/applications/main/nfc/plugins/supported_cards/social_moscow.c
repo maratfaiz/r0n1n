@@ -254,7 +254,7 @@ static bool social_moscow_parse(const NfcDevice* device, FuriString* parsed_data
             mosgortrans_parse_transport_block(&data->block[16], ground_result);
         furi_string_cat_printf(
             parsed_data,
-            "\e#Social \ecard\nNumber: %lx %x %llx %x\nOMC: %llx\nValid for: %02x/%02x %02x%02x\n",
+            "\e#Социальная \eкарта\nНомер: %lx %x %llx %x\nОМС: %llx\nДействует: %02x/%02x %02x%02x\n",
             card_code,
             card_region,
             card_number,
@@ -265,11 +265,11 @@ static bool social_moscow_parse(const NfcDevice* device, FuriString* parsed_data
             data->block[60].data[13],
             data->block[60].data[14]);
         if(is_metro_data_present && !furi_string_empty(metro_result)) {
-            render_section_header(parsed_data, "Metro", 22, 21);
+            render_section_header(parsed_data, "Метро", 22, 21);
             furi_string_cat_printf(parsed_data, "%s\n", furi_string_get_cstr(metro_result));
         }
         if(is_ground_data_present && !furi_string_empty(ground_result)) {
-            render_section_header(parsed_data, "Ground", 21, 20);
+            render_section_header(parsed_data, "Наземный", 21, 20);
             furi_string_cat_printf(parsed_data, "%s\n", furi_string_get_cstr(ground_result));
         }
         furi_string_free(ground_result);

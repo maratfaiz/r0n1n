@@ -17,21 +17,14 @@ void nfc_scene_mf_ultralight_wrong_card_on_enter(void* context) {
     notification_message(instance->notifications, &sequence_error);
 
     widget_add_icon_element(widget, 83, 22, &I_WarningDolphinFlip_45x42);
-    widget_add_string_element(
-        widget, 3, 4, AlignLeft, AlignTop, FontPrimary, "This is wrong card");
+    widget_add_string_element(widget, 3, 4, AlignLeft, AlignTop, FontPrimary, "Это не та карта");
     widget_add_string_multiline_element(
-        widget,
-        4,
-        17,
-        AlignLeft,
-        AlignTop,
-        FontSecondary,
-        "Card of the same\ntype should be\n presented");
+        widget, 4, 17, AlignLeft, AlignTop, FontSecondary, "Нужна карта\nтого же\n типа");
     //"Data management\nis only possible\nwith card of same type");
     widget_add_button_element(
         widget,
         GuiButtonTypeLeft,
-        "Retry",
+        "Повтор",
         nfc_scene_mf_ultralight_wrong_card_widget_callback,
         instance);
 

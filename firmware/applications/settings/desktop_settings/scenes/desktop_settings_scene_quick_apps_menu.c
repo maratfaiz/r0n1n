@@ -19,19 +19,19 @@ void desktop_settings_scene_quick_apps_menu_on_enter(void* context) {
 
     submenu_add_item(
         submenu,
-        "Default Mode",
+        "Обычный режим",
         DesktopSettingsCustomEventSetDefault,
         desktop_settings_scene_quick_apps_menu_submenu_callback,
         app);
 
     submenu_add_item(
         submenu,
-        "Dummy Mode",
+        "Режим Dummy",
         DesktopSettingsCustomEventSetDummy,
         desktop_settings_scene_quick_apps_menu_submenu_callback,
         app);
 
-    submenu_set_header(app->submenu, "Set Quick Access Apps");
+    submenu_set_header(app->submenu, "Быстрый запуск");
     submenu_set_selected_item(app->submenu, app->quick_apps_menu_idx);
     view_dispatcher_switch_to_view(app->view_dispatcher, DesktopSettingsAppViewMenu);
 }

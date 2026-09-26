@@ -175,8 +175,7 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
             generated_protocol = subghz_txrx_gen_keeloq_protocol(
                 subghz->txrx, "AM650", 433920000, "DoorHan", key, 0x2, 0x0003);
             if(generated_protocol != SubGhzProtocolStatusOk) {
-                furi_string_set(
-                    subghz->error_str, "Function requires\nan SD card with\nfresh databases.");
+                furi_string_set(subghz->error_str, "Нужна SD-карта\nсо свежими\nбазами.");
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
             }
             break;
@@ -184,8 +183,7 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
             generated_protocol = subghz_txrx_gen_keeloq_protocol(
                 subghz->txrx, "AM650", 315000000, "DoorHan", key, 0x2, 0x0003);
             if(generated_protocol != SubGhzProtocolStatusOk) {
-                furi_string_set(
-                    subghz->error_str, "Function requires\nan SD card with\nfresh databases.");
+                furi_string_set(subghz->error_str, "Нужна SD-карта\nсо свежими\nбазами.");
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
             }
             break;

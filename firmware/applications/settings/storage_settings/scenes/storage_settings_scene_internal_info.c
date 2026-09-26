@@ -20,15 +20,14 @@ void storage_settings_scene_internal_info_on_enter(void* context) {
     dialog_ex_set_result_callback(dialog_ex, storage_settings_scene_internal_info_dialog_callback);
 
     if(error != FSE_OK) {
-        dialog_ex_set_header(
-            dialog_ex, "Internal Storage Error", 64, 10, AlignCenter, AlignCenter);
+        dialog_ex_set_header(dialog_ex, "Ошибка внутр. памяти", 64, 10, AlignCenter, AlignCenter);
         dialog_ex_set_text(
             dialog_ex, storage_error_get_desc(error), 64, 32, AlignCenter, AlignCenter);
     } else {
         furi_string_printf(
             app->text_string,
-            "Name: %s\nType: Virtual\nTotal: %lu KiB\nFree: %lu KiB",
-            furi_hal_version_get_name_ptr() ? furi_hal_version_get_name_ptr() : "Unknown",
+            "Имя: %s\nТип: виртуальная\nВсего: %lu КиБ\nСвободно: %lu КиБ",
+            furi_hal_version_get_name_ptr() ? furi_hal_version_get_name_ptr() : "Неизвестно",
             (uint32_t)(total_space / 1024),
             (uint32_t)(free_space / 1024));
         dialog_ex_set_text(

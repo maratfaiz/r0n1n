@@ -18,25 +18,25 @@ void infrared_scene_universal_on_enter(void* context) {
 
     submenu_add_item(
         submenu,
-        "TVs",
+        "Телевизоры",
         SubmenuIndexUniversalTV,
         infrared_scene_universal_submenu_callback,
         context);
     submenu_add_item(
         submenu,
-        "Audio Players",
+        "Аудиоплееры",
         SubmenuIndexUniversalAudio,
         infrared_scene_universal_submenu_callback,
         context);
     submenu_add_item(
         submenu,
-        "Projectors",
+        "Проекторы",
         SubmenuIndexUniversalProjector,
         infrared_scene_universal_submenu_callback,
         context);
     submenu_add_item(
         submenu,
-        "Air Conditioners",
+        "Кондиционеры",
         SubmenuIndexUniversalAC,
         infrared_scene_universal_submenu_callback,
         context);

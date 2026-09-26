@@ -297,8 +297,8 @@ static bool bip_parse(const NfcDevice* device, FuriString* parsed_data) {
         furi_string_printf(
             parsed_data,
             "\e#Tarjeta Bip!\n"
-            "Card Number: %lu\n"
-            "Balance: $%hu (flags %hu)\n"
+            "Номер карты: %lu\n"
+            "Баланс: $%hu (флаги %hu)\n"
             "Current Trip Window Ends:\n  @",
             bip_data.card_id,
             bip_data.balance,
@@ -317,7 +317,7 @@ static bool bip_parse(const NfcDevice* device, FuriString* parsed_data) {
         }
 
         // Print top-ups, newest first
-        furi_string_cat_printf(parsed_data, "\n\e#Last Top-ups");
+        furi_string_cat_printf(parsed_data, "\n\e#Последние пополнения");
         for(size_t i = 0; i < 3; i++) {
             const BipTransaction* top_up = &bip_data.top_ups[(3u + newest_top_up - i) % 3];
             furi_string_cat_printf(parsed_data, "\n+$%d\n  @", top_up->amount);
@@ -335,7 +335,7 @@ static bool bip_parse(const NfcDevice* device, FuriString* parsed_data) {
         }
 
         // Print charges
-        furi_string_cat_printf(parsed_data, "\n\e#Last Charges (Trips)");
+        furi_string_cat_printf(parsed_data, "\n\e#Последние списания");
         for(size_t i = 0; i < 3; i++) {
             const BipTransaction* charge = &bip_data.charges[(3u + newest_charge - i) % 3];
             furi_string_cat_printf(parsed_data, "\n-$%d\n  @", charge->amount);

@@ -32,7 +32,7 @@ static void hid_mouse_jiggler_draw_callback(Canvas* canvas, void* context) {
 #endif
 
     canvas_set_font(canvas, FontPrimary);
-    elements_multiline_text_aligned(canvas, 17, 3, AlignLeft, AlignTop, "Mouse Jiggler");
+    elements_multiline_text_aligned(canvas, 17, 3, AlignLeft, AlignTop, "Джиглер");
     canvas_set_font(canvas, FontSecondary);
 
     // Ok
@@ -46,15 +46,15 @@ static void hid_mouse_jiggler_draw_callback(Canvas* canvas, void* context) {
     canvas_draw_icon(canvas, 43, 29, &I_Ok_btn_9x9);
 
     if(model->running) {
-        elements_multiline_text_aligned(canvas, 60, 37, AlignLeft, AlignBottom, "Stop");
+        elements_multiline_text_aligned(canvas, 60, 37, AlignLeft, AlignBottom, "Стоп");
     } else {
-        elements_multiline_text_aligned(canvas, 60, 37, AlignLeft, AlignBottom, "Start");
+        elements_multiline_text_aligned(canvas, 60, 37, AlignLeft, AlignBottom, "Старт");
     }
     canvas_set_color(canvas, ColorBlack);
 
     // Back
     canvas_draw_icon(canvas, 0, 54, &I_Pin_back_arrow_10x8);
-    elements_multiline_text_aligned(canvas, 13, 62, AlignLeft, AlignBottom, "Exit");
+    elements_multiline_text_aligned(canvas, 13, 62, AlignLeft, AlignBottom, "Выход");
 }
 
 static void hid_mouse_jiggler_timer_callback(void* context) {

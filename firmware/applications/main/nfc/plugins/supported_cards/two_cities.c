@@ -158,7 +158,7 @@ static bool two_cities_parse(const NfcDevice* device, FuriString* parsed_data) {
 
         furi_string_printf(
             parsed_data,
-            "\e#Troika+Plantain\nPN: %lluX\nPB: %lu rur.\nTN: %lu\nTB: %u rur.\n",
+            "\e#Тройка+Подорожник\nPN: %lluX\nPB: %lu руб.\nTN: %lu\nTB: %u руб.\n",
             card_number,
             balance,
             troika_number,

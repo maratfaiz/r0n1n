@@ -71,7 +71,10 @@ void desktop_scene_main_on_enter(void* context) {
     DateTime datetime;
     furi_hal_rtc_get_datetime(&datetime);
     desktop_main_update_dashboard(
-        main_view, &datetime, r0n1n_profiles[desktop->r0n1n.profile].name);
+        main_view,
+        &datetime,
+        r0n1n_profiles[desktop->r0n1n.profile].name,
+        furi_hal_power_get_pct());
     furi_timer_start(desktop->dashboard_update_timer, furi_ms_to_ticks(1000));
 
     view_dispatcher_switch_to_view(desktop->view_dispatcher, DesktopViewIdMain);

@@ -63,7 +63,7 @@ void subghz_scene_save_name_on_enter(void* context) {
     }
 
     strlcpy(subghz->file_name_tmp, furi_string_get_cstr(file_name), SUBGHZ_MAX_LEN_NAME);
-    text_input_set_header_text(text_input, "Name signal");
+    text_input_set_header_text(text_input, "Имя сигнала");
     text_input_set_result_callback(
         text_input,
         subghz_scene_save_name_text_input_callback,
@@ -149,7 +149,7 @@ bool subghz_scene_save_name_on_event(void* context, SceneManagerEvent event) {
                 }
                 return true;
             } else {
-                furi_string_set(subghz->error_str, "No name file");
+                furi_string_set(subghz->error_str, "Нет имени файла");
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowErrorSub);
                 return true;
             }

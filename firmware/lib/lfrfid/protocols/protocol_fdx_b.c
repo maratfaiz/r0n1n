@@ -296,9 +296,9 @@ void protocol_fdx_b_render_data(ProtocolFDXB* protocol, FuriString* result) {
     furi_string_printf(
         result,
         "ID: %03hu-%012llu\n"
-        "Country Code: %hu\n"
-        "Country: %s\n"
-        "Temperature: ",
+        "Код страны: %hu\n"
+        "Страна: %s\n"
+        "Температура: ",
         country_code,
         national_code,
         country_code,
@@ -319,8 +319,8 @@ void protocol_fdx_b_render_data(ProtocolFDXB* protocol, FuriString* result) {
     furi_string_cat_printf(
         result,
         "\n"
-        "Animal: %s\n"
-        "Bits: %hhX-%hhX-%hhX-%hhX-%hhX",
+        "Животное: %s\n"
+        "Биты: %hhX-%hhX-%hhX-%hhX-%hhX",
         animal_flag ? "Yes" : "No",
         block_status,
         rudi_bit,
@@ -344,7 +344,7 @@ void protocol_fdx_b_render_brief_data(ProtocolFDXB* protocol, FuriString* result
     furi_string_printf(
         result,
         "ID: %03hu-%012llu\n"
-        "Country: %hu %s; Temp.: ",
+        "Страна: %hu %s; Темп.: ",
         country_code,
         national_code,
         country_code,

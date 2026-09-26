@@ -3,9 +3,9 @@
 #include "../iso14443_3a/iso14443_3a_render.h"
 
 static void nfc_render_mf_ultralight_pages_count(const MfUltralightData* data, FuriString* str) {
-    furi_string_cat_printf(str, "\nPages Read: %u/%u", data->pages_read, data->pages_total);
+    furi_string_cat_printf(str, "\nСтраниц прочитано: %u/%u", data->pages_read, data->pages_total);
     if(data->pages_read != data->pages_total) {
-        furi_string_cat_printf(str, "\nPassword-protected pages!");
+        furi_string_cat_printf(str, "\nСтраницы под паролем!");
     }
 }
 
@@ -16,22 +16,22 @@ void nfc_render_mf_ultralight_pwd_pack(const MfUltralightData* data, FuriString*
     bool has_config = mf_ultralight_get_config_page(data, &config);
 
     if(!has_config) {
-        furi_string_cat_printf(str, "\e#Already Unlocked!");
+        furi_string_cat_printf(str, "\e#Уже разблокирована!");
     } else if(all_pages) {
-        furi_string_cat_printf(str, "\e#All Pages Are Unlocked!");
+        furi_string_cat_printf(str, "\e#Все страницы открыты!");
     } else {
-        furi_string_cat_printf(str, "\e#Some Pages Are Locked!");
+        furi_string_cat_printf(str, "\e#Часть страниц заблок.!");
     }
 
     if(has_config) {
-        furi_string_cat_printf(str, "\nPassword: ");
+        furi_string_cat_printf(str, "\nПароль: ");
         nfc_render_iso14443_3a_format_bytes(
             str, config->password.data, MF_ULTRALIGHT_AUTH_PASSWORD_SIZE);
 
         furi_string_cat_printf(str, "\nPACK: ");
         nfc_render_iso14443_3a_format_bytes(str, config->pack.data, MF_ULTRALIGHT_AUTH_PACK_SIZE);
     } else {
-        furi_string_cat_printf(str, "\nThis card does not support\npassword protection!");
+        furi_string_cat_printf(str, "\nКарта не поддерживает\nзащиту паролем!");
     }
 
     nfc_render_mf_ultralight_pages_count(data, str);

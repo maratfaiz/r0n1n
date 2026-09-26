@@ -59,15 +59,17 @@ list rows, tiles, captions, scrollbar) and `R0n1nList` / `R0n1nGrid` /
 FontSecondary switched to the same face with Cyrillic, +1.7 KB), selection is
 always a filled rounded shape, icons are in `assets/icons/R0N1N/`.
 
-- **Home**: big clock, Russian date, active profile and a landscape picture,
-  opaque over the idle dolphin animation (blocking animations such as SD card
-  errors still show), under the system status bar.
+- **Home**: battery, big clock, Russian date, active profile and a landscape
+  picture over the whole screen. gui draws no status bar over the desktop
+  (only over app windows), and the dolphin's blocking animations are not
+  shown (a pending level-up is applied directly), so Home never falls back
+  to the stock dolphin screen.
 - **Navigation law**: Left/Right = sections of the active profile
   (carousel), Up = Quick Actions, Down = Control Center, OK = Applications
   menu, hold OK = Recent, hold Back = Search (opened on release, so holding
   on for the stock 5 s power-off menu still works).
 - **Control Center**: Bluetooth, sound, vibration, stealth (silent) mode,
-  lock, dummy mode, profile, settings, plus a brightness slider; the selected
+  lock, power (off/reboot), profile, settings, plus a brightness slider; the selected
   tile's name and state are in the header, a corner mark means "on".
 - **Quick Actions**: six configurable slots (`r0n1n_settings.c`,
   `/int/.r0n1n.settings`), defaults NFC / Sub-GHz / IR / BadUSB / Files /

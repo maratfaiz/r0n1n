@@ -26,7 +26,7 @@ void nfc_scene_mf_ultralight_capture_pass_on_enter(void* context) {
         AlignLeft,
         AlignCenter,
         FontPrimary,
-        "Touch the\nreader to get\npassword...");
+        "Поднесите к\nсчитывателю для\nполучения пароля...");
     widget_add_icon_element(instance->widget, 0, 15, &I_Modern_reader_18x34);
     widget_add_icon_element(instance->widget, 20, 12, &I_Move_flipper_26x39);
     view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewWidget);

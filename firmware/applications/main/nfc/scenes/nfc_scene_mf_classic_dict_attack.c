@@ -164,7 +164,7 @@ static void nfc_scene_mf_classic_dict_attack_prepare_view(NfcApp* instance) {
                 break;
             }
 
-            dict_attack_set_header(instance->dict_attack, "MF Classic CUID Dictionary");
+            dict_attack_set_header(instance->dict_attack, "Словарь CUID MF Classic");
         } while(false);
 
         furi_string_free(cuid_dict_path);
@@ -205,13 +205,13 @@ static void nfc_scene_mf_classic_dict_attack_prepare_view(NfcApp* instance) {
                 break;
             }
 
-            dict_attack_set_header(instance->dict_attack, "MF Classic User Dictionary");
+            dict_attack_set_header(instance->dict_attack, "Польз. словарь MF Classic");
         } while(false);
     }
     if(state == DictAttackStateSystemDictInProgress) {
         instance->nfc_dict_context.dict = keys_dict_alloc(
             NFC_APP_MF_CLASSIC_DICT_SYSTEM_PATH, KeysDictModeOpenExisting, sizeof(MfClassicKey));
-        dict_attack_set_header(instance->dict_attack, "MF Classic System Dictionary");
+        dict_attack_set_header(instance->dict_attack, "Сист. словарь MF Classic");
     }
 
     instance->nfc_dict_context.dict_keys_total =

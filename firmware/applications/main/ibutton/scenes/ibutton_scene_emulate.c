@@ -24,7 +24,7 @@ void ibutton_scene_emulate_on_enter(void* context) {
     if(furi_string_empty(ibutton->file_path)) {
         furi_string_printf(
             tmp,
-            "Unsaved\n%s",
+            "Не сохранено\n%s",
             ibutton_protocols_get_name(ibutton->protocols, ibutton_key_get_protocol_id(key)));
     } else {
         furi_string_printf(tmp, "%s", ibutton->key_name);
@@ -34,7 +34,7 @@ void ibutton_scene_emulate_on_enter(void* context) {
         widget, 52, 23, 75, 26, AlignCenter, AlignTop, furi_string_get_cstr(tmp), false);
 
     widget_add_string_multiline_element(
-        widget, 88, 10, AlignCenter, AlignTop, FontPrimary, "Emulating");
+        widget, 88, 10, AlignCenter, AlignTop, FontPrimary, "Эмуляция");
 
     ibutton_worker_emulate_set_callback(ibutton->worker, ibutton_scene_emulate_callback, ibutton);
     ibutton_worker_emulate_start(ibutton->worker, key);

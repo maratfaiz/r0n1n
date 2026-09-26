@@ -100,13 +100,39 @@ static uint32_t loader_menu_exit(void* context) {
     return VIEW_NONE;
 }
 
+// R0N1N: Russian display names. Apps are still launched by their FAM names
+// (other code and the mobile app refer to them), so only the menus change.
+const char* loader_display_name(const char* name) {
+    static const char* const names[][2] = {
+        {"125 kHz RFID", "RFID 125 кГц"},
+        {"Infrared", "ИК-порт"},
+        {"Remote", "Пульт"},
+        {"JS Runner", "Скрипты JS"},
+        {"Snake Game", "Змейка"},
+        {"About", "О Flipper"},
+        {"Clock & Alarm", "Часы и будильник"},
+        {"Desktop", "Рабочий стол"},
+        {"Passport", "Паспорт"},
+        {"Expansion Modules", "Модули расширения"},
+        {"LCD and Notifications", "Экран и уведомления"},
+        {"Power", "Питание"},
+        {"Storage", "Хранилище"},
+        {"System", "Система"},
+        {LOADER_APPLICATIONS_NAME, "Приложения"},
+    };
+    for(size_t i = 0; i < COUNT_OF(names); i++) {
+        if(strcmp(name, names[i][0]) == 0) return names[i][1];
+    }
+    return name;
+}
+
 static void loader_menu_build_menu(LoaderMenuApp* app, LoaderMenu* menu) {
     size_t i;
 
     for(i = 0; i < FLIPPER_EXTERNAL_APPS_COUNT; i++) {
         menu_add_item(
             app->primary_menu,
-            FLIPPER_EXTERNAL_APPS[i].name,
+            loader_display_name(FLIPPER_EXTERNAL_APPS[i].name),
             FLIPPER_EXTERNAL_APPS[i].icon,
             i,
             loader_menu_external_apps_callback,
@@ -116,17 +142,17 @@ static void loader_menu_build_menu(LoaderMenuApp* app, LoaderMenu* menu) {
     for(i = 0; i < FLIPPER_APPS_COUNT; i++) {
         menu_add_item(
             app->primary_menu,
-            FLIPPER_APPS[i].name,
+            loader_display_name(FLIPPER_APPS[i].name),
             FLIPPER_APPS[i].icon,
             i,
             loader_menu_apps_callback,
             (void*)menu);
     }
     menu_add_item(
-        app->primary_menu, "Settings", &A_Settings_14, i++, loader_menu_switch_to_settings, app);
+        app->primary_menu, "Настройки", &A_Settings_14, i++, loader_menu_switch_to_settings, app);
     menu_add_item(
         app->primary_menu,
-        LOADER_APPLICATIONS_NAME,
+        loader_display_name(LOADER_APPLICATIONS_NAME),
         &A_Plugins_14,
         i++,
         loader_menu_applications_callback,
@@ -137,7 +163,7 @@ static void loader_menu_build_submenu(LoaderMenuApp* app, LoaderMenu* loader_men
     for(size_t i = 0; i < FLIPPER_SETTINGS_APPS_COUNT; i++) {
         submenu_add_item_ex(
             app->settings_menu,
-            FLIPPER_SETTINGS_APPS[i].name,
+            loader_display_name(FLIPPER_SETTINGS_APPS[i].name),
             i,
             loader_menu_settings_menu_callback,
             loader_menu);

@@ -13,7 +13,7 @@ void desktop_scene_dev_tools_on_enter(void* context) {
     R0n1nGrid* grid = desktop->r0n1n_grid;
 
     desktop_r0n1n_prepare_grid(desktop);
-    r0n1n_grid_set_title(grid, &I_R_Chip_9x7, "Dev");
+    r0n1n_grid_set_title(grid, &I_R_Chip_9x7, "Разработка");
     r0n1n_grid_set_layout(grid, 4, 30, 19, 12);
     for(uint32_t i = 0; i < r0n1n_dev_tools_count; i++) {
         r0n1n_grid_add_item(grid, r0n1n_dev_tools[i].icon, r0n1n_dev_tools[i].caption, false, i);

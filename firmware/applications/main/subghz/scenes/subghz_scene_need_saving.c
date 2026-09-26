@@ -23,13 +23,13 @@ void subghz_scene_need_saving_on_enter(void* context) {
         54,
         AlignCenter,
         AlignTop,
-        "\e#Exit to Sub-GHz Menu?\e#\nAll unsaved data will be lost",
+        "\e#Выйти в меню Sub-GHz?\e#\nНесохраненные данные\nбудут потеряны",
         false);
 
     widget_add_button_element(
-        subghz->widget, GuiButtonTypeRight, "Stay", subghz_scene_need_saving_callback, subghz);
+        subghz->widget, GuiButtonTypeRight, "Остаться", subghz_scene_need_saving_callback, subghz);
     widget_add_button_element(
-        subghz->widget, GuiButtonTypeLeft, "Exit", subghz_scene_need_saving_callback, subghz);
+        subghz->widget, GuiButtonTypeLeft, "Выйти", subghz_scene_need_saving_callback, subghz);
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdWidget);
 }

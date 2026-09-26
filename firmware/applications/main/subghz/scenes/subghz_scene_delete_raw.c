@@ -24,7 +24,7 @@ void subghz_scene_delete_raw_on_enter(void* context) {
 
     path_extract_filename(subghz->file_path, file_name, true);
     furi_string_cat_printf(
-        text_out, "\e#Delete %s?\e#\nRAW signal\n", furi_string_get_cstr(file_name));
+        text_out, "\e#Удалить %s?\e#\nRAW-сигнал\n", furi_string_get_cstr(file_name));
     furi_string_free(file_name);
 
     frequency_str = furi_string_alloc();
@@ -45,9 +45,9 @@ void subghz_scene_delete_raw_on_enter(void* context) {
     furi_string_free(text_out);
 
     widget_add_button_element(
-        subghz->widget, GuiButtonTypeRight, "Delete", subghz_scene_delete_raw_callback, subghz);
+        subghz->widget, GuiButtonTypeRight, "Удалить", subghz_scene_delete_raw_callback, subghz);
     widget_add_button_element(
-        subghz->widget, GuiButtonTypeLeft, "Cancel", subghz_scene_delete_raw_callback, subghz);
+        subghz->widget, GuiButtonTypeLeft, "Отмена", subghz_scene_delete_raw_callback, subghz);
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdWidget);
 }

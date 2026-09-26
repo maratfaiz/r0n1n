@@ -46,8 +46,8 @@ bool infrared_scene_remote_list_on_event(void* context, SceneManagerEvent event)
                 bool wrong_file_type =
                     INFRARED_ERROR_CHECK(task_error, InfraredErrorCodeWrongFileType);
                 const char* format = wrong_file_type ?
-                                         "Library file\n\"%s\" can't be openned as a remote" :
-                                         "Failed to load\n\"%s\"";
+                                         "Файл библиотеки\n\"%s\" нельзя открыть\nкак пульт" :
+                                         "Не удалось\nзагрузить\n\"%s\"";
 
                 infrared_show_error_message(
                     infrared, format, furi_string_get_cstr(infrared->file_path));

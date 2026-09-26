@@ -165,7 +165,7 @@ static bool washcity_parse(const NfcDevice* device, FuriString* parsed_data) {
 
         furi_string_printf(
             parsed_data,
-            "\e#WashCity\nCard number: %0*llX\nBalance: %lu.%02u EUR",
+            "\e#WashCity\nНомер карты: %0*llX\nБаланс: %lu.%02u EUR",
             uid_len * 2,
             card_number,
             balance_eur,

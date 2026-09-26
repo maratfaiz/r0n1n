@@ -13,22 +13,22 @@ void storage_settings_scene_unmount_confirm_on_enter(void* context) {
 
     FS_Error sd_status = storage_sd_status(app->fs_api);
     if(sd_status == FSE_NOT_READY) {
-        dialog_ex_set_header(dialog_ex, "Mount SD Card?", 64, 10, AlignCenter, AlignCenter);
+        dialog_ex_set_header(dialog_ex, "Подключить SD-карту?", 64, 10, AlignCenter, AlignCenter);
         dialog_ex_set_text(
             dialog_ex,
-            "This may turn off power\nfor external modules",
+            "Питание внешних модулей\nможет отключиться",
             64,
             32,
             AlignCenter,
             AlignCenter);
-        dialog_ex_set_left_button_text(dialog_ex, "Cancel");
-        dialog_ex_set_right_button_text(dialog_ex, "Mount");
+        dialog_ex_set_left_button_text(dialog_ex, "Отмена");
+        dialog_ex_set_right_button_text(dialog_ex, "Подключить");
     } else {
-        dialog_ex_set_header(dialog_ex, "Unmount SD Card?", 64, 10, AlignCenter, AlignCenter);
+        dialog_ex_set_header(dialog_ex, "Извлечь SD-карту?", 64, 10, AlignCenter, AlignCenter);
         dialog_ex_set_text(
-            dialog_ex, "SD card will be\nunavailable", 64, 32, AlignCenter, AlignCenter);
-        dialog_ex_set_left_button_text(dialog_ex, "Cancel");
-        dialog_ex_set_right_button_text(dialog_ex, "Unmount");
+            dialog_ex, "SD-карта станет\nнедоступна", 64, 32, AlignCenter, AlignCenter);
+        dialog_ex_set_left_button_text(dialog_ex, "Отмена");
+        dialog_ex_set_right_button_text(dialog_ex, "Извлечь");
     }
 
     dialog_ex_set_context(dialog_ex, app);

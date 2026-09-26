@@ -52,7 +52,20 @@ Checked as real-resolution mockups before it was built:
 - tiles carry icons only, the selected tile's full name is in a caption
   (or, in Control Center, in the header together with its state);
 - 13 px list rows, four visible, with a scrollbar;
-- no hint rows: OK opens, Back returns, arrows move — on every screen.
+- no hint rows: OK opens, Back returns, arrows move — on every screen;
+- no system status bar over R0N1N screens: they own the whole 128x64.
+
+Russian everywhere, stock apps included:
+
+- FontPrimary (bold headings) has no Cyrillic, so a heading that contains
+  Cyrillic is drawn in the Cyrillic FontSecondary face, struck twice as
+  bold (`canvas.c`); ASCII-only headings keep the stock look;
+- text layout (text box, scrolling text, multiline, truncation) steps
+  through whole UTF-8 characters (`gui/utf8_i.h`), not bytes;
+- apps keep their FAM names for launching; the stock menus show Russian
+  names (`loader_display_name()`);
+- not translated: protocol dumps and file formats (UID, ATQA, Sub-GHz
+  key lines), CLI, logs, debug apps; the on-screen keyboard is Latin.
 
 Brand moments carry the 77×20 R0N1N wordmark (`r0n1n_ui_logo`):
 

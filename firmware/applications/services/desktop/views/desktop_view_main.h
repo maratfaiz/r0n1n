@@ -3,7 +3,6 @@
 #include <gui/view.h>
 #include <datetime/datetime.h>
 #include "desktop_events.h"
-#include "../animations/animation_manager.h"
 
 typedef struct DesktopMainView DesktopMainView;
 
@@ -24,12 +23,6 @@ View* desktop_main_get_dashboard_view(DesktopMainView* main_view);
 
 void desktop_main_set_dummy_mode_state(DesktopMainView* main_view, bool dummy_mode);
 
-// The dashboard hides itself (and passes Right through) while the animation
-// manager shows a blocking animation.
-void desktop_main_set_animation_manager(
-    DesktopMainView* main_view,
-    AnimationManager* animation_manager);
-
 // R0N1N Home dashboard (see docs/UX_DESIGN.md): pushes the clock/date/profile
 // content the draw callback renders. Called from a periodic timer while the
 // Main scene is active (desktop_scene_main.c), not read from inside the view
@@ -38,7 +31,8 @@ void desktop_main_set_animation_manager(
 void desktop_main_update_dashboard(
     DesktopMainView* main_view,
     const DateTime* datetime,
-    const char* profile_name);
+    const char* profile_name,
+    uint8_t battery_pct);
 
 DesktopMainView* desktop_main_alloc(void);
 void desktop_main_free(DesktopMainView* main_view);

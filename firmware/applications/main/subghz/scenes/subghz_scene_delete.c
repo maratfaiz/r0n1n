@@ -23,7 +23,7 @@ void subghz_scene_delete_on_enter(void* context) {
     text = furi_string_alloc();
 
     path_extract_filename(subghz->file_path, text, true);
-    furi_string_cat_printf(text_out, "\e#Delete %s?\e#\n", furi_string_get_cstr(text));
+    furi_string_cat_printf(text_out, "\e#Удалить %s?\e#\n", furi_string_get_cstr(text));
 
     furi_string_reset(text);
     subghz_protocol_decoder_base_get_string(subghz_txrx_get_decoder(subghz->txrx), text);
@@ -54,9 +54,9 @@ void subghz_scene_delete_on_enter(void* context) {
     furi_string_free(text_out);
 
     widget_add_button_element(
-        subghz->widget, GuiButtonTypeRight, "Delete", subghz_scene_delete_callback, subghz);
+        subghz->widget, GuiButtonTypeRight, "Удалить", subghz_scene_delete_callback, subghz);
     widget_add_button_element(
-        subghz->widget, GuiButtonTypeLeft, "Cancel", subghz_scene_delete_callback, subghz);
+        subghz->widget, GuiButtonTypeLeft, "Отмена", subghz_scene_delete_callback, subghz);
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdWidget);
 }

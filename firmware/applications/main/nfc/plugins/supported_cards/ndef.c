@@ -40,10 +40,10 @@
 #error Invalid NDEF_PROTO specified!
 #endif
 
-#define NDEF_TITLE(device, parsed_data)         \
-    furi_string_printf(                         \
-        parsed_data,                            \
-        "\e#NDEF Format Data\nCard type: %s\n", \
+#define NDEF_TITLE(device, parsed_data)    \
+    furi_string_printf(                    \
+        parsed_data,                       \
+        "\e#Данные NDEF\nТип карты: %s\n", \
         nfc_device_get_name(device, NfcDeviceNameTypeFull))
 
 // ---=== structures ===---
@@ -329,10 +329,10 @@ static bool ndef_parse_uri(Ndef* ndef, size_t pos, size_t len) {
         if(strncmp(prepend, "http", 4) == 0) {
             type = "URL";
         } else if(strncmp(prepend, "tel:", 4) == 0) {
-            type = "Phone";
+            type = "Телефон";
             prepend = ""; // Not NULL to avoid schema check below, only want to hide it from output
         } else if(strncmp(prepend, "mailto:", 7) == 0) {
-            type = "Mail";
+            type = "Почта";
             prepend = ""; // Not NULL to avoid schema check below, only want to hide it from output
         }
     }
@@ -344,11 +344,11 @@ static bool ndef_parse_uri(Ndef* ndef, size_t pos, size_t len) {
         if(strncmp(schema, "http", 4) == 0) {
             type = "URL";
         } else if(strncmp(schema, "tel:", 4) == 0) {
-            type = "Phone";
+            type = "Телефон";
             pos += 4;
             len -= 4;
         } else if(strncmp(schema, "mailto:", 7) == 0) {
-            type = "Mail";
+            type = "Почта";
             pos += 7;
             len -= 7;
         }
@@ -388,7 +388,7 @@ static bool ndef_parse_uri(Ndef* ndef, size_t pos, size_t len) {
 }
 
 static bool ndef_parse_text(Ndef* ndef, size_t pos, size_t len) {
-    furi_string_cat(ndef->output, "Text\n");
+    furi_string_cat(ndef->output, "Текст\n");
     if(!ndef_dump(ndef, NULL, pos + 3, len - 3, false)) return false;
     return true;
 }
@@ -459,7 +459,7 @@ static bool ndef_parse_vcard(Ndef* ndef, size_t pos, size_t len) {
         }
     }
 
-    furi_string_cat(ndef->output, "Contact\n");
+    furi_string_cat(ndef->output, "Контакт\n");
     ndef_dump(ndef, NULL, pos, len, false);
 
     return true;
@@ -535,7 +535,7 @@ static bool ndef_parse_wifi(Ndef* ndef, size_t pos, size_t len) {
                     const char* auth;
                     switch(auth_type) {
                     case AUTH_TYPE_OPEN:
-                        auth = "Open";
+                        auth = "Открыт";
                         break;
                     case AUTH_TYPE_WPA_PSK:
                         auth = "WPA Personal";
@@ -553,7 +553,7 @@ static bool ndef_parse_wifi(Ndef* ndef, size_t pos, size_t len) {
                         auth = "WPA/WPA2 Personal";
                         break;
                     default:
-                        auth = "Unknown";
+                        auth = "Неизвестно";
                         break;
                     }
                     ndef_print(ndef, "AUTH", auth, strlen(auth), false);
@@ -568,7 +568,7 @@ static bool ndef_parse_wifi(Ndef* ndef, size_t pos, size_t len) {
         pos += field_len;
     }
 
-    furi_string_cat(ndef->output, "No data parsed\n");
+    furi_string_cat(ndef->output, "Данные не разобраны\n");
     return true;
 }
 
@@ -593,14 +593,14 @@ bool ndef_parse_record(
     uint8_t type_len) {
     FURI_LOG_D(TAG, "payload type: %.*s len: %hu pos: %zu", type_len, type, len, pos);
     if(!len) {
-        furi_string_cat(ndef->output, "Empty\n");
+        furi_string_cat(ndef->output, "Пусто\n");
         return true;
     }
 
     switch(tnf) {
     case NdefTnfWellKnownType:
         if(strncmp("Sp", type, type_len) == 0) {
-            furi_string_cat(ndef->output, "SmartPoster\nContained records below\n\n");
+            furi_string_cat(ndef->output, "SmartPoster\nЗаписи ниже\n\n");
             return ndef_parse_message(ndef, pos, len, 0, true);
         } else if(strncmp("U", type, type_len) == 0) {
             return ndef_parse_uri(ndef, pos, len);
@@ -608,8 +608,8 @@ bool ndef_parse_record(
             return ndef_parse_text(ndef, pos, len);
         }
         // Dump data without parsing
-        furi_string_cat(ndef->output, "Unknown\n");
-        ndef_print(ndef, "Well-known Type", type, type_len, false);
+        furi_string_cat(ndef->output, "Неизвестно\n");
+        ndef_print(ndef, "Стандартный тип", type, type_len, false);
         if(!ndef_dump(ndef, "Payload", pos, len, false)) return false;
         return true;
 
@@ -622,8 +622,8 @@ bool ndef_parse_record(
             return ndef_parse_wifi(ndef, pos, len);
         }
         // Dump data without parsing
-        furi_string_cat(ndef->output, "Unknown\n");
-        ndef_print(ndef, "Media Type", type, type_len, false);
+        furi_string_cat(ndef->output, "Неизвестно\n");
+        ndef_print(ndef, "MIME-тип", type, type_len, false);
         if(!ndef_dump(ndef, "Payload", pos, len, false)) return false;
         return true;
 
@@ -635,9 +635,9 @@ bool ndef_parse_record(
     case NdefTnfReserved:
     default:
         // Dump data without parsing
-        furi_string_cat(ndef->output, "Unsupported\n");
-        ndef_print(ndef, "Type name format", &tnf, 1, true);
-        ndef_print(ndef, "Type", type, type_len, false);
+        furi_string_cat(ndef->output, "Не поддерживается\n");
+        ndef_print(ndef, "Формат типа", &tnf, 1, true);
+        ndef_print(ndef, "Тип", type, type_len, false);
         if(!ndef_dump(ndef, "Payload", pos, len, false)) return false;
         return true;
     }

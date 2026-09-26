@@ -31,7 +31,7 @@ void archive_scene_rename_on_enter(void* context) {
         memset(archive->file_extension, 0, sizeof(archive->file_extension));
     }
 
-    text_input_set_header_text(text_input, "Rename:");
+    text_input_set_header_text(text_input, "Переименовать:");
 
     text_input_set_result_callback(
         text_input,

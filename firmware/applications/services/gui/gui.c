@@ -249,18 +249,24 @@ static void gui_redraw(Gui* gui) {
 
         canvas_reset(gui->canvas);
 
+        // R0N1N: the desktop draws its own full-screen chrome (clock,
+        // battery, headers), so the status bar only goes over app windows,
+        // which leave room for it, or flags an app running while locked.
         if(gui->lockdown) {
             gui_redraw_desktop(gui);
             bool need_attention =
                 (gui_view_port_find_enabled(gui->layers[GuiLayerWindow]) != 0 ||
                  gui_view_port_find_enabled(gui->layers[GuiLayerFullscreen]) != 0);
-            gui_redraw_status_bar(gui, need_attention);
+            if(need_attention) {
+                gui_redraw_status_bar(gui, need_attention);
+            }
         } else {
             if(!gui_redraw_fs(gui)) {
-                if(!gui_redraw_window(gui)) {
+                if(gui_redraw_window(gui)) {
+                    gui_redraw_status_bar(gui, false);
+                } else {
                     gui_redraw_desktop(gui);
                 }
-                gui_redraw_status_bar(gui, false);
             }
         }
 

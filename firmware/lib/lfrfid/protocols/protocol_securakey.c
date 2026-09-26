@@ -200,7 +200,7 @@ void protocol_securakey_render_data(ProtocolSecurakey* protocol, FuriString* res
         protocol->bit_format = 0;
         furi_string_printf(
             result,
-            "RKKTH Plaintext format\nCard number: %llu",
+            "RKKTH открытый формат\nНомер карты: %llu",
             bit_lib_get_bits_64(protocol->data, 0, 48));
     } else {
         if(bit_lib_get_bits(protocol->data, 0, 8) == 0) {
@@ -210,7 +210,7 @@ void protocol_securakey_render_data(ProtocolSecurakey* protocol, FuriString* res
         }
         furi_string_printf(
             result,
-            "RKKT %u-bit format\nFacility code: %u\nCard number: %u",
+            "RKKT, %u бит\nКод объекта: %u\nНомер карты: %u",
             protocol->bit_format,
             bit_lib_get_bits_16(protocol->data, 0, 16),
             bit_lib_get_bits_16(protocol->data, 16, 16));

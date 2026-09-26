@@ -15,14 +15,14 @@ void subghz_scene_more_raw_on_enter(void* context) {
 
     submenu_add_item(
         subghz->submenu,
-        "Rename",
+        "Переименовать",
         SubmenuIndexEdit,
         subghz_scene_more_raw_submenu_callback,
         subghz);
 
     submenu_add_item(
         subghz->submenu,
-        "Delete",
+        "Удалить",
         SubmenuIndexDelete,
         subghz_scene_more_raw_submenu_callback,
         subghz);

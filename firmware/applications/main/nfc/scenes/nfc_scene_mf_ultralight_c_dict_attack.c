@@ -92,7 +92,7 @@ void nfc_scene_mf_ultralight_c_dict_attack_prepare_view(NfcApp* instance) {
                 state = DictAttackStateSystemDictInProgress;
                 break;
             }
-            dict_attack_set_header(instance->dict_attack, "MFUL C User Dictionary");
+            dict_attack_set_header(instance->dict_attack, "Польз. словарь MFUL C");
         } while(false);
     }
     if(state == DictAttackStateSystemDictInProgress) {
@@ -100,7 +100,7 @@ void nfc_scene_mf_ultralight_c_dict_attack_prepare_view(NfcApp* instance) {
             NFC_APP_MF_ULTRALIGHT_C_DICT_SYSTEM_PATH,
             KeysDictModeOpenExisting,
             sizeof(MfUltralightC3DesAuthKey));
-        dict_attack_set_header(instance->dict_attack, "MFUL C System Dictionary");
+        dict_attack_set_header(instance->dict_attack, "Сист. словарь MFUL C");
     }
 
     instance->mf_ultralight_c_dict_context.dict_keys_total =

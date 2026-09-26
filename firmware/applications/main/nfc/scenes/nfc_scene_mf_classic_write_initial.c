@@ -65,12 +65,12 @@ static void nfc_scene_mf_classic_write_initial_setup_view(NfcApp* instance) {
         scene_manager_get_scene_state(instance->scene_manager, NfcSceneMfClassicWriteInitial);
 
     if(state == NfcSceneMfClassicWriteInitialStateCardSearch) {
-        popup_set_header(instance->popup, "Writing", 95, 20, AlignCenter, AlignCenter);
+        popup_set_header(instance->popup, "Запись", 95, 20, AlignCenter, AlignCenter);
         popup_set_text(
-            instance->popup, "Use the source\ncard only", 95, 38, AlignCenter, AlignCenter);
+            instance->popup, "Только\nисходная\nкарта", 95, 38, AlignCenter, AlignCenter);
         popup_set_icon(instance->popup, 0, 8, &I_NFC_manual_60x50);
     } else {
-        popup_set_header(popup, "Writing\nDon't move...", 52, 32, AlignLeft, AlignCenter);
+        popup_set_header(popup, "Запись\nНе двигайте...", 52, 32, AlignLeft, AlignCenter);
         popup_set_icon(popup, 12, 23, &A_Loading_24);
     }
 

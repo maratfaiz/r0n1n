@@ -30,7 +30,7 @@ void desktop_debug_render(Canvas* canvas, void* model) {
     snprintf(
         buffer,
         sizeof(buffer),
-        "Uptime: %luh%lum%lus",
+        "Аптайм: %luч%luм%luс",
         uptime / 60 / 60,
         uptime / 60 % 60,
         uptime % 60);
@@ -50,7 +50,7 @@ void desktop_debug_render(Canvas* canvas, void* model) {
         furi_hal_version_get_hw_connect(),
         furi_hal_version_get_hw_region_name(),
         furi_hal_region_get_name(),
-        my_name ? my_name : "Unknown");
+        my_name ? my_name : "Неизвестно");
     canvas_draw_str(canvas, 0, 19 + STATUS_BAR_Y_SHIFT, buffer);
 
     ver = furi_hal_version_get_firmware_version();
@@ -59,7 +59,7 @@ void desktop_debug_render(Canvas* canvas, void* model) {
     c2_ver = ble_glue_get_c2_info();
 #endif
     if(!ver) { //-V1051
-        canvas_draw_str(canvas, 0, 30 + STATUS_BAR_Y_SHIFT, "No info");
+        canvas_draw_str(canvas, 0, 30 + STATUS_BAR_Y_SHIFT, "Нет данных");
         return;
     }
 
@@ -77,7 +77,7 @@ void desktop_debug_render(Canvas* canvas, void* model) {
         version_get_githash(ver),
         api_major,
         api_minor,
-        c2_ver ? c2_ver->StackTypeString : "<none>");
+        c2_ver ? c2_ver->StackTypeString : "<нет>");
     canvas_draw_str(canvas, 0, 40 + STATUS_BAR_Y_SHIFT, buffer);
 
     snprintf(

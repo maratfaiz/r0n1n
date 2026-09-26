@@ -289,7 +289,7 @@ int32_t subghz_app(void* p) {
                 subghz->scene_manager, SubGhzSceneShowError, SubGhzCustomEventManagerSet);
             furi_string_set(
                 subghz->error_str,
-                "No SD card or\ndatabase found.\nSome app function\nmay be reduced.");
+                "Нет SD-карты\nили базы данных.\nЧасть функций\nможет не работать.");
             scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
         }
     }

@@ -62,7 +62,7 @@ static void menu_draw_callback(Canvas* canvas, void* _model) {
         elements_frame(canvas, 0, 21, 128 - 5, 21);
         elements_scrollbar(canvas, position, items_count);
     } else {
-        canvas_draw_str(canvas, 2, 32, "Empty");
+        canvas_draw_str(canvas, 2, 32, "Пусто");
         elements_scrollbar(canvas, 0, 0);
     }
 }

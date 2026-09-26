@@ -200,9 +200,9 @@ static bool banapass_parse(const NfcDevice* device, FuriString* parsed_data) {
                 bool value_found = mf_classic_block_to_value(
                     &data->block[2], &value, &addr); // block 2 is value block
                 if(value_found) {
-                    furi_string_cat_printf(parsed_data, "\nValue: %08lX", value);
+                    furi_string_cat_printf(parsed_data, "\nЗначение: %08lX", value);
                 } else {
-                    furi_string_cat_str(parsed_data, "\nPotential clone:\nInvalid value block.");
+                    furi_string_cat_str(parsed_data, "\nВозможно, клон:\nневерный value-блок.");
                 }
                 furi_string_cat_str(
                     parsed_data,
@@ -232,7 +232,7 @@ static bool banapass_parse(const NfcDevice* device, FuriString* parsed_data) {
                 if((access_code[0] >> 4) != 3) {
                     furi_string_cat_printf(
                         parsed_data,
-                        "Potential clone:\nAccess Code preamble\nexpected 3, got %d\n",
+                        "Возможно, клон:\nпреамбула кода доступа\nожидалась 3, получено %d\n",
                         (access_code[0] >> 4));
                 }
                 furi_string_cat_str(

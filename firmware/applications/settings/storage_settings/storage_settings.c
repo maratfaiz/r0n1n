@@ -5,12 +5,12 @@ const SubmenuSettingsHelperDescriptor descriptor_template = {
     .options_cnt = 6,
     .options =
         {
-            {.name = "About Internal Storage", .scene_id = StorageSettingsInternalInfo},
-            {.name = "About SD Card", .scene_id = StorageSettingsSDInfo},
-            {.name = "Unmount SD Card", .scene_id = StorageSettingsUnmountConfirm},
-            {.name = "Format SD Card", .scene_id = StorageSettingsFormatConfirm},
-            {.name = "Benchmark SD Card", .scene_id = StorageSettingsBenchmarkConfirm},
-            {.name = "Factory Reset", .scene_id = StorageSettingsFactoryReset},
+            {.name = "Внутренняя память", .scene_id = StorageSettingsInternalInfo},
+            {.name = "О SD-карте", .scene_id = StorageSettingsSDInfo},
+            {.name = "Извлечь SD-карту", .scene_id = StorageSettingsUnmountConfirm},
+            {.name = "Форматировать SD", .scene_id = StorageSettingsFormatConfirm},
+            {.name = "Тест скорости SD", .scene_id = StorageSettingsBenchmarkConfirm},
+            {.name = "Сброс к заводским", .scene_id = StorageSettingsFactoryReset},
         },
 };
 

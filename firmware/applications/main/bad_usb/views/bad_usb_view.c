@@ -31,7 +31,7 @@ static void bad_usb_draw_callback(Canvas* canvas, void* _model) {
     canvas_draw_str(canvas, 2, 8, furi_string_get_cstr(disp_str));
 
     if(strlen(model->layout) == 0) {
-        furi_string_set(disp_str, "(default)");
+        furi_string_set(disp_str, "(по умолч.)");
     } else {
         furi_string_printf(disp_str, "(%s)", model->layout);
     }
@@ -51,49 +51,49 @@ static void bad_usb_draw_callback(Canvas* canvas, void* _model) {
 
     if((state == BadUsbStateIdle) || (state == BadUsbStateDone) ||
        (state == BadUsbStateNotConnected)) {
-        elements_button_center(canvas, "Run");
+        elements_button_center(canvas, "Старт");
         if(model->interface == BadUsbHidInterfaceBle) {
             elements_button_right(canvas, "USB");
-            elements_button_left(canvas, "Config");
+            elements_button_left(canvas, "Настр.");
         } else {
             elements_button_right(canvas, "BLE");
-            elements_button_left(canvas, "Layout");
+            elements_button_left(canvas, "Раскл.");
         }
     } else if((state == BadUsbStateRunning) || (state == BadUsbStateDelay)) {
-        elements_button_center(canvas, "Stop");
+        elements_button_center(canvas, "Стоп");
         if(!model->pause_wait) {
-            elements_button_right(canvas, "Pause");
+            elements_button_right(canvas, "Пауза");
         }
     } else if(state == BadUsbStatePaused) {
-        elements_button_center(canvas, "End");
-        elements_button_right(canvas, "Resume");
+        elements_button_center(canvas, "Конец");
+        elements_button_right(canvas, "Дальше");
     } else if(state == BadUsbStateWaitForBtn) {
-        elements_button_center(canvas, "Press to continue");
+        elements_button_center(canvas, "Продолжить");
     } else if(state == BadUsbStateWillRun) {
-        elements_button_center(canvas, "Cancel");
+        elements_button_center(canvas, "Отмена");
     }
 
     if(state == BadUsbStateNotConnected) {
         canvas_draw_icon(canvas, 4, 26, &I_Clock_18x18);
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 127, 31, AlignRight, AlignBottom, "Connect");
-        canvas_draw_str_aligned(canvas, 127, 43, AlignRight, AlignBottom, "to device");
+        canvas_draw_str_aligned(canvas, 127, 31, AlignRight, AlignBottom, "Подключи");
+        canvas_draw_str_aligned(canvas, 127, 43, AlignRight, AlignBottom, "к ПК");
     } else if(state == BadUsbStateWillRun) {
         canvas_draw_icon(canvas, 4, 26, &I_Clock_18x18);
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 127, 31, AlignRight, AlignBottom, "Will run");
-        canvas_draw_str_aligned(canvas, 127, 43, AlignRight, AlignBottom, "on connect");
+        canvas_draw_str_aligned(canvas, 127, 31, AlignRight, AlignBottom, "Запустится");
+        canvas_draw_str_aligned(canvas, 127, 43, AlignRight, AlignBottom, "при связи");
     } else if(state == BadUsbStateFileError) {
         canvas_draw_icon(canvas, 4, 26, &I_Error_18x18);
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 127, 31, AlignRight, AlignBottom, "File");
-        canvas_draw_str_aligned(canvas, 127, 43, AlignRight, AlignBottom, "ERROR");
+        canvas_draw_str_aligned(canvas, 127, 31, AlignRight, AlignBottom, "Ошибка");
+        canvas_draw_str_aligned(canvas, 127, 43, AlignRight, AlignBottom, "файла");
     } else if(state == BadUsbStateScriptError) {
         canvas_draw_icon(canvas, 4, 26, &I_Error_18x18);
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 127, 33, AlignRight, AlignBottom, "ERROR:");
+        canvas_draw_str_aligned(canvas, 127, 33, AlignRight, AlignBottom, "ОШИБКА:");
         canvas_set_font(canvas, FontSecondary);
-        furi_string_printf(disp_str, "line %zu", model->state.error_line);
+        furi_string_printf(disp_str, "строка %zu", model->state.error_line);
         canvas_draw_str_aligned(
             canvas, 127, 46, AlignRight, AlignBottom, furi_string_get_cstr(disp_str));
         furi_string_reset(disp_str);
@@ -141,7 +141,7 @@ static void bad_usb_draw_callback(Canvas* canvas, void* _model) {
         furi_string_reset(disp_str);
         canvas_draw_icon(canvas, 117, 26, &I_Percent_10x14);
         canvas_set_font(canvas, FontSecondary);
-        furi_string_printf(disp_str, "delay %lus", model->state.delay_remain);
+        furi_string_printf(disp_str, "ждем %luс", model->state.delay_remain);
         canvas_draw_str_aligned(
             canvas, 127, 50, AlignRight, AlignBottom, furi_string_get_cstr(disp_str));
         furi_string_reset(disp_str);
@@ -159,7 +159,7 @@ static void bad_usb_draw_callback(Canvas* canvas, void* _model) {
         furi_string_reset(disp_str);
         canvas_draw_icon(canvas, 117, 26, &I_Percent_10x14);
         canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str_aligned(canvas, 127, 50, AlignRight, AlignBottom, "Paused");
+        canvas_draw_str_aligned(canvas, 127, 50, AlignRight, AlignBottom, "Пауза");
         furi_string_reset(disp_str);
     } else {
         canvas_draw_icon(canvas, 4, 26, &I_Clock_18x18);

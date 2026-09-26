@@ -3,13 +3,13 @@
 const char*
     subghz_frequency_analyzer_log_get_order_name(SubGhzFrequencyAnalyzerLogOrderBy order_by) {
     if(order_by == SubGhzFrequencyAnalyzerLogOrderBySeqAsc) {
-        return "Seq. A";
+        return "Пор. А";
     }
     if(order_by == SubGhzFrequencyAnalyzerLogOrderByCountDesc) {
-        return "Count D";
+        return "Кол. Д";
     }
     if(order_by == SubGhzFrequencyAnalyzerLogOrderByCountAsc) {
-        return "Count A";
+        return "Кол. А";
     }
     if(order_by == SubGhzFrequencyAnalyzerLogOrderByRSSIDesc) {
         return "RSSI D";
@@ -18,10 +18,10 @@ const char*
         return "RSSI A";
     }
     if(order_by == SubGhzFrequencyAnalyzerLogOrderByFrequencyDesc) {
-        return "Freq. D";
+        return "Част. Д";
     }
     if(order_by == SubGhzFrequencyAnalyzerLogOrderByFrequencyAsc) {
-        return "Freq. A";
+        return "Част. А";
     }
-    return "Seq. D";
+    return "Пор. Д";
 }

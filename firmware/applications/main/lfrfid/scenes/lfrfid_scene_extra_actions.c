@@ -19,13 +19,13 @@ void lfrfid_scene_extra_actions_on_enter(void* context) {
 
     submenu_add_item(
         submenu,
-        "Read ASK (Animal, Ordinary Card)",
+        "Чтение ASK (животные, обычные)",
         SubmenuIndexASK,
         lfrfid_scene_extra_actions_submenu_callback,
         app);
     submenu_add_item(
         submenu,
-        "Read PSK (Indala)",
+        "Чтение PSK (Indala)",
         SubmenuIndexPSK,
         lfrfid_scene_extra_actions_submenu_callback,
         app);
@@ -33,7 +33,7 @@ void lfrfid_scene_extra_actions_on_enter(void* context) {
     if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
         submenu_add_item(
             submenu,
-            "Read RAW RFID data",
+            "Чтение RAW-данных RFID",
             SubmenuIndexRAW,
             lfrfid_scene_extra_actions_submenu_callback,
             app);

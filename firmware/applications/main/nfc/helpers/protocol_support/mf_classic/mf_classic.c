@@ -118,21 +118,21 @@ static void nfc_scene_read_menu_on_enter_mf_classic(NfcApp* instance) {
     if(!mf_classic_is_card_read(data)) {
         submenu_add_item(
             submenu,
-            "Extract MF Keys",
+            "Извлечь ключи MF",
             SubmenuIndexDetectReader,
             nfc_protocol_support_common_submenu_callback,
             instance);
 
         submenu_add_item(
             submenu,
-            "Unlock with Dictionary",
+            "Подбор по словарю",
             SubmenuIndexDictAttack,
             nfc_protocol_support_common_submenu_callback,
             instance);
 
         submenu_add_item(
             submenu,
-            "Crack nonces in MFKey32",
+            "Взлом nonce в MFKey32",
             SubmenuIndexCrackNonces,
             nfc_protocol_support_common_submenu_callback,
             instance);
@@ -163,28 +163,28 @@ static void nfc_scene_saved_menu_on_enter_mf_classic(NfcApp* instance) {
     if(!mf_classic_is_card_read(data)) {
         submenu_add_item(
             submenu,
-            "Extract MF Keys",
+            "Извлечь ключи MF",
             SubmenuIndexDetectReader,
             nfc_protocol_support_common_submenu_callback,
             instance);
 
         submenu_add_item(
             submenu,
-            "Unlock with Dictionary",
+            "Подбор по словарю",
             SubmenuIndexDictAttack,
             nfc_protocol_support_common_submenu_callback,
             instance);
     }
     submenu_add_item(
         submenu,
-        "Write to Initial Card",
+        "Записать на исходную",
         SubmenuIndexWrite,
         nfc_protocol_support_common_submenu_callback,
         instance);
 
     submenu_add_item(
         submenu,
-        "Update from Initial Card",
+        "Обновить с исходной",
         SubmenuIndexUpdate,
         nfc_protocol_support_common_submenu_callback,
         instance);

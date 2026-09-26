@@ -17,21 +17,14 @@ void nfc_scene_mf_classic_write_initial_fail_on_enter(void* context) {
     notification_message(instance->notifications, &sequence_error);
 
     widget_add_icon_element(widget, 83, 22, &I_WarningDolphinFlip_45x42);
-    widget_add_string_element(
-        widget, 7, 4, AlignLeft, AlignTop, FontPrimary, "Writing gone wrong!");
+    widget_add_string_element(widget, 7, 4, AlignLeft, AlignTop, FontPrimary, "Ошибка записи!");
     widget_add_string_multiline_element(
-        widget,
-        7,
-        17,
-        AlignLeft,
-        AlignTop,
-        FontSecondary,
-        "Not all sectors\nwere written\ncorrectly.");
+        widget, 7, 17, AlignLeft, AlignTop, FontSecondary, "Не все сектора\nзаписаны\nкорректно.");
 
     widget_add_button_element(
         widget,
         GuiButtonTypeLeft,
-        "Finish",
+        "Готово",
         nfc_scene_mf_classic_write_initial_fail_widget_callback,
         instance);
 

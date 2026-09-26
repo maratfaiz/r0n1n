@@ -20,32 +20,32 @@ void infrared_scene_start_on_enter(void* context) {
 
     submenu_add_item(
         submenu,
-        "Universal Remotes",
+        "Универсальные пульты",
         SubmenuIndexUniversalRemotes,
         infrared_scene_start_submenu_callback,
         infrared);
     submenu_add_item(
         submenu,
-        "Learn New Remote",
+        "Записать новый пульт",
         SubmenuIndexLearnNewRemote,
         infrared_scene_start_submenu_callback,
         infrared);
     submenu_add_item(
         submenu,
-        "Saved Remotes",
+        "Сохраненные пульты",
         SubmenuIndexSavedRemotes,
         infrared_scene_start_submenu_callback,
         infrared);
     submenu_add_item(
         submenu,
-        "GPIO Settings",
+        "Настройки GPIO",
         SubmenuIndexGpioSettings,
         infrared_scene_start_submenu_callback,
         infrared);
 
     if(infrared->app_state.is_debug_enabled) {
         submenu_add_item(
-            submenu, "Debug", SubmenuIndexDebug, infrared_scene_start_submenu_callback, infrared);
+            submenu, "Отладка", SubmenuIndexDebug, infrared_scene_start_submenu_callback, infrared);
     }
 
     const uint32_t submenu_index =

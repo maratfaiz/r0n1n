@@ -57,18 +57,18 @@ void desktop_lock_menu_draw_callback(Canvas* canvas, void* model) {
         const char* str = NULL;
 
         if(i == DesktopLockMenuIndexLock) {
-            str = "Lock";
+            str = "Заблокировать";
         } else if(i == DesktopLockMenuIndexStealth) {
             if(m->stealth_mode) {
-                str = "Unmute";
+                str = "Включить звук";
             } else {
-                str = "Mute";
+                str = "Выключить звук";
             }
         } else if(i == DesktopLockMenuIndexDummy) { //-V547
             if(m->dummy_mode) {
-                str = "Default Mode";
+                str = "Обычный режим";
             } else {
-                str = "Dummy Mode";
+                str = "Режим Dummy";
             }
         }
 

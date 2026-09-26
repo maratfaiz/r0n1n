@@ -8,16 +8,16 @@
 #define SCROLL_DELAY    (2)
 
 static const char* ArchiveTabNames[] = {
-    [ArchiveTabFavorites] = "Favorites",
+    [ArchiveTabFavorites] = "Избранное",
     [ArchiveTabIButton] = "iButton",
     [ArchiveTabNFC] = "NFC",
     [ArchiveTabSubGhz] = "Sub-GHz",
-    [ArchiveTabLFRFID] = "RFID LF",
-    [ArchiveTabInfrared] = "Infrared",
+    [ArchiveTabLFRFID] = "RFID 125",
+    [ArchiveTabInfrared] = "ИК",
     [ArchiveTabBadUsb] = "Bad USB",
     [ArchiveTabU2f] = "U2F",
-    [ArchiveTabApplications] = "Apps",
-    [ArchiveTabBrowser] = "Browser",
+    [ArchiveTabApplications] = "Приложения",
+    [ArchiveTabBrowser] = "Все файлы",
 };
 
 static const Icon* ArchiveItemIcons[] = {
@@ -56,15 +56,15 @@ static void render_item_menu(Canvas* canvas, ArchiveBrowserViewModel* model) {
 
     FuriString* menu[MENU_ITEMS];
 
-    menu[0] = furi_string_alloc_set("Run in app");
-    menu[1] = furi_string_alloc_set("Pin");
-    menu[2] = furi_string_alloc_set("Rename");
-    menu[3] = furi_string_alloc_set("Delete");
+    menu[0] = furi_string_alloc_set("Открыть в прил.");
+    menu[1] = furi_string_alloc_set("Закрепить");
+    menu[2] = furi_string_alloc_set("Переименовать");
+    menu[3] = furi_string_alloc_set("Удалить");
 
     ArchiveFile_t* selected = files_array_get(model->files, model->item_idx - model->array_offset);
 
     if((selected->fav) || (model->tab_idx == ArchiveTabFavorites)) {
-        furi_string_set(menu[1], "Unpin");
+        furi_string_set(menu[1], "Открепить");
     }
 
     if(!archive_is_known_app(selected->type)) {
@@ -72,7 +72,7 @@ static void render_item_menu(Canvas* canvas, ArchiveBrowserViewModel* model) {
         furi_string_set(menu[1], "---");
     } else {
         if(model->tab_idx == ArchiveTabFavorites) {
-            furi_string_set(menu[2], "Move");
+            furi_string_set(menu[2], "Переместить");
             furi_string_set(menu[3], "---");
         } else if(selected->is_app) {
             furi_string_set(menu[2], "---");
@@ -241,7 +241,7 @@ static void archive_view_render(Canvas* canvas, void* mdl) {
         draw_list(canvas, model);
     } else {
         canvas_draw_str_aligned(
-            canvas, GUI_DISPLAY_WIDTH / 2, 40, AlignCenter, AlignCenter, "Empty");
+            canvas, GUI_DISPLAY_WIDTH / 2, 40, AlignCenter, AlignCenter, "Пусто");
     }
 }
 

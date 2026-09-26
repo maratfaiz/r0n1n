@@ -16,7 +16,10 @@ static void subghz_format_file_name_tmp(SubGhz* subghz) {
     file_name = furi_string_alloc();
     path_extract_filename(subghz->file_path, file_name, true);
     snprintf(
-        subghz->file_name_tmp, SUBGHZ_MAX_LEN_NAME, "loaded\n%s", furi_string_get_cstr(file_name));
+        subghz->file_name_tmp,
+        SUBGHZ_MAX_LEN_NAME,
+        "загружен\n%s",
+        furi_string_get_cstr(file_name));
     furi_string_free(file_name);
 }
 
@@ -56,8 +59,7 @@ bool subghz_scene_rpc_on_event(void* context, SceneManagerEvent event) {
                     rpc_system_app_set_error_code(
                         subghz->rpc_ctx, RpcAppSystemErrorCodeRegionLock);
                     rpc_system_app_set_error_text(
-                        subghz->rpc_ctx,
-                        "Transmission on this frequency is restricted in your region");
+                        subghz->rpc_ctx, "Передача на этой частоте запрещена в вашем регионе");
                     break;
                 case SubGhzTxRxStartTxStateErrorParserOthers:
                     rpc_system_app_set_error_code(
@@ -94,8 +96,7 @@ bool subghz_scene_rpc_on_event(void* context, SceneManagerEvent event) {
                     rpc_system_app_set_error_code(
                         subghz->rpc_ctx, RpcAppSystemErrorCodeRegionLock);
                     rpc_system_app_set_error_text(
-                        subghz->rpc_ctx,
-                        "Transmission on this frequency is restricted in your region");
+                        subghz->rpc_ctx, "Передача на этой частоте запрещена в вашем регионе");
                     break;
                 case SubGhzTxRxStartTxStateErrorParserOthers:
                     rpc_system_app_set_error_code(

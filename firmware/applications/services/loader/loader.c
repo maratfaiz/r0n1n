@@ -56,22 +56,24 @@ typedef struct {
 } LoaderError;
 
 static const LoaderError err_app_not_found =
-    {"App Not Found", "Update firmware or app", "err_01", &I_err_01};
-static const LoaderError err_invalid_flie = {"Invalid File", "Update the app", "err_02", &I_err_02};
+    {"Нет приложения", "Обновите прошивку или приложение", "err_01", &I_err_01};
+static const LoaderError err_invalid_flie =
+    {"Неверный файл", "Обновите приложение", "err_02", &I_err_02};
 static const LoaderError err_invalid_manifest =
-    {"Invalid Manifest", "Update firmware or app", "err_03", &I_err_03};
+    {"Неверный манифест", "Обновите прошивку или приложение", "err_03", &I_err_03};
 static const LoaderError err_missing_imports =
-    {"Missing Imports", "Update firmware", "err_04", &I_err_04};
+    {"Нет функций API", "Обновите прошивку", "err_04", &I_err_04};
 static const LoaderError err_hw_target_mismatch =
-    {"HW Target\nMismatch", "App not supported", "err_05", &I_err_05};
-static const LoaderError err_outdated_app = {"Outdated App", "Update the app", "err_06", &I_err_06};
+    {"Не то\nжелезо", "Не поддерживается", "err_05", &I_err_05};
+static const LoaderError err_outdated_app =
+    {"Старое приложение", "Обновите приложение", "err_06", &I_err_06};
 static const LoaderError err_outdated_firmware =
-    {"Outdated\nFirmware", "Update firmware", "err_07", &I_err_07};
+    {"Старая\nпрошивка", "Обновите прошивку", "err_07", &I_err_07};
 
 static void loader_dialog_prepare_and_show(DialogsApp* dialogs, const LoaderError* err) {
-    FuriString* header = furi_string_alloc_printf("Error: %s", err->error);
+    FuriString* header = furi_string_alloc_printf("Ошибка: %s", err->error);
     FuriString* text =
-        furi_string_alloc_printf("%s\nLearn more:\nr.flipper.net/%s", err->description, err->url);
+        furi_string_alloc_printf("%s\nПодробнее:\nr.flipper.net/%s", err->description, err->url);
     DialogMessage* message = dialog_message_alloc();
 
     dialog_message_set_header(message, furi_string_get_cstr(header), 64, 0, AlignCenter, AlignTop);
@@ -99,11 +101,11 @@ static void loader_show_gui_error(
         const char* text = NULL;
         Storage* storage = furi_record_open(RECORD_STORAGE);
         if(storage_sd_status(storage) == FSE_OK) {
-            header = "Update needed";
-            text = "Update firmware\nto run this app";
+            header = "Нужно обновление";
+            text = "Обновите прошивку\nдля запуска";
         } else {
-            header = "SD card needed";
-            text = "Install SD card\nto run this app";
+            header = "Нужна SD-карта";
+            text = "Вставьте SD-карту\nдля запуска";
         }
         furi_record_close(RECORD_STORAGE);
         dialog_message_set_header(message, header, 64, 3, AlignCenter, AlignTop);
@@ -136,22 +138,22 @@ static void loader_show_gui_error(
             break;
         case LoaderStatusErrorOutOfMemory:
             dialog_message_set_header(
-                message, "Error: Out of Memory", 64, 0, AlignCenter, AlignTop);
+                message, "Ошибка: мало памяти", 64, 0, AlignCenter, AlignTop);
             dialog_message_set_text(
                 message,
-                "Not enough RAM to run the\napp. Please reboot the device",
+                "Мало памяти для запуска.\nПерезагрузите устройство",
                 64,
                 13,
                 AlignCenter,
                 AlignTop);
-            dialog_message_set_buttons(message, NULL, NULL, "Reboot");
+            dialog_message_set_buttons(message, NULL, NULL, "Перезагрузить");
             if(dialog_message_show(dialogs, message) == DialogMessageButtonRight) {
                 furi_hal_power_reset();
             }
             break;
         default:
             // Generic error
-            dialog_message_set_header(message, "Error", 64, 0, AlignCenter, AlignTop);
+            dialog_message_set_header(message, "Ошибка", 64, 0, AlignCenter, AlignTop);
 
             furi_string_replace(error_message, "/ext/apps/", "");
             furi_string_replace(error_message, ", ", "\n");

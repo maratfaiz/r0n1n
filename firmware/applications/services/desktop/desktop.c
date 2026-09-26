@@ -285,7 +285,10 @@ static void desktop_dashboard_update(Desktop* desktop) {
     DateTime datetime;
     furi_hal_rtc_get_datetime(&datetime);
     desktop_main_update_dashboard(
-        desktop->main_view, &datetime, r0n1n_profiles[desktop->r0n1n.profile].name);
+        desktop->main_view,
+        &datetime,
+        r0n1n_profiles[desktop->r0n1n.profile].name,
+        furi_hal_power_get_pct());
 }
 
 static void desktop_dashboard_update_timer_callback(void* context) {
@@ -303,6 +306,10 @@ static void desktop_apply_settings(Desktop* desktop) {
     desktop->in_transition = true;
 
     desktop_clock_reconfigure(desktop);
+
+    // R0N1N has no dummy ("game") mode: its Home is always the dashboard.
+    // Clear a flag saved by an earlier firmware so nobody gets stuck in it.
+    desktop->settings.dummy_mode = false;
 
     view_port_enabled_set(desktop->dummy_mode_icon_viewport, desktop->settings.dummy_mode);
     desktop_main_set_dummy_mode_state(desktop->main_view, desktop->settings.dummy_mode);
@@ -367,7 +374,6 @@ static Desktop* desktop_alloc(void) {
 
     desktop->main_view_stack = view_stack_alloc();
     desktop->main_view = desktop_main_alloc();
-    desktop_main_set_animation_manager(desktop->main_view, desktop->animation_manager);
     View* dolphin_view = animation_manager_get_animation_view(desktop->animation_manager);
     view_stack_add_view(desktop->main_view_stack, desktop_main_get_view(desktop->main_view));
     view_stack_add_view(desktop->main_view_stack, dolphin_view);

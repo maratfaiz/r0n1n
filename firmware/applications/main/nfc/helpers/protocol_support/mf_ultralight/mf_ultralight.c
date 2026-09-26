@@ -63,14 +63,14 @@ static void nfc_scene_more_info_on_enter_mf_ultralight(NfcApp* instance) {
         widget_add_button_element(
             instance->widget,
             GuiButtonTypeRight,
-            "Raw Data",
+            "Сырые данные",
             nfc_protocol_support_common_widget_callback,
             instance);
 
         widget_add_button_element(
             instance->widget,
             GuiButtonTypeLeft,
-            "Info",
+            "Инфо",
             nfc_protocol_support_common_widget_callback,
             instance);
     } else if(scene_state == NfcSceneMoreInfoStateRawData) {
@@ -214,14 +214,14 @@ static void nfc_scene_read_and_saved_menu_on_enter_mf_ultralight(NfcApp* instanc
     if(!mf_ultralight_is_all_data_read(data)) {
         submenu_add_item(
             submenu,
-            "Unlock",
+            "Разблокировать",
             SubmenuIndexUnlock,
             nfc_protocol_support_common_submenu_callback,
             instance);
         if(data->type == MfUltralightTypeMfulC) {
             submenu_add_item(
                 submenu,
-                "Unlock with Dictionary",
+                "Подбор по словарю",
                 SubmenuIndexDictAttack,
                 nfc_protocol_support_common_submenu_callback,
                 instance);
@@ -232,7 +232,7 @@ static void nfc_scene_read_and_saved_menu_on_enter_mf_ultralight(NfcApp* instanc
         data->type == MfUltralightTypeUL21 || data->type == MfUltralightTypeOrigin) {
         submenu_add_item(
             submenu,
-            "Write",
+            "Записать",
             SubmenuIndexWrite,
             nfc_protocol_support_common_submenu_callback,
             instance);

@@ -5,9 +5,9 @@ const SubmenuSettingsHelperDescriptor settings_helper_descriptor = {
     .options_cnt = 3,
     .options =
         {
-            {.name = "Battery Info", .scene_id = PowerSettingsAppSceneBatteryInfo},
-            {.name = "Reboot", .scene_id = PowerSettingsAppSceneReboot},
-            {.name = "Power OFF", .scene_id = PowerSettingsAppScenePowerOff},
+            {.name = "Батарея", .scene_id = PowerSettingsAppSceneBatteryInfo},
+            {.name = "Перезагрузка", .scene_id = PowerSettingsAppSceneReboot},
+            {.name = "Выключение", .scene_id = PowerSettingsAppScenePowerOff},
         },
 };
 

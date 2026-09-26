@@ -39,42 +39,42 @@ const size_t r0n1n_system_apps_count = COUNT_OF(r0n1n_system_apps);
 
 const R0n1nSectionInfo r0n1n_sections[R0n1nSectionCount] = {
     [R0n1nSectionRadio] =
-        {"Radio",
-         "Radio",
-         &I_sub1_10px,
-         &A_Sub1ghz_14,
-         r0n1n_apps_radio,
-         COUNT_OF(r0n1n_apps_radio)},
+        {"Эфир", "Радио", &I_sub1_10px, &A_Sub1ghz_14, r0n1n_apps_radio, COUNT_OF(r0n1n_apps_radio)},
     [R0n1nSectionCards] =
-        {"Cards",
-         "NFC / RFID",
+        {"NFC",
+         "Карты: NFC / RFID",
          &I_Nfc_10px,
          &A_NFC_14,
          r0n1n_apps_cards,
          COUNT_OF(r0n1n_apps_cards)},
     [R0n1nSectionIr] =
-        {"IR", "Infrared", &I_ir_10px, &A_Infrared_14, r0n1n_apps_ir, COUNT_OF(r0n1n_apps_ir)},
+        {"ИК", "ИК-порт", &I_ir_10px, &A_Infrared_14, r0n1n_apps_ir, COUNT_OF(r0n1n_apps_ir)},
     [R0n1nSectionUsb] =
         {"USB", "USB / HID", &I_badusb_10px, &A_BadUsb_14, r0n1n_apps_usb, COUNT_OF(r0n1n_apps_usb)},
     [R0n1nSectionDev] =
-        {"Dev", "GPIO / Dev", &I_R_Chip_9x7, &A_GPIO_14, r0n1n_apps_dev, COUNT_OF(r0n1n_apps_dev)},
+        {"Разр.",
+         "GPIO / разработка",
+         &I_R_Chip_9x7,
+         &A_GPIO_14,
+         r0n1n_apps_dev,
+         COUNT_OF(r0n1n_apps_dev)},
 };
 
 const R0n1nProfileInfo r0n1n_profiles[R0n1nProfileCount] = {
     [R0n1nProfileEveryday] =
-        {"Everyday",
+        {"Обычный",
          "Повседневные задачи",
          &I_R_Brightness_9x9,
          4,
          {R0n1nSectionRadio, R0n1nSectionCards, R0n1nSectionIr, R0n1nSectionUsb}},
     [R0n1nProfilePentest] =
-        {"Pentest",
+        {"Пентест",
          "Инструменты безопасности",
          &I_R_Pentest_9x7,
          5,
          {R0n1nSectionRadio, R0n1nSectionCards, R0n1nSectionUsb, R0n1nSectionIr, R0n1nSectionDev}},
     [R0n1nProfileDev] =
-        {"Dev",
+        {"Разраб.",
          "Разработка и отладка",
          &I_R_Chip_9x7,
          4,

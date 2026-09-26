@@ -9,8 +9,8 @@ enum SubGhzRadioSettingIndex {
 
 #define RADIO_DEVICE_COUNT 2
 const char* const radio_device_text[RADIO_DEVICE_COUNT] = {
-    "Internal",
-    "External",
+    "Внутр.",
+    "Внешн.",
 };
 
 const uint32_t radio_device_value[RADIO_DEVICE_COUNT] = {
@@ -58,7 +58,7 @@ void subghz_scene_radio_settings_on_enter(void* context) {
 
     item = variable_item_list_add(
         subghz->variable_item_list,
-        "Module",
+        "Модуль",
         value_count_device,
         subghz_scene_radio_settings_set_device,
         subghz);

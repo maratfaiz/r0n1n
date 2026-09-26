@@ -114,7 +114,7 @@ bool subghz_scene_receiver_info_on_event(void* context, SceneManagerEvent event)
             }
             return true;
         } else if(event.event == SubGhzCustomEventSceneShowErrorSub) {
-            furi_string_set(subghz->error_str, "Error history parse.");
+            furi_string_set(subghz->error_str, "Ошибка разбора\nистории.");
             scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowErrorSub);
         }
 

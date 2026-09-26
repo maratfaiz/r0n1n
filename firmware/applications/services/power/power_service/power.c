@@ -175,7 +175,7 @@ static void power_handle_shutdown(Power* power) {
     view_holder_set_view(
         power->view_holder, power_unplug_usb_get_view(power->view_power_unplug_usb));
     furi_delay_ms(100);
-    furi_halt("Disconnect USB for safe shutdown");
+    furi_halt("Отключите USB для безопасного выключения");
 }
 
 static void power_handle_reboot(PowerBootMode mode) {

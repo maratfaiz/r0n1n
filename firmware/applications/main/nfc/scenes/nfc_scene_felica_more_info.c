@@ -35,7 +35,7 @@ void nfc_scene_felica_more_info_on_enter(void* context) {
 
         for(uint32_t i = 0; i < simple_array_get_count(data->systems); ++i) {
             const FelicaSystem* system = simple_array_cget(data->systems, i);
-            furi_string_printf(label, "System %04X", system->system_code);
+            furi_string_printf(label, "Система %04X", system->system_code);
             submenu_add_item(
                 submenu,
                 furi_string_get_cstr(label),

@@ -8,7 +8,7 @@ void subghz_scene_region_info_on_enter(void* context) {
     FuriString* buffer = furi_string_alloc();
 
     if(region) {
-        furi_string_cat_printf(buffer, "Region: %s\nBands:\n", region->country_code);
+        furi_string_cat_printf(buffer, "Регион: %s\nДиапазоны:\n", region->country_code);
         for(uint16_t i = 0; i < region->bands_count; ++i) {
             furi_string_cat_printf(
                 buffer,
@@ -17,11 +17,11 @@ void subghz_scene_region_info_on_enter(void* context) {
                 region->bands[i].end / 1000);
         }
     } else {
-        furi_string_cat_printf(buffer, "Region: N/A\n");
+        furi_string_cat_printf(buffer, "Регион: н/д\n");
     }
 
     widget_add_string_multiline_element(
-        subghz->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, "Region Information");
+        subghz->widget, 0, 0, AlignLeft, AlignTop, FontPrimary, "О регионе");
 
     widget_add_string_multiline_element(
         subghz->widget, 0, 13, AlignLeft, AlignTop, FontSecondary, furi_string_get_cstr(buffer));

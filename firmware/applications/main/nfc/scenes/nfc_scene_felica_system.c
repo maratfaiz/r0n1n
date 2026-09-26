@@ -24,7 +24,7 @@ void nfc_scene_felica_system_on_enter(void* context) {
     const FelicaData* data = nfc_device_get_data(nfc->nfc_device, NfcProtocolFelica);
 
     submenu_add_item(
-        submenu, "Directory", SubmenuIndexDirectory, nfc_scene_felica_system_submenu_callback, nfc);
+        submenu, "Каталог", SubmenuIndexDirectory, nfc_scene_felica_system_submenu_callback, nfc);
 
     FuriString* label = furi_string_alloc();
 
@@ -35,7 +35,7 @@ void nfc_scene_felica_system_on_enter(void* context) {
         if(!is_public) {
             continue;
         }
-        furi_string_printf(label, "Readable serv %04X", service->code);
+        furi_string_printf(label, "Читаемый сервис %04X", service->code);
         submenu_add_item(
             submenu,
             furi_string_get_cstr(label),
@@ -80,7 +80,7 @@ bool nfc_scene_felica_system_on_event(void* context, SceneManagerEvent event) {
                 furi_string_reset(nfc->text_box_store);
 
                 const FelicaService* service = simple_array_cget(system->services, service_ind);
-                furi_string_cat_printf(nfc->text_box_store, "Service 0x%04X\n", service->code);
+                furi_string_cat_printf(nfc->text_box_store, "Сервис 0x%04X\n", service->code);
                 nfc_more_info_render_felica_blocks(
                     data, system, nfc->text_box_store, service->code);
 

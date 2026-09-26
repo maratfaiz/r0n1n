@@ -7,24 +7,22 @@
 #include <dolphin/dolphin.h>
 #include <locale/locale.h>
 #include <assets_icons.h>
+#include <gui/r0n1n_ui.h>
 
 #include "desktop_view_main.h"
 
-// R0N1N Home dashboard (docs/UX_DESIGN.md): below the system status bar
-// (battery/BT/SD are drawn there by power/bt/storage), a big clock, the date,
-// the active profile and a landscape picture, opaque over the idle dolphin
-// animation. Blocking animations (SD card problems, pending notices) are
-// left visible: the dashboard draws nothing while one is shown.
-#define DASHBOARD_TOP       13
-#define DASHBOARD_CLOCK_Y   35
-#define DASHBOARD_DATE_Y    46
-#define DASHBOARD_PROFILE_Y 59
+// R0N1N Home dashboard (docs/UX_DESIGN.md): the whole screen, opaque over
+// the idle dolphin animation (gui draws no status bar over the desktop):
+// battery, a big clock, the date, the active profile and a landscape picture.
+#define DASHBOARD_CLOCK_Y   31
+#define DASHBOARD_DATE_Y    43
+#define DASHBOARD_PROFILE_Y 57
 
 typedef struct {
     DateTime datetime;
-    char profile_name[16];
+    char profile_name[32];
+    uint8_t battery_pct;
     bool has_datetime;
-    AnimationManager* animation_manager;
 } DesktopMainViewModel;
 
 struct DesktopMainView {
@@ -41,7 +39,6 @@ struct DesktopMainView {
     DesktopMainViewCallback callback;
     void* context;
     FuriTimer* poweroff_timer;
-    AnimationManager* animation_manager;
     bool dummy_mode;
     bool back_held; // Back held past InputTypeLong: open Search on release
 };
@@ -79,22 +76,11 @@ void desktop_main_set_dummy_mode_state(DesktopMainView* main_view, bool dummy_mo
     main_view->dummy_mode = dummy_mode;
 }
 
-void desktop_main_set_animation_manager(
-    DesktopMainView* main_view,
-    AnimationManager* animation_manager) {
-    furi_assert(main_view);
-    main_view->animation_manager = animation_manager;
-    with_view_model(
-        main_view->dashboard_view,
-        DesktopMainViewModel * model,
-        { model->animation_manager = animation_manager; },
-        false);
-}
-
 void desktop_main_update_dashboard(
     DesktopMainView* main_view,
     const DateTime* datetime,
-    const char* profile_name) {
+    const char* profile_name,
+    uint8_t battery_pct) {
     furi_assert(main_view);
     furi_assert(datetime);
     furi_assert(profile_name);
@@ -103,14 +89,11 @@ void desktop_main_update_dashboard(
         DesktopMainViewModel * model,
         {
             model->datetime = *datetime;
+            model->battery_pct = battery_pct;
             model->has_datetime = true;
             strlcpy(model->profile_name, profile_name, sizeof(model->profile_name));
         },
         true);
-}
-
-static bool desktop_main_is_blocking(AnimationManager* animation_manager) {
-    return animation_manager && animation_manager_is_blocking(animation_manager);
 }
 
 static void desktop_main_draw_callback(Canvas* canvas, void* model) {
@@ -118,13 +101,14 @@ static void desktop_main_draw_callback(Canvas* canvas, void* model) {
     static const char* const months[] = {
         "янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"};
     DesktopMainViewModel* m = model;
-    if(!m->has_datetime || desktop_main_is_blocking(m->animation_manager)) return;
+    if(!m->has_datetime) return;
 
     canvas_set_color(canvas, ColorWhite);
-    canvas_draw_box(canvas, 0, DASHBOARD_TOP, 128, 64 - DASHBOARD_TOP);
+    canvas_draw_box(canvas, 0, 0, 128, 64);
     canvas_set_color(canvas, ColorBlack);
 
-    canvas_draw_icon(canvas, 77, 16, &I_R_Mountains_51x46);
+    r0n1n_ui_battery(canvas, 127, 1, m->battery_pct);
+    canvas_draw_icon(canvas, 77, 17, &I_R_Mountains_51x46);
 
     FuriString* str = furi_string_alloc();
     locale_format_time(str, &m->datetime, locale_get_time_format(), false);
@@ -149,7 +133,7 @@ static void desktop_main_draw_callback(Canvas* canvas, void* model) {
 
 static bool desktop_main_dashboard_input_callback(InputEvent* event, void* context) {
     DesktopMainView* main_view = context;
-    if(main_view->dummy_mode || desktop_main_is_blocking(main_view->animation_manager)) {
+    if(main_view->dummy_mode) {
         return false;
     }
     if(event->key == InputKeyRight && event->type == InputTypeShort) {
@@ -178,7 +162,7 @@ bool desktop_main_input_callback(InputEvent* event, void* context) {
                 main_view->callback(DesktopMainEventOpenControlCenter, main_view->context);
             } else if(event->key == InputKeyLeft) {
                 // Left/Right = sections; Right is taken by the dashboard view
-                // on top (or by the dolphin while a blocking animation shows).
+                // on top.
                 main_view->callback(DesktopMainEventOpenSectionsLeft, main_view->context);
             }
         } else if(event->type == InputTypeLong) {

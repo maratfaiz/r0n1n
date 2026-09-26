@@ -17,29 +17,28 @@ void nfc_scene_mf_ultralight_unlock_warn_on_enter(void* context) {
     MfUltralightAuthType type = nfc->mf_ul_auth->type;
     if((type == MfUltralightAuthTypeReader) || (type == MfUltralightAuthTypeManual)) {
         // Build dialog text
-        FuriString* password_str =
-            furi_string_alloc_set_str("Try to unlock the card with\npassword: ");
+        FuriString* password_str = furi_string_alloc_set_str("Разблокировать карту\nпаролем: ");
         for(size_t i = 0; i < sizeof(nfc->mf_ul_auth->password.data); i++) {
             furi_string_cat_printf(password_str, "%02X ", nfc->mf_ul_auth->password.data[i]);
         }
-        furi_string_cat_str(password_str, "\nWarning: incorrect password\nwill block the card!");
+        furi_string_cat_str(password_str, "\nВнимание: неверный пароль\nзаблокирует карту!");
         nfc_text_store_set(nfc, furi_string_get_cstr(password_str));
         furi_string_free(password_str);
 
-        const char* message = (type == MfUltralightAuthTypeReader) ? "Password Captured!" :
-                                                                     "Risky Action!";
+        const char* message = (type == MfUltralightAuthTypeReader) ? "Пароль получен!" :
+                                                                     "Опасное действие!";
         dialog_ex_set_header(dialog_ex, message, 64, 0, AlignCenter, AlignTop);
         dialog_ex_set_text(dialog_ex, nfc->text_store, 64, 10, AlignCenter, AlignTop);
-        dialog_ex_set_left_button_text(dialog_ex, "Cancel");
-        dialog_ex_set_right_button_text(dialog_ex, "Continue");
+        dialog_ex_set_left_button_text(dialog_ex, "Отмена");
+        dialog_ex_set_right_button_text(dialog_ex, "Продолжить");
 
         if(type == MfUltralightAuthTypeReader) {
             notification_message(nfc->notifications, &sequence_set_green_255);
         }
     } else {
-        dialog_ex_set_header(dialog_ex, "Risky action!", 64, 4, AlignCenter, AlignTop);
+        dialog_ex_set_header(dialog_ex, "Опасное действие!", 64, 4, AlignCenter, AlignTop);
         dialog_ex_set_text(
-            dialog_ex, "Wrong password\ncan block your\ncard.", 4, 18, AlignLeft, AlignTop);
+            dialog_ex, "Неверный пароль\nможет заблок.\nкарту.", 4, 18, AlignLeft, AlignTop);
         dialog_ex_set_icon(dialog_ex, 83, 22, &I_WarningDolphinFlip_45x42);
         dialog_ex_set_center_button_text(dialog_ex, "OK");
     }

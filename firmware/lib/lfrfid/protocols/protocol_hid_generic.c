@@ -245,8 +245,8 @@ void protocol_hid_generic_render_data(ProtocolHID* protocol, FuriString* result)
     if(protocol_size == HID_PROTOCOL_SIZE_UNKNOWN) {
         furi_string_printf(
             result,
-            "Generic HID Proximity\n"
-            "Data: %02X%02X%02X%02X%02X%X",
+            "HID Proximity (общий)\n"
+            "Данные: %02X%02X%02X%02X%02X%X",
             protocol->data[0],
             protocol->data[1],
             protocol->data[2],
@@ -256,8 +256,8 @@ void protocol_hid_generic_render_data(ProtocolHID* protocol, FuriString* result)
     } else {
         furi_string_printf(
             result,
-            "%hhu-bit HID Proximity\n"
-            "Data: ",
+            "HID Proximity, %hhu бит\n"
+            "Данные: ",
             protocol_size);
         protocol_hid_generic_string_cat_protocol_bits(protocol, protocol_size, result);
     }

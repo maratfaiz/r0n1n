@@ -20,7 +20,7 @@ void nfc_scene_mf_classic_mfkey_complete_on_enter(void* context) {
     NfcApp* instance = context;
 
     widget_add_string_element(
-        instance->widget, 64, 0, AlignCenter, AlignTop, FontPrimary, "Completed!");
+        instance->widget, 64, 0, AlignCenter, AlignTop, FontPrimary, "Готово!");
 
     NfcSceneMfClassicMfKeyCompleteState scene_state =
         storage_common_exists(instance->storage, NFC_MFKEY32_APP_PATH) ?
@@ -37,12 +37,12 @@ void nfc_scene_mf_classic_mfkey_complete_on_enter(void* context) {
             AlignCenter,
             AlignTop,
             FontSecondary,
-            "Now use Mfkey32 to extract \nkeys: r.flipper.net/nfc-tools");
+            "Извлеките ключи\nв Mfkey32:\nr.flipper.net/nfc-tools");
         widget_add_icon_element(instance->widget, 50, 39, &I_MFKey_qr_25x25);
         widget_add_button_element(
             instance->widget,
             GuiButtonTypeRight,
-            "Finish",
+            "Готово",
             nfc_scene_mf_classic_mfkey_complete_callback,
             instance);
     } else {
@@ -53,12 +53,12 @@ void nfc_scene_mf_classic_mfkey_complete_on_enter(void* context) {
             AlignLeft,
             AlignTop,
             FontSecondary,
-            "Now run Mfkey32\n to extract \nkeys");
+            "Извлеките\nключи в\nMfkey32");
         widget_add_icon_element(instance->widget, 5, 18, &I_WarningDolphin_45x42);
         widget_add_button_element(
             instance->widget,
             GuiButtonTypeRight,
-            "Run",
+            "Запуск",
             nfc_scene_mf_classic_mfkey_complete_callback,
             instance);
     }

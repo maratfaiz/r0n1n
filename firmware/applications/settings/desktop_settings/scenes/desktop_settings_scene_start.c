@@ -14,20 +14,20 @@ typedef enum {
 
 #define AUTO_LOCK_DELAY_COUNT 6
 static const char* const auto_lock_delay_text[AUTO_LOCK_DELAY_COUNT] = {
-    "OFF",
+    "ВЫКЛ",
     "30s",
     "60s",
-    "2min",
-    "5min",
-    "10min",
+    "2мин",
+    "5мин",
+    "10мин",
 };
 static const uint32_t auto_lock_delay_value[AUTO_LOCK_DELAY_COUNT] =
     {0, 30000, 60000, 120000, 300000, 600000};
 
 #define CLOCK_ENABLE_COUNT 2
 const char* const clock_enable_text[CLOCK_ENABLE_COUNT] = {
-    "OFF",
-    "ON",
+    "ВЫКЛ",
+    "ВКЛ",
 };
 
 const uint32_t clock_enable_value[CLOCK_ENABLE_COUNT] = {0, 1};
@@ -60,11 +60,11 @@ void desktop_settings_scene_start_on_enter(void* context) {
     VariableItem* item;
     uint8_t value_index;
 
-    variable_item_list_add(variable_item_list, "PIN Setup", 1, NULL, NULL);
+    variable_item_list_add(variable_item_list, "PIN-код", 1, NULL, NULL);
 
     item = variable_item_list_add(
         variable_item_list,
-        "Auto Lock Time",
+        "Автоблок.",
         AUTO_LOCK_DELAY_COUNT,
         desktop_settings_scene_start_auto_lock_delay_changed,
         app);
@@ -76,7 +76,7 @@ void desktop_settings_scene_start_on_enter(void* context) {
 
     item = variable_item_list_add(
         variable_item_list,
-        "Show Clock",
+        "Часы в строке",
         CLOCK_ENABLE_COUNT,
         desktop_settings_scene_start_clock_enable_changed,
         app);
@@ -86,9 +86,9 @@ void desktop_settings_scene_start_on_enter(void* context) {
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, clock_enable_text[value_index]);
 
-    variable_item_list_add(variable_item_list, "Set Quick Access Apps", 1, NULL, NULL);
+    variable_item_list_add(variable_item_list, "Быстрый запуск", 1, NULL, NULL);
 
-    variable_item_list_add(variable_item_list, "Happy Mode", 1, NULL, NULL);
+    variable_item_list_add(variable_item_list, "Всегда рад", 1, NULL, NULL);
 
     variable_item_list_set_enter_callback(
         variable_item_list, desktop_settings_scene_start_var_list_enter_callback, app);

@@ -12,7 +12,7 @@ void ibutton_scene_info_on_enter(void* context) {
 
     furi_string_printf(
         tmp,
-        "Name:%s\n\e#%s %s\e#\n",
+        "Имя:%s\n\e#%s %s\e#\n",
         ibutton->key_name,
         ibutton_protocols_get_manufacturer(ibutton->protocols, protocol_id),
         ibutton_protocols_get_name(ibutton->protocols, protocol_id));
@@ -30,7 +30,7 @@ void ibutton_scene_info_on_enter(void* context) {
     if(ibutton_protocols_get_features(ibutton->protocols, protocol_id) &
        iButtonProtocolFeatureExtData) {
         widget_add_button_element(
-            widget, GuiButtonTypeRight, "More", ibutton_widget_callback, context);
+            widget, GuiButtonTypeRight, "Еще", ibutton_widget_callback, context);
     }
 
     view_dispatcher_switch_to_view(ibutton->view_dispatcher, iButtonViewWidget);
