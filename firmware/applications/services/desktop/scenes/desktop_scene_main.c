@@ -70,7 +70,8 @@ void desktop_scene_main_on_enter(void* context) {
     // for the first second, then keep it ticking while this scene is shown.
     DateTime datetime;
     furi_hal_rtc_get_datetime(&datetime);
-    desktop_main_update_dashboard(main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+    desktop_main_update_dashboard(
+        main_view, &datetime, r0n1n_profiles[desktop->r0n1n.profile].name);
     furi_timer_start(desktop->dashboard_update_timer, furi_ms_to_ticks(1000));
 
     view_dispatcher_switch_to_view(desktop->view_dispatcher, DesktopViewIdMain);
@@ -82,12 +83,10 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         switch(event.event) {
-        case DesktopMainEventOpenMenu: {
-            Loader* loader = furi_record_open(RECORD_LOADER);
-            loader_show_menu(loader);
-            furi_record_close(RECORD_LOADER);
+        case DesktopMainEventOpenMenu:
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneMenu);
             consumed = true;
-        } break;
+            break;
 
         case DesktopMainEventLock:
             desktop_lock(desktop);
@@ -111,6 +110,28 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
 
         case DesktopMainEventOpenRecent:
             scene_manager_next_scene(desktop->scene_manager, DesktopSceneRecent);
+            consumed = true;
+            break;
+
+        case DesktopMainEventOpenControlCenter:
+            scene_manager_set_scene_state(desktop->scene_manager, DesktopSceneControlCenter, 0);
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneControlCenter);
+            consumed = true;
+            break;
+
+        case DesktopMainEventOpenSectionsLeft:
+        case DesktopMainEventOpenSectionsRight:
+            // Like swiping: Right starts at the first section, Left at the last.
+            scene_manager_set_scene_state(
+                desktop->scene_manager,
+                DesktopSceneSections,
+                event.event == DesktopMainEventOpenSectionsLeft ? UINT32_MAX : 0);
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneSections);
+            consumed = true;
+            break;
+
+        case DesktopMainEventOpenSearch:
+            scene_manager_next_scene(desktop->scene_manager, DesktopSceneSearch);
             consumed = true;
             break;
 

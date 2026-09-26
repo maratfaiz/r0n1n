@@ -455,6 +455,12 @@ static StorageAnimation*
     return selected;
 }
 
+bool animation_manager_is_blocking(AnimationManager* animation_manager) {
+    furi_assert(animation_manager);
+    return animation_manager->state == AnimationManagerStateBlocked ||
+           animation_manager->state == AnimationManagerStateFreezedBlocked;
+}
+
 bool animation_manager_is_animation_loaded(AnimationManager* animation_manager) {
     furi_assert(animation_manager);
     return animation_manager->current_animation;

@@ -141,6 +141,15 @@ bool animation_manager_interact_process(AnimationManager* animation_manager);
 bool animation_manager_is_animation_loaded(AnimationManager* animation_manager);
 
 /**
+ * Whether a blocking animation (SD card problems, a pending URL/mail
+ * notice...) is on screen rather than an idle one. R0N1N's Home dashboard
+ * stays out of the way while it is.
+ *
+ * @animation_manager instance
+ */
+bool animation_manager_is_blocking(AnimationManager* animation_manager);
+
+/**
  * Unload and Stall animation actions. Draw callback in view
  * paints first frame of current animation until
  * animation_manager_load_and_continue_animation() is called.

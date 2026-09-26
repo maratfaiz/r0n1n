@@ -3,6 +3,7 @@
 #include <gui/view.h>
 #include <datetime/datetime.h>
 #include "desktop_events.h"
+#include "../animations/animation_manager.h"
 
 typedef struct DesktopMainView DesktopMainView;
 
@@ -15,14 +16,19 @@ void desktop_main_set_callback(
 
 View* desktop_main_get_view(DesktopMainView* main_view);
 
-// R0N1N Home dashboard: a separate draw-only View (no input callback) meant
-// to be stacked *above* the dolphin animation view in desktop.c, so the
-// clock/date/profile draw on top of it rather than being drawn over. See the
-// dashboard_view comment in desktop_view_main.c for why this isn't just
-// desktop_main_get_view() reordered in the stack instead.
+// R0N1N Home dashboard: a separate View meant to be stacked *above* the
+// dolphin animation view in desktop.c, so the dashboard draws on top of it.
+// See the dashboard_view comment in desktop_view_main.c for why this isn't
+// just desktop_main_get_view() reordered in the stack instead.
 View* desktop_main_get_dashboard_view(DesktopMainView* main_view);
 
 void desktop_main_set_dummy_mode_state(DesktopMainView* main_view, bool dummy_mode);
+
+// The dashboard hides itself (and passes Right through) while the animation
+// manager shows a blocking animation.
+void desktop_main_set_animation_manager(
+    DesktopMainView* main_view,
+    AnimationManager* animation_manager);
 
 // R0N1N Home dashboard (see docs/UX_DESIGN.md): pushes the clock/date/profile
 // content the draw callback renders. Called from a periodic timer while the

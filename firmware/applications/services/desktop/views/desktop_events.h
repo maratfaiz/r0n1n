@@ -2,20 +2,22 @@
 
 typedef enum {
     DesktopMainEventLock,
-    // R0N1N navigation law (docs/UX_DESIGN.md): Down opens this same scene,
-    // now framed as "Control Center" -- the stock lock menu (Lock, dummy
-    // mode), unchanged, just reached from a different button.
+    // Stock lock menu: in R0N1N only reached from Up in dummy mode; Down opens
+    // Control Center (DesktopMainEventOpenControlCenter) instead.
     DesktopMainEventOpenLockMenu,
     DesktopMainEventOpenFavoriteLeftShort,
     DesktopMainEventOpenFavoriteLeftLong,
     DesktopMainEventOpenFavoriteRightShort,
     DesktopMainEventOpenFavoriteRightLong,
-    // R0N1N Quick Actions (Up) and Recent (hold OK) -- see
-    // desktop_scene_favorites.c / desktop_scene_recent.c. Quick Actions
-    // replaces Archive's dedicated Down-short shortcut (Archive is still
-    // reachable from the app launcher).
+    // R0N1N navigation law (docs/UX_DESIGN.md): Up = Quick Actions, hold OK =
+    // Recent, Down = Control Center, Left/Right = sections, hold Back = Search.
+    // Archive (the stock Down-short target) is in Quick Actions and the menu.
     DesktopMainEventOpenFavorites,
     DesktopMainEventOpenRecent,
+    DesktopMainEventOpenControlCenter,
+    DesktopMainEventOpenSectionsLeft,
+    DesktopMainEventOpenSectionsRight,
+    DesktopMainEventOpenSearch,
     DesktopMainEventOpenMenu,
     DesktopMainEventOpenDebug,
     DesktopMainEventOpenPowerOff,

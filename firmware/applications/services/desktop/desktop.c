@@ -151,8 +151,10 @@ static void desktop_recent_apps_push(Desktop* desktop, const char* name) {
     }
     for(; i > 0; i--) {
         strlcpy(desktop->recent_apps[i], desktop->recent_apps[i - 1], DESKTOP_RECENT_APP_NAME_LEN);
+        desktop->recent_apps_time[i] = desktop->recent_apps_time[i - 1];
     }
     strlcpy(desktop->recent_apps[0], name, DESKTOP_RECENT_APP_NAME_LEN);
+    desktop->recent_apps_time[0] = furi_hal_rtc_get_timestamp();
 }
 
 static bool desktop_custom_event_callback(void* context, uint32_t event) {
@@ -199,6 +201,7 @@ static bool desktop_custom_event_callback(void* context, uint32_t event) {
 
     } else if(event == DesktopGlobalReloadSettings) {
         desktop_settings_load(&desktop->settings);
+        r0n1n_settings_load(&desktop->r0n1n);
         desktop_apply_settings(desktop);
 
     } else {
@@ -280,7 +283,8 @@ static void desktop_clock_timer_callback(void* context) {
 static void desktop_dashboard_update(Desktop* desktop) {
     DateTime datetime;
     furi_hal_rtc_get_datetime(&datetime);
-    desktop_main_update_dashboard(desktop->main_view, &datetime, DASHBOARD_DEFAULT_PROFILE_NAME);
+    desktop_main_update_dashboard(
+        desktop->main_view, &datetime, r0n1n_profiles[desktop->r0n1n.profile].name);
 }
 
 static void desktop_dashboard_update_timer_callback(void* context) {
@@ -320,11 +324,14 @@ static void desktop_init_settings(Desktop* desktop) {
     }
 
     desktop_settings_load(&desktop->settings);
+    r0n1n_settings_load(&desktop->r0n1n);
     desktop_apply_settings(desktop);
 }
 
 static Desktop* desktop_alloc(void) {
     Desktop* desktop = malloc(sizeof(Desktop));
+    // R0N1N defaults until the SD card (and /int on it) is ready.
+    r0n1n_settings_load(&desktop->r0n1n);
 
     desktop->animation_semaphore = furi_semaphore_alloc(1, 0);
     desktop->animation_manager = animation_manager_alloc();
@@ -351,11 +358,15 @@ static Desktop* desktop_alloc(void) {
     desktop->pin_input_view = desktop_view_pin_input_alloc();
     desktop->pin_timeout_view = desktop_view_pin_timeout_alloc();
     desktop->slideshow_view = desktop_view_slideshow_alloc();
-    desktop->favorites_submenu = submenu_alloc();
-    desktop->recent_submenu = submenu_alloc();
+    desktop->r0n1n_list = r0n1n_list_alloc();
+    desktop->r0n1n_grid = r0n1n_grid_alloc();
+    desktop->r0n1n_carousel = r0n1n_carousel_alloc();
+    desktop->text_input = text_input_alloc();
+    desktop->dialog_ex = dialog_ex_alloc();
 
     desktop->main_view_stack = view_stack_alloc();
     desktop->main_view = desktop_main_alloc();
+    desktop_main_set_animation_manager(desktop->main_view, desktop->animation_manager);
     View* dolphin_view = animation_manager_get_animation_view(desktop->animation_manager);
     view_stack_add_view(desktop->main_view_stack, desktop_main_get_view(desktop->main_view));
     view_stack_add_view(desktop->main_view_stack, dolphin_view);
@@ -405,10 +416,22 @@ static Desktop* desktop_alloc(void) {
         desktop_view_slideshow_get_view(desktop->slideshow_view));
     view_dispatcher_add_view(
         desktop->view_dispatcher,
-        DesktopViewIdFavorites,
-        submenu_get_view(desktop->favorites_submenu));
+        DesktopViewIdR0n1nList,
+        r0n1n_list_get_view(desktop->r0n1n_list));
     view_dispatcher_add_view(
-        desktop->view_dispatcher, DesktopViewIdRecent, submenu_get_view(desktop->recent_submenu));
+        desktop->view_dispatcher,
+        DesktopViewIdR0n1nGrid,
+        r0n1n_grid_get_view(desktop->r0n1n_grid));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher,
+        DesktopViewIdR0n1nCarousel,
+        r0n1n_carousel_get_view(desktop->r0n1n_carousel));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher,
+        DesktopViewIdTextInput,
+        text_input_get_view(desktop->text_input));
+    view_dispatcher_add_view(
+        desktop->view_dispatcher, DesktopViewIdDialog, dialog_ex_get_view(desktop->dialog_ex));
 
     // Lock icon
     desktop->lock_icon_viewport = view_port_alloc();
