@@ -4,9 +4,10 @@
 shell — not yet another "fork with a pile of apps."
 
 > **Status: in development.** `firmware/` is the official Flipper Zero
-> firmware (1.4.3) with R0N1N's Home dashboard, Control Center, Quick
-> Actions, and Recent implemented and verified against actual builds
-> (Stages 0–1 of the roadmap). See [`docs/ROADMAP.md`](docs/ROADMAP.md),
+> firmware (1.4.3) with R0N1N's shell on top: a Russian UI, Home, sections,
+> Control Center, Quick Actions, Recent, profiles, search, the Capture
+> Timeline and a first Hub, verified against actual builds (Stages 0–2 of
+> the roadmap; not yet tested on a device). See [`docs/ROADMAP.md`](docs/ROADMAP.md),
 > "Current status," for exactly what's shipped, what's simplified, and
 > what's next.
 

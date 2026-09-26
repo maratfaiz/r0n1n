@@ -34,6 +34,26 @@ section:
 It feels like flipping through phone home screens, but it's implemented
 entirely with buttons — no imitation of gestures that would require touch.
 
+**As implemented** (see `ROADMAP.md`, Stages 1–2): OK opens the R0N1N
+Applications menu (categories, then Files, Captures, Search, Hub, all apps,
+Settings); Left/Right open the active profile's sections as a carousel
+(Right starts at the first, Left at the last); hold Back opens Search on
+release, because holding it for 5 s is still the stock power-off menu. The
+stock favorites stay on hold Left/Right.
+
+## Visual language ("v2")
+
+Checked as real-resolution mockups before it was built:
+
+- one readable font for all text (FontSecondary, now with Cyrillic);
+- an inverted 10 px header bar: title left, an "n/N" position or the state
+  on the right; clock and battery only on Home and in Control Center;
+- selection is always a filled rounded shape with inverted content;
+- tiles carry icons only, the selected tile's full name is in a caption
+  (or, in Control Center, in the header together with its state);
+- 13 px list rows, four visible, with a scrollbar;
+- no hint rows: OK opens, Back returns, arrows move — on every screen.
+
 ## Profiles/modes — the core of the UX concept
 
 The same build serves a mixed audience through a profile, not through a

@@ -129,8 +129,12 @@ Default `f7-firmware-D` (debug) target, built from `firmware/`:
 | `.bss` (RAM, uninitialized) | 4,748 B (4.6 KB) | 4,748 B (4.6 KB) |
 | `.free_flash` | 251,532 B (245.6 KB) | 250,180 B (244.3 KB) |
 
-Stage 1 costs ~1.3 KB of flash and no static RAM. The release build
-(`COMPACT=1 DEBUG=0`) leaves ~272 KB free. That is plenty of headroom to
+Stage 1 costs ~1.3 KB of flash and no static RAM. The v2 interface with the
+Stage 2 screens (Cyrillic font, icons, all R0N1N scenes) brings the debug
+build to `.text` 642,592 B / 224 KB free (~22 KB over stock), `.bss` +144 B;
+the release build (`COMPACT=1 DEBUG=0`) leaves ~254 KB free. The desktop
+thread's stack went from 2 to 3 KB because the shell scenes scan the SD card
+on it. That is plenty of headroom to
 budget a Cyrillic font and the R0N1N-layer services against, as long as
 they're kept frugal (see `ARCHITECTURE.md`). These numbers will shift with
 each upstream release (`git subtree pull`) and should be re-measured

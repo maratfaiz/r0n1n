@@ -2,12 +2,15 @@
 
 ## Current status
 
-**Stages 0 and 1 are done** — see their sections below for exactly what
-shipped and what was simplified. `firmware/` is the official Flipper Zero
-firmware, release 1.4.3 (`git subtree`, full history), with R0N1N's Home
-dashboard, Control Center, Quick Actions, and Recent wired in and verified
-against actual `./fbt` builds, not just planned. Stage 2 (Profiles, Global Search,
-Capture Timeline) is next and hasn't started.
+**Stages 0 and 1 are done, and Stage 2 has a working first version** —
+see their sections below for exactly what shipped and what was simplified.
+`firmware/` is the official Flipper Zero firmware, release 1.4.3
+(`git subtree`, full history), with R0N1N's shell on top: the "v2"
+interface (Russian UI, one visual language for every screen), Home,
+sections, Control Center, Quick Actions, Recent, the Applications menu,
+profiles, Global Search, the Capture Timeline and a first Hub — all built
+with `./fbt` and their drawing code checked on a host render of the real
+firmware views. Nothing has been tested on a physical device yet.
 
 Stage-duration estimates are rough, carried over from the original
 research without independent verification; real planning should
@@ -48,78 +51,46 @@ Risk: Desktop RAM/performance — mitigated by profiling and lazy `View`s.
 Outcome: the device feels like a cohesive shell rather than an app list —
 a demonstrable MVP prototype.
 
-**Shipped**, all inside `firmware/applications/services/desktop/` unless
-noted, each verified with a real `./fbt` build:
+**Shipped** (the "v2" interface, `docs/UX_DESIGN.md`): all screens are
+desktop-service scenes (`firmware/applications/services/desktop/scenes/`)
+drawn with shared R0N1N views in the GUI service — `r0n1n_ui` (header bar,
+list rows, tiles, captions, scrollbar) and `R0n1nList` / `R0n1nGrid` /
+`R0n1nCarousel` (`gui/modules/`). One readable font everywhere (the stock
+FontSecondary switched to the same face with Cyrillic, +1.7 KB), selection is
+always a filled rounded shape, icons are in `assets/icons/R0N1N/`.
 
-- **Home dashboard**: `desktop_view_main.c` gained a big clock, date, and
-  a profile-name label, drawn via `locale_format_time`/`locale_format_date`
-  (already in the codebase — respects the existing 12h/24h and date-format
-  settings) on a 1 Hz timer that only runs while Home is on screen. It's a
-  *separate* draw-only `View` layered above the dolphin animation in
-  `main_view_stack`, not the same `View` main_view's input handling uses —
-  `ViewStack` ties draw order and input priority to the same array (reverse
-  order, first-consumer-wins), and main_view's input callback always
-  returns `true`, so simply reordering it would have made it swallow input
-  before the dolphin's own view-level "poke" interaction (right button
-  short) ever saw it. See the `dashboard_view` comment in
-  `desktop_view_main.c`.
-- **Control Center (Down)**: no new screen — the official firmware's
-  lock menu (Lock, dummy mode) is reused as-is, just reached from Down
-  instead of Up. Quick toggles (BT, sound, brightness/volume) and the
-  USB-mode and TX-lock toggles from the original `UX_DESIGN.md` list
-  aren't wired in yet — the official lock menu has no such pages, and
-  they need their own design pass rather than a stub.
-- **Quick Actions (Up)**, `desktop_scene_favorites.c` (new): lists the four
-  existing `FavoriteApp` slots (previously each reachable only by its own
-  D-pad shortcut) as one list, launches on selection, plus a fixed
-  **Archive** entry: in the official firmware Archive isn't a Loader app
-  and was reachable only from Down-short on Home, which is now Control
-  Center — without this entry it would be unreachable (the linker even
-  dropped it from the image). Not the customizable 3×2 grid `UX_DESIGN.md`
-  describes — it's the existing favorite slots in list form, which is what
-  made this buildable without inventing a second, parallel favorites
-  store.
-- **Recent (hold OK)**, `desktop_scene_recent.c` (new): shows apps launched
-  since boot, most-recent first, in-memory only (nothing persisted across
-  reboot). Needed one small addition outside `desktop/`: `LoaderEvent`
-  (`firmware/applications/services/loader/loader.h`) didn't carry the
-  app's name, so `LoaderEventTypeApplicationBeforeLoad` subscribers had no
-  way to know what was about to launch — confirmed by reading
-  `loader_do_start_by_name`, not assumed. Added a `name` field, populated
-  only at that one call site and only when the Loader isn't already
-  running an app (the official Loader publishes the event before its lock
-  check; the other three publish sites set it `NULL`); purely additive, every other subscriber (power, archive,
-  loader_applications) only reads `.type` and is unaffected. An app is
-  added to the list only once the Loader reports it stopped
-  (`LoaderEventTypeApplicationStopped`), so failed launches (app not found,
-  bad `.fap`) never appear; relaunching an app already listed moves it to
-  the front instead of duplicating it. Entries hold the full `.fap` path
-  (same 128-byte limit as the favorite slots) but the list shows just the
-  file name; Quick Actions labels its slots the same way.
-- **Navigation remap**: Up opens Quick Actions (was the lock menu), Down
-  opens Control Center (was Archive), hold-OK opens Recent (unused on
-  Home before). Archive moved into Quick Actions, as above.
+- **Home**: big clock, Russian date, active profile and a landscape picture,
+  opaque over the idle dolphin animation (blocking animations such as SD card
+  errors still show), under the system status bar.
+- **Navigation law**: Left/Right = sections of the active profile
+  (carousel), Up = Quick Actions, Down = Control Center, OK = Applications
+  menu, hold OK = Recent, hold Back = Search (opened on release, so holding
+  on for the stock 5 s power-off menu still works).
+- **Control Center**: Bluetooth, sound, vibration, stealth (silent) mode,
+  lock, dummy mode, profile, settings, plus a brightness slider; the selected
+  tile's name and state are in the header, a corner mark means "on".
+- **Quick Actions**: six configurable slots (`r0n1n_settings.c`,
+  `/int/.r0n1n.settings`), defaults NFC / Sub-GHz / IR / BadUSB / Files /
+  Settings; hold OK on a tile to reassign it. The stock four favorites stay
+  on hold Left/Right.
+- **Recent**: apps that actually ran, newest first, with the time since
+  launch ("5 мин"). `LoaderEvent` gained a `name` field for this, set only
+  when the Loader isn't already running an app (the official Loader
+  publishes the event before its lock check).
+- **Archive** is reachable from Quick Actions and the menu: in the official
+  firmware it isn't a Loader app and was only on Down-short.
 
-**Deliberately not done** (see `UX_DESIGN.md` for the full model these are
-part of):
-- **Left/Right "desktop" paging** — still direct favorite-app shortcuts,
-  unchanged from the official firmware. Real per-profile desktop sets need Stage 2's
-  Profile Manager to define what the panes even are; building paging with
-  no real content behind it now would've meant deleting a working shortcut
-  for a stub.
-- **Global Search (hold Back)** — explicitly Stage 2 scope, not touched.
-- **Profile-aware anything** — the dashboard's profile label is a fixed
-  `"Everyday"` string (`DASHBOARD_DEFAULT_PROFILE_NAME` in `desktop_i.h`);
-  there is no Profile Manager to read from yet.
-- **Recent files** — `UX_DESIGN.md` has hold-OK list "last-used
-  apps/files"; Recent lists apps only, and relaunches them *without* the
-  arguments they were first started with. Replaying args blindly isn't
-  safe: they can be stale file paths or an RPC session marker from
-  qFlipper/mobile, and an app opened on a file from Archive would silently
-  reopen that file. Recent files belong with Stage 2's Capture Timeline,
-  which will know which files are captures worth reopening.
+**Deliberately not done** (see `UX_DESIGN.md` for the full model):
+- **Recent files / args** — Recent relaunches apps *without* the arguments
+  they were first started with: replaying args blindly isn't safe (stale
+  file paths, an RPC session marker). Recent files are the Capture Timeline's
+  job.
+- **Recent across reboots** — in-memory only.
+- **USB-mode, TX-lock and external-module tiles** in Control Center — the
+  official firmware has no such switch to flip (TX restrictions are always
+  on), so they'd be stubs.
 
-## Stage 2 — Profiles + Global Search + Capture Timeline
+## Stage 2 — Profiles + Global Search + Capture Timeline — first version
 
 Goal: Profile Manager (Everyday/Pentest/Dev/CTF), global search (index on
 SD), a unified capture feed.
@@ -127,6 +98,33 @@ Dependencies: storage, hooks into core apps' capture-save paths.
 Risk: the search index and memory — mitigated by keeping it on SD, not RAM.
 Outcome: R0N1N's key UX differentiator (see `UNIQUE_FEATURES.md`, item 1)
 is working.
+
+**Shipped** (`r0n1n_catalog.c`, `r0n1n_shell.c` and the scenes):
+- **Profiles**: four profiles, each with its own set and order of sections
+  (Radio, Cards, IR, USB, Dev); switched from Control Center or Settings in
+  two presses, shown on Home, saved on the SD card.
+- **Sections and the Applications menu**: apps grouped by section; the Dev
+  section is a tool grid (GPIO, UART, I2C, SPI, SWD, logic analyzer, CLI, JS)
+  that launches catalog apps from `/ext/apps` when installed and says what to
+  install when not.
+- **Global Search**: apps, settings, apps on the SD card and saved captures
+  whose names contain the query; results open the app or the file in its app.
+- **Capture Timeline**: every saved NFC / Sub-GHz / IR / RFID / iButton file,
+  newest first, with its time; OK opens it, hold OK deletes it. File times
+  come from `storage_common_mtime()` — a small internal storage call added
+  for this (kept out of the SDK: `FileInfo` can't grow without breaking
+  existing apps).
+- **Hub, first version**: the apps installed on the SD card by category, and
+  launching them (see Stage 3 for installing).
+
+**Simplified / not done yet:**
+- **Search is a live scan, not an SD index**, and the system keyboard is
+  Latin-only, so Russian labels can only be found by their English app name.
+- **Captures aren't tagged or exported** (frequency, protocol, export to the
+  companion), and there are no hooks in the apps' save paths — the timeline
+  reads their folders.
+- **Profiles don't yet change** Quick Actions, Control Center content,
+  density or hints — only the sections.
 
 ## Stage 3 — R0N1N Hub + app compatibility
 

@@ -70,11 +70,12 @@ I2C scanner, sensors, a logic analyzer, GPS NMEA.
 
 ## System capabilities (UX layer)
 
-**Built in (R0N1N, Stage 1):** the Home dashboard, Control Center (Down),
-Quick Actions (Up, including Archive), Recent (hold OK) — see
-`ROADMAP.md`.
+**Built in (R0N1N):** the Home dashboard, sections (Left/Right), Control
+Center (Down), Quick Actions (Up), Recent (hold OK), the Applications menu
+(OK), profiles, Global Search (hold Back), the Capture Timeline and a first
+Hub — in Russian — see `ROADMAP.md`.
 
-**Later:** profiles, Global Search, Capture Timeline, keybinds, an
+**Later:** an SD search index, capture tags and export, keybinds, an
 advanced file manager (see `UX_DESIGN.md`, `UNIQUE_FEATURES.md`).
 
 ## Explicitly outside the core feature set (see `HARDWARE.md`)

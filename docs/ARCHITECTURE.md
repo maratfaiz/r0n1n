@@ -102,6 +102,19 @@ Archive isn't a Loader app there and was only reachable from Down on Home,
 so with Down given to Control Center, Quick Actions carries a fixed Archive
 entry (`desktop_run_archive` in `desktop.c`).
 
+The v2 interface kept the same pattern and added to it: every R0N1N screen
+(sections, menu, profiles, search, captures, Hub, Dev tools) is a desktop
+scene, and they share one instance each of three new GUI modules —
+`R0n1nList`, `R0n1nGrid`, `R0n1nCarousel` (`gui/modules/`), drawn with
+`gui/r0n1n_ui.c` — reset on scene entry, so extra screens cost almost no
+RAM. Screens report actions as custom events tagged in their high bits, so
+a list index can never collide with the desktop's global events. Two small
+additions outside `desktop/`: FontSecondary uses the Cyrillic variant of the
+same face (`canvas.c`), and `storage_common_mtime()` (a new storage command,
+`storage/storage_mtime.h`) gives a file's own modification time for the
+Capture Timeline — deliberately not an SDK function, since `FileInfo` can't
+grow without breaking apps that allocate it.
+
 ## Open question (Stage 2 and later)
 
 Whether *later* R0N1N services — Global Search, Capture Timeline, Profile
