@@ -1,5 +1,6 @@
 #include <fatfs.h>
 #include <furi_hal.h>
+#include <datetime/datetime.h>
 #include <furi_hal_sd.h>
 
 #include "sd_notify.h"
@@ -605,6 +606,27 @@ static FS_Error storage_ext_common_stat(void* ctx, const char* path, FileInfo* f
     return storage_ext_parse_error(result);
 }
 
+static FS_Error storage_ext_common_mtime(void* ctx, const char* path, uint32_t* timestamp) {
+    UNUSED(ctx);
+    SDFileInfo _fileinfo;
+    SDError result = f_stat(path, &_fileinfo);
+
+    if(result == FR_OK && timestamp != NULL) {
+        // FAT packs the RTC time from get_fattime() (targets/f7/fatfs/fatfs.c).
+        DateTime datetime = {
+            .year = 1980 + (_fileinfo.fdate >> 9),
+            .month = (_fileinfo.fdate >> 5) & 0x0F,
+            .day = _fileinfo.fdate & 0x1F,
+            .hour = _fileinfo.ftime >> 11,
+            .minute = (_fileinfo.ftime >> 5) & 0x3F,
+            .second = (_fileinfo.ftime & 0x1F) * 2,
+        };
+        *timestamp = datetime_datetime_to_timestamp(&datetime);
+    }
+
+    return storage_ext_parse_error(result);
+}
+
 static FS_Error storage_ext_common_remove(void* ctx, const char* path) {
     UNUSED(ctx);
 #ifdef FURI_RAM_EXEC
@@ -707,6 +729,7 @@ static const FS_Api fs_api = {
             .remove = storage_ext_common_remove,
             .fs_info = storage_ext_common_fs_info,
             .equivalent_path = storage_ext_common_equivalent_path,
+            .mtime = storage_ext_common_mtime,
         },
 };
 

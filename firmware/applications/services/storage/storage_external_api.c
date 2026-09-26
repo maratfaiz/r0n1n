@@ -2,6 +2,7 @@
 #include <core/record.h>
 #include "storage.h"
 #include "storage_i.h" // IWYU pragma: keep
+#include "storage_mtime.h"
 #include "storage_message.h"
 #include <toolbox/stream/file_stream.h>
 #include <toolbox/dir_walk.h>
@@ -456,6 +457,22 @@ FS_Error storage_common_stat(Storage* storage, const char* path, FileInfo* filei
         }};
 
     S_API_MESSAGE(StorageCommandCommonStat);
+    S_API_EPILOGUE;
+    return S_RETURN_ERROR;
+}
+
+FS_Error storage_common_mtime(Storage* storage, const char* path, uint32_t* timestamp) {
+    furi_check(storage);
+
+    S_API_PROLOGUE;
+    SAData data = {
+        .ctimestamp = {
+            .path = path,
+            .timestamp = timestamp,
+            .thread_id = furi_thread_get_current_id(),
+        }};
+
+    S_API_MESSAGE(StorageCommandCommonMtime);
     S_API_EPILOGUE;
     return S_RETURN_ERROR;
 }
