@@ -54,6 +54,16 @@ Checked as real-resolution mockups before it was built:
 - 13 px list rows, four visible, with a scrollbar;
 - no hint rows: OK opens, Back returns, arrows move — on every screen.
 
+Brand moments carry the 77×20 R0N1N wordmark (`r0n1n_ui_logo`):
+
+- boot splash (`desktop/helpers/r0n1n_boot.c`, ~3 s, any key skips): the
+  wordmark settles out of glitching scanlines, a blade cuts under it, then
+  the motto types out while a bar fills;
+- the updater's progress screen (wordmark, "ОБНОВЛЕНИЕ", hatched bar,
+  percentage, stage in Russian) and its failure screen;
+- the post-update slideshow (`assets/slideshow/update_default`, 3 frames):
+  "firmware installed", the d-pad map of Home, and the hold gestures.
+
 ## Profiles/modes — the core of the UX concept
 
 The same build serves a mixed audience through a profile, not through a

@@ -18,7 +18,7 @@ void desktop_scene_captures_on_enter(void* context) {
     desktop_r0n1n_prepare_list(desktop);
     r0n1n_list_set_title(list, NULL, "Захваты");
     r0n1n_list_set_empty_text(
-        list, "Захватов пока нет.\nСохранённые сигналы\nи карты появятся здесь.");
+        list, "Захватов пока нет.\nСохраненные сигналы\nи карты появятся здесь.");
     char time[8];
     for(size_t i = 0; i < desktop->r0n1n_entry_count; i++) {
         const R0n1nEntry* entry = &desktop->r0n1n_entries[i];

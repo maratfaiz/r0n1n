@@ -77,6 +77,31 @@ void r0n1n_ui_icon_centered(
     uint8_t height,
     const Icon* icon);
 
+#define R0N1N_UI_LOGO_WIDTH  77
+#define R0N1N_UI_LOGO_HEIGHT 20
+
+/** The R0N1N wordmark. `row_shift` (may be NULL) moves each of its 20 rows sideways, for glitch effects. */
+void r0n1n_ui_logo(Canvas* canvas, int32_t x, int32_t y, const int8_t* row_shift);
+
+/** Text with `spacing` extra px between characters, centered on `x` at baseline `y`.
+ * Only the first `chars` characters are drawn; the position is that of the whole text. */
+void r0n1n_ui_spaced_text(
+    Canvas* canvas,
+    int32_t x,
+    int32_t y,
+    const char* text,
+    uint8_t spacing,
+    size_t chars);
+
+/** Rounded frame with a hatched fill, `percent` of 100. */
+void r0n1n_ui_progress(
+    Canvas* canvas,
+    int32_t x,
+    int32_t y,
+    uint8_t width,
+    uint8_t height,
+    uint8_t percent);
+
 #ifdef __cplusplus
 }
 #endif

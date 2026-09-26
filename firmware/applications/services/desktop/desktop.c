@@ -12,6 +12,7 @@
 
 #include "scenes/desktop_scene.h"
 #include "scenes/desktop_scene_locked.h"
+#include "helpers/r0n1n_boot.h"
 
 #define TAG "Desktop"
 
@@ -694,6 +695,11 @@ int32_t desktop_srv(void* p) {
     // Special case: autostart application is already running
     if(desktop->app_running && animation_manager_is_animation_loaded(desktop->animation_manager)) {
         animation_manager_unload_and_stall_animation(desktop->animation_manager);
+    }
+
+    // R0N1N boot splash, unless an autostart application is already on screen
+    if(!desktop->app_running) {
+        r0n1n_boot_run(desktop->gui);
     }
 
     view_dispatcher_run(desktop->view_dispatcher);
